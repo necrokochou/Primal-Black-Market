@@ -1,0 +1,46 @@
+services:
+  primal-black-market:
+    build:
+      context: .
+    container_name: primal-black-market-service
+    ports:
+      - "8111:8000"
+    develop:
+      watch:
+        - path: .
+          target: /var/www/html
+          action: sync
+        - path: ./composer.json
+          action: rebuild
+        - path: ./composer.lock
+          action: rebuild
+    depends_on:
+      - mongodb
+      - postgresql
+
+  mongodb:
+    image: mongo:latest
+    container_name: primal-black-market-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootPassword
+      MONGO_INITDB_DATABASE: primal-black-market
+    ports:
+      - "27111:27017"
+
+  postgresql:
+    image: postgres:15
+    container_name: primal-black-market-postgresql
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: primal-black-market
+    ports:
+      - "5111:5432"
+
+volumes:
+  primal-black-market-mongodb:
+    driver: local
+  primal-black-market-postgresql:
+    driver: local
