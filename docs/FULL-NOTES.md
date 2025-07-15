@@ -203,7 +203,9 @@ example : merging frontend/navbar branch to frontend branch
 // (base)      (head)
    frontend <- frontend/navbar
 ```
-6) the QA will check the pull request and look for merging conflicts then approve/disapprove the request accordingly
+6) click _Create pull request_
+
+> QA will check the pull request and look for merging conflicts then approve/disapprove the request accordingly
 
 <br>
 
