@@ -1,5 +1,3 @@
-# THIS NOTES IS OLD
-
 ## IMPORTANT
 - make sure na nasa tamang branch kayo
 - nasa bottom left ng vscode ung branches
