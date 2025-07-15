@@ -9,11 +9,13 @@
     "authors": [
         {
             "name": "necrokochou",
-            "email": "togami.playz2905@gmail.com"
+            "email": "togami.playz2905@gmail.com",
+            "role": "Backend Developer/QA"
         },
         {
             "name": "phantommorphus",
-            "email": "louiejohnpamilar@gmail.com"
+            "email": "louiejohnpamilar@gmail.com",
+            "role": "Database Developer"
         }
     ],
     "require": {
