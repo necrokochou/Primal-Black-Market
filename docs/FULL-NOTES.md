@@ -1,7 +1,7 @@
 ## IMPORTANT
 - make sure na nasa tamang branch kayo
 - nasa bottom left ng vscode ung branches
-- aybe avoid using [Source Control] sa VSCode coz that shit's ass for group works probably maybe i think
+- maybe avoid using [Source Control] sa VSCode coz that shit's ass for group works probably maybe i think
 - sa pagcommit, dapat lahat ng changes ini-specify (ehem Pami)
 - on _Source Control_ tab in VSCode, naka-lista ung _Changes_ mo. use that as reference
 example: <br>
