@@ -28,6 +28,10 @@
             "role": "Database Developer"
         }
     ],
+    "scripts": {
+        "postgresql:seed": "php utils/dbSeederUsersPostgresql.util.php",
+        "postgresql:migrate": "php utils/dbMigrateUsersPostgresql.util.php"
+    },
     "require": {
         "vlucas/phpdotenv": "^5.6"
     }
