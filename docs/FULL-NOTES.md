@@ -14,7 +14,11 @@ fix: adjusted padding in main.css for consistency
 refactor: reorganized header styles into separate CSS block
 ```
 - or refer to [MAKE CHANGES AND COMMIT]() and use that format
-- ALWAYS CONFIRM YOUR BRANCH PLEASE PARA MADALI BUHAY NATING LAHAT THANSKGYUO
+- ALWAYS RUN THIS COMMAND TO GET UPDATED
+```
+git checkout <your-branch>
+```
+- ALWAYS CONFIRM WHICH BRANCH YOU ARE IN PLEASE PARA MADALI BUHAY NATING LAHAT THANSKGYUO
 
 <br>
 
