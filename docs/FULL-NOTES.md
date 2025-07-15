@@ -14,7 +14,11 @@ fix: adjusted padding in main.css for consistency
 refactor: reorganized header styles into separate CSS block
 ```
 - or refer to [MAKE CHANGES AND COMMIT]() and use that format
-- ALWAYS CONFIRM YOUR BRANCH PLEASE PARA MADALI BUHAY NATING LAHAT THANSKGYUO
+- ALWAYS RUN THIS COMMAND TO GET UPDATED
+```
+git checkout <your-branch>
+```
+- ALWAYS CONFIRM WHICH BRANCH YOU ARE IN PLEASE PARA MADALI BUHAY NATING LAHAT THANSKGYUO
 
 <br>
 
@@ -62,12 +66,12 @@ database
 ## FEATURE/TASK BRANCHES
 naming convention
 ```
-<team or role>/<feature name or task name>
+<team or role>-<feature name or task name>
 ```
 examples :
-- backend/login-feature
-- frontend/navbar-update
-- database/user-seed-fix
+- backend-login-feature
+- frontend-navbar-update
+- database-user-seed-fix
 
 <br>
 
@@ -128,16 +132,17 @@ example :
 ```
 git push origin backend
 ```
+<br>
 
 
 ## CREATE NEW FEATURE/TASK BRANCH
 to push your new feature/task to a unique branch
 ```
-git checkout -b <team-or-role-branch>/<feature-or-task>
+git checkout -b <team-or-role-branch>-<feature-or-task>
 ```
 example :
 ```
-git checkout -b backend/user-auth
+git checkout -b backend-user-auth
 ```
 <br>
 
@@ -180,11 +185,11 @@ git commit -m "feat: added new file" \
 
 ## PUSH FEATURE/TASK BRANCH
 ```
-git push origin <team-or-role-branch>/<feature-or-task>
+git push origin <team-or-role-branch>-<feature-or-task>
 ```
 example :
 ```
-git push origin backend/user-auth
+git push origin backend-user-auth
 ```
 <br>
 
@@ -211,7 +216,7 @@ example : merging frontend/navbar branch to frontend branch
 
 
 ## SYNCING CHANGES FROM MAIN
-after the QA had approved of a branch's pull request, they will also be sending a pull request to merge the main branch to other branches---excluding the branch that sent the pull request to begin with
+after the QA had approved of a branch's pull request, the QA will also be sending a pull request to merge the main branch to other branches---excluding the branch that sent the pull request to begin with
 
 scenario example :
 1) database developer sent a pull request to merge database/shopping-cart branch to database branch
