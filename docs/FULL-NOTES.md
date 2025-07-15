@@ -206,7 +206,7 @@ example : merging frontend/navbar branch to frontend branch
 ```
 // this is what the UI would look like in GitHub
 // (base)      (head)
-   frontend <- frontend/navbar
+   main <- frontend/navbar
 ```
 6) click _Create pull request_
 
@@ -219,11 +219,9 @@ example : merging frontend/navbar branch to frontend branch
 after the QA had approved of a branch's pull request, the QA will also be sending a pull request to merge the main branch to other branches---excluding the branch that sent the pull request to begin with
 
 scenario example :
-1) database developer sent a pull request to merge database/shopping-cart branch to database branch
-2) let's say, the QA approves of this pull request
-3) QA sends a pull request to merge database branch to the main branch.
-4) QA checks for merging conflicts then either approves/disapproves of their own pull request
-5) after merging database to main, QA sends another pull request to merge the main branch to all branches other than where the original change originated which, in this example, is from the database branch.
-6) other branches (backend and frontend) will approve of this request IF QA does their properly and actually checks for merging conflicts and role conflicts : )
+1) database developer sent a pull request to merge database/shopping-cart branch to main branch
+2) QA checks for merging conflicts then either approves/disapproves of this pull request
+3) after merging this feature branch to main, QA sends another pull request to merge the main branch to all branches other than where the original change originated which, in this example, is from the feature branch.
+4) other branches (backend and frontend) will check for conflicts and approve/disapprove of this request IF QA does their properly and actually checks for merging conflicts and role conflicts : )
 
 <br>
