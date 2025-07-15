@@ -16,6 +16,11 @@
             "name": "phantommorphus",
             "email": "louiejohnpamilar@gmail.com",
             "role": "Database Developer"
+        },
+        {
+            "name": "Aiden017",
+            "email": "kentc1322@gmail.com",
+            "role": "Database Developer"
         }
     ],
     "require": {
