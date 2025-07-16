@@ -25,27 +25,26 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-echo "Creating users table...\n";
+echo "Creating messages table...\n";
 
-// Create users table (adapted for PostgreSQL)
-$createUsersTable = '
-CREATE TABLE IF NOT EXISTS users (
-    "UserID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "Username" VARCHAR(256) UNIQUE NOT NULL,
-    "Password" VARCHAR(256) NOT NULL,
-    "Email" VARCHAR(256) NOT NULL,
-    "Alias" VARCHAR(256) NOT NULL,
-    "TrustLevel" REAL DEFAULT 0,
-    "IsVendor" BOOLEAN DEFAULT FALSE,
-    "IsAdmin" BOOLEAN DEFAULT FALSE
+// Create messages table (adapted for PostgreSQL)
+$createMessagesTable = '
+CREATE TABLE IF NOT EXISTS messages (
+    "MessageID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    "SenderID" INTEGER NOT NULL,
+    "ReceiverID" INTEGER NOT NULL,
+    "MessagesContent" TEXT,
+    "SentAt" DATE NOT NULL,
+    FOREIGN KEY ("SenderID") REFERENCES users("UserID"),
+    FOREIGN KEY ("ReceiverID") REFERENCES users("UserID")
 );
 ';
 
 try {
-    $pdo->exec($createUsersTable);
-    echo "✅ Users table created successfully.\n";
+    $pdo->exec($createMessagesTable);
+    echo "✅ Messages table created successfully.\n";
 } catch (PDOException $e) {
-    die("❌ Failed to create users table: " . $e->getMessage() . "\n");
+    die("❌ Failed to create messages table: " . $e->getMessage() . "\n");
 }
 
 echo "✅ Migration complete!\n";

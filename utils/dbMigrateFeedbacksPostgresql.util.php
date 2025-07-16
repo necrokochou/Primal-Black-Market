@@ -25,27 +25,27 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-echo "Creating users table...\n";
+echo "Creating feedbacks table...\n";
 
-// Create users table (adapted for PostgreSQL)
-$createUsersTable = '
-CREATE TABLE IF NOT EXISTS users (
-    "UserID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "Username" VARCHAR(256) UNIQUE NOT NULL,
-    "Password" VARCHAR(256) NOT NULL,
-    "Email" VARCHAR(256) NOT NULL,
-    "Alias" VARCHAR(256) NOT NULL,
-    "TrustLevel" REAL DEFAULT 0,
-    "IsVendor" BOOLEAN DEFAULT FALSE,
-    "IsAdmin" BOOLEAN DEFAULT FALSE
+// Create feedbacks table (adapted for PostgreSQL, fixed missing comma)
+$createFeedbacksTable = '
+CREATE TABLE IF NOT EXISTS feedbacks (
+    "FeedbackID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    "ReviewerID" INTEGER NOT NULL,
+    "VendorID" INTEGER NOT NULL,
+    "Rating" INTEGER CHECK ("Rating" BETWEEN 0 AND 5),
+    "Comments" TEXT NOT NULL,
+    "PostedAt" DATE NOT NULL,
+    FOREIGN KEY ("ReviewerID") REFERENCES users("UserID"),
+    FOREIGN KEY ("VendorID") REFERENCES users("UserID")
 );
 ';
 
 try {
-    $pdo->exec($createUsersTable);
-    echo "✅ Users table created successfully.\n";
+    $pdo->exec($createFeedbacksTable);
+    echo "✅ Feedbacks table created successfully.\n";
 } catch (PDOException $e) {
-    die("❌ Failed to create users table: " . $e->getMessage() . "\n");
+    die("❌ Failed to create feedbacks table: " . $e->getMessage() . "\n");
 }
 
 echo "✅ Migration complete!\n";

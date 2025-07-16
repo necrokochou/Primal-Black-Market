@@ -25,27 +25,29 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-echo "Creating users table...\n";
+echo "Creating listings table...\n";
 
-// Create users table (adapted for PostgreSQL)
-$createUsersTable = '
-CREATE TABLE IF NOT EXISTS users (
-    "UserID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "Username" VARCHAR(256) UNIQUE NOT NULL,
-    "Password" VARCHAR(256) NOT NULL,
-    "Email" VARCHAR(256) NOT NULL,
-    "Alias" VARCHAR(256) NOT NULL,
-    "TrustLevel" REAL DEFAULT 0,
-    "IsVendor" BOOLEAN DEFAULT FALSE,
-    "IsAdmin" BOOLEAN DEFAULT FALSE
+// Create listings table (adapted for PostgreSQL)
+$createListingsTable = '
+CREATE TABLE IF NOT EXISTS listings (
+    "ListingID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    "VendorID" uuid NOT NULL,
+    "Title" VARCHAR(256) NOT NULL,
+    "Description" TEXT NOT NULL,
+    "Category" VARCHAR(100) NOT NULL,
+    "Price" REAL NOT NULL,
+    "Quantity" INTEGER NOT NULL,
+    "IsActive" BOOLEAN DEFAULT TRUE,
+    "PublishDate" DATE NOT NULL,
+    FOREIGN KEY ("VendorID") REFERENCES users("UserID")
 );
 ';
 
 try {
-    $pdo->exec($createUsersTable);
-    echo "✅ Users table created successfully.\n";
+    $pdo->exec($createListingsTable);
+    echo "✅ Listings table created successfully.\n";
 } catch (PDOException $e) {
-    die("❌ Failed to create users table: " . $e->getMessage() . "\n");
+    die("❌ Failed to create listings table: " . $e->getMessage() . "\n");
 }
 
 echo "✅ Migration complete!\n";
