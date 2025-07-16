@@ -1,5 +1,5 @@
 CREATE TABLE messages (
-    "MessageID" int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    "MessageID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "SenderID" int NOT NULL,
     "ReceiverID" int NOT NULL,
     "SentAt" date NOT NULL,

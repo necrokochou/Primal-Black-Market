@@ -1,5 +1,5 @@
 CREATE TABLE feedback (
-    "FeedbackID" int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    "FeedbackID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "ReviewerID" int NOT NULL,
     "VendorID" int NOT NULL,
     "Rating" int CHECK ("Rating" BETWEEN 0 AND 5),
