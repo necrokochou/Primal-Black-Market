@@ -17,37 +17,10 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-// ---- 🧱 Run Migrations ----
-echo "\n📦 Running migrations...\n";
-$migrationFiles = [
-    'migrate.users.php',
-    'migrate.categories.php',
-    'migrate.listings.php',
-    'migrate.feedbacks.php',
-    'migrate.transactions.php',
-    'migrate.messages.php',
-];
+// Tables in correct truncation order (child → parent)
+$tables = ['transactions', 'messages', 'feedbacks', 'listings', 'categories', 'users'];
 
-foreach ($migrationFiles as $file) {
-    $path = MIGRATIONS_PATH . '/' . $file;
-    if (file_exists($path)) {
-        require_once $path;
-    } else {
-        echo "⚠️  Migration file missing: $file\n";
-    }
-}
-
-// ---- 🧹 Truncate Tables ----
 echo "\n🧹 Truncating tables...\n";
-$tables = [
-    'transactions',
-    'messages',
-    'feedbacks',
-    'listings',
-    'categories',
-    'users'
-];
-
 foreach ($tables as $table) {
     try {
         $pdo->exec("TRUNCATE TABLE {$table} RESTART IDENTITY CASCADE;");
@@ -57,25 +30,4 @@ foreach ($tables as $table) {
     }
 }
 
-// ---- 🌱 Run Seeders ----
-echo "\n🌱 Running seeders...\n";
-$seederFiles = [
-    'seeder.categories.php',
-    'seeder.users.php',
-    'seeder.listings.php',
-    'seeder.feedbacks.php',
-    'seeder.transactions.php',
-    'seeder.messages.php',
-];
-
-foreach ($seederFiles as $file) {
-    $path = SEEDERS_PATH . '/' . $file;
-    if (file_exists($path)) {
-        require_once $path;
-    } else {
-        echo "⚠️  Seeder file missing: $file\n";
-    }
-}
-
-echo "\n🎉 Database reset and seeding complete!\n";
-    
+echo "\n✅ PostgreSQL reset complete (data only).\n";
