@@ -28,7 +28,7 @@ try {
 echo "Seeding transactions table...\n";
 
 // Load dummy data
-$dummyTransactions = require_once DUMMIES_PATH . '/dummydata.transactions.php';
+$dummyTransactions = require_once DUMMIES_PATH . '/transactions.staticData.php';
 
 // Clear existing data
 $pdo->exec('DELETE FROM transactions');

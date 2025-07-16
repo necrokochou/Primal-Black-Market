@@ -28,7 +28,7 @@ try {
 echo "Seeding messages table...\n";
 
 // Load dummy data
-$dummyMessages = require_once DUMMIES_PATH . '/dummydata.messages.php';
+$dummyMessages = require_once DUMMIES_PATH . '/messages.staticData.php';
 
 // Clear existing data
 $pdo->exec('DELETE FROM messages');
