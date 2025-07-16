@@ -5,5 +5,6 @@ CREATE TABLE users (
     "Email" varchar(256) NOT NULL,
     "Alias" varchar(256) NOT NULL,
     "TrustLevel" real DEFAULT 0,
-    "IsVendor" boolean DEFAULT FALSE
+    "IsVendor" boolean DEFAULT FALSE,
+    "IsAdmin" boolean DEFAULT FALSE
 );
