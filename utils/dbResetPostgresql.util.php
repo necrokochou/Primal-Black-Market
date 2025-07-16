@@ -5,6 +5,22 @@ require_once 'vendor/autoload.php';
 require_once 'bootstrap.php';
 require_once UTILS_PATH . '/envSetter.util.php';
 
+echo "🚨 ========================================\n";
+echo "🚨 PRIMAL BLACK MARKET DATABASE RESET    \n";
+echo "🚨 ========================================\n";
+echo "⚠️  THIS WILL DELETE ALL DATABASE DATA!\n";
+echo "⚠️  PRESS CTRL+C TO CANCEL IN 5 SECONDS\n";
+echo "🚨 ========================================\n";
+
+// Countdown warning
+for ($i = 5; $i > 0; $i--) {
+    echo "⏱️  Resetting in {$i} seconds...\n";
+    sleep(1);
+}
+
+echo "\n🔥 Starting database reset process...\n";
+
+// Get PostgreSQL configuration
 $pgConfig = getPostgresEnv();
 $dsn = "pgsql:host={$pgConfig['host']};port={$pgConfig['port']};dbname={$pgConfig['db']}";
 
@@ -17,11 +33,14 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-// ---- 🧹 Step 1: Truncate Tables ----
-echo "\n🧹 Truncating tables...\n";
+// ---- 🧹 Database Reset ----
+echo "\n🧹 Resetting database...\n";
+
+// Drop all tables individually
+echo "🗂️  Dropping tables individually...\n";
 $tables = [
     'transactions',
-    'messages',
+    'messages', 
     'feedbacks',
     'listings',
     'categories',
@@ -30,51 +49,43 @@ $tables = [
 
 foreach ($tables as $table) {
     try {
-        $pdo->exec("TRUNCATE TABLE {$table} RESTART IDENTITY CASCADE;");
-        echo "✅ Truncated: {$table}\n";
+        $pdo->exec("DROP TABLE IF EXISTS {$table} CASCADE;");
+        echo "✅ Dropped table: {$table}\n";
     } catch (PDOException $e) {
-        echo "❌ Failed to truncate {$table}: " . $e->getMessage() . "\n";
+        echo "⚠️  Failed to drop {$table}: " . $e->getMessage() . "\n";
     }
 }
 
-// ---- 🧱 Step 2: Run Migrations ----
-echo "\n📦 Running migrations...\n";
-$migrationFiles = [
-    'dbMigrateUsersPostgresql.util.php',
-    'dbMigrateCategoriesPostgresql.util.php',
-    'dbMigrateListingsPostgresql.util.php',
-    'dbMigrateFeedbacksPostgresql.util.php',
-    'dbMigrateTransactionsPostgresql.util.php',
-    'dbMigrateMessagesPostgresql.util.php',
-];
+// Verify reset was successful
+echo "\n🔍 Verifying reset...\n";
+$stmt = $pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+$remainingTables = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-foreach ($migrationFiles as $file) {
-    $path = MIGRATIONS_PATH . '/' . $file;
-    if (file_exists($path)) {
-        require_once $path;
-    } else {
-        echo "⚠️  Migration file missing: $file\n";
-    }
+if (empty($remainingTables)) {
+    echo "✅ All tables successfully removed\n";
+} else {
+    echo "⚠️  Some tables may still exist: " . implode(', ', $remainingTables) . "\n";
+    echo "🧹 Performing schema reset as backup...\n";
+    
+    // Backup method: Drop entire schema if individual drops failed
+    $pdo->exec("DROP SCHEMA IF EXISTS public CASCADE;");
+    echo "✅ Dropped public schema\n";
+    
+    $pdo->exec("CREATE SCHEMA public;");
+    echo "✅ Recreated public schema\n";
+    
+    $pdo->exec("GRANT ALL ON SCHEMA public TO postgres;");
+    $pdo->exec("GRANT ALL ON SCHEMA public TO public;");
+    echo "✅ Set schema permissions\n";
 }
 
-// ---- 🌱 Step 3: Run Seeders ----
-echo "\n🌱 Running seeders...\n";
-$seederFiles = [
-    'dbSeederCategoriesPostgresql.util.php',
-    'dbSeederUsersPostgresql.util.php',
-    'dbSeederListingsPostgresql.util.php',
-    'dbSeederFeedbacksPostgresql.util.php',
-    'dbSeederTransactionsPostgresql.util.php',
-    'dbSeederMessagesPostgresql.util.php',
-];
-
-foreach ($seederFiles as $file) {
-    $path = SEEDERS_PATH . '/' . $file;
-    if (file_exists($path)) {
-        require_once $path;
-    } else {
-        echo "⚠️  Seeder file missing: $file\n";
-    }
-}
-
-echo "\n🎉 PostgreSQL database reset, migration, and seeding complete!\n";
+// ---- 🎉 Reset Complete ----
+echo "\n🎉 ========================================\n";
+echo "🎉 DATABASE RESET COMPLETE!              \n";
+echo "🎉 ========================================\n";
+echo "🧹 All tables and data have been deleted\n";
+echo "📋 Database is now empty and ready\n";
+echo "➡️  Next steps:\n";
+echo "   1. Run migrations: php utils/dbMigrateAllPostgresql.util.php\n";
+echo "   2. Run seeders: php utils/dbSeederAllPostgresql.util.php\n";
+echo "🎉 ========================================\n";
