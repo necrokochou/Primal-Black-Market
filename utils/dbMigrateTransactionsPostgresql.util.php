@@ -25,27 +25,28 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-echo "Creating users table...\n";
+echo "Creating transactions table...\n";
 
-// Create users table (adapted for PostgreSQL)
-$createUsersTable = '
-CREATE TABLE IF NOT EXISTS users (
-    "UserID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "Username" VARCHAR(256) UNIQUE NOT NULL,
-    "Password" VARCHAR(256) NOT NULL,
-    "Email" VARCHAR(256) NOT NULL,
-    "Alias" VARCHAR(256) NOT NULL,
-    "TrustLevel" REAL DEFAULT 0,
-    "IsVendor" BOOLEAN DEFAULT FALSE,
-    "IsAdmin" BOOLEAN DEFAULT FALSE
+// Create transactions table (adapted for PostgreSQL)
+$createTransactionsTable = '
+CREATE TABLE IF NOT EXISTS transactions (
+    "TransactionID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    "BuyerID" INTEGER NOT NULL,
+    "ListingID" uuid NOT NULL,
+    "Quantity" INTEGER NOT NULL,
+    "TotalPrice" INTEGER NOT NULL,
+    "TransactionStatus" VARCHAR(30) NOT NULL,
+    "Timestamp" DATE NOT NULL,
+    FOREIGN KEY ("BuyerID") REFERENCES users("UserID"),
+    FOREIGN KEY ("ListingID") REFERENCES listings("ListingID")
 );
 ';
 
 try {
-    $pdo->exec($createUsersTable);
-    echo "✅ Users table created successfully.\n";
+    $pdo->exec($createTransactionsTable);
+    echo "✅ Transactions table created successfully.\n";
 } catch (PDOException $e) {
-    die("❌ Failed to create users table: " . $e->getMessage() . "\n");
+    die("❌ Failed to create transactions table: " . $e->getMessage() . "\n");
 }
 
 echo "✅ Migration complete!\n";

@@ -35,8 +35,8 @@ $users = require_once STATICDATAS_PATH . '/dummies/dummydata.users.php';
 // Seeding logic
 echo "Seeding users…\n";
 $stmt = $pdo->prepare('
-    INSERT INTO users ("Username", "Password", "Alias", "TrustLevel", "IsVendor")
-    VALUES (:username, :password, :alias, :trustlevel, :isvendor)
+    INSERT INTO users ("Username", "Password", "Email", "Alias", "TrustLevel", "IsVendor", "IsAdmin")
+    VALUES (:username, :password, :email, :alias, :trustlevel, :isvendor, :isadmin)
     ON CONFLICT ("Username") DO NOTHING
 ');
 
@@ -48,9 +48,11 @@ foreach ($users as $user) {
         $result = $stmt->execute([
             ':username' => $user['Username'],
             ':password' => password_hash($user['Password'], PASSWORD_DEFAULT),
+            ':email' => $user['Email'] ?? $user['Username'] . '@example.com',
             ':alias' => $user['Alias'],
             ':trustlevel' => $user['TrustLevel'],
-            ':isvendor' => $user['IsVendor'] ? 'true' : 'false'
+            ':isvendor' => $user['IsVendor'] ? 'true' : 'false',
+            ':isadmin' => $user['IsAdmin'] ? 'true' : 'false'
         ]);
         
         if ($stmt->rowCount() > 0) {
