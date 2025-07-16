@@ -2,9 +2,11 @@
 require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/envSetter.util.php';
 
+$postgres = getPostgresEnv();
+
 try {
-    $dsn = "pgsql:host={$databases['pgHost']};port={$databases['pgPort']};dbname={$databases['pgDB']}";
-    $pdo = new PDO($dsn, $databases['pgUser'], $databases['pgPassword'], [
+    $dsn = "pgsql:host={$postgres['host']};port={$postgres['port']};dbname={$postgres['db']}";
+    $pdo = new PDO($dsn, $postgres['user'], $postgres['password'], [
       PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
     echo "✅ PostgreSQL Connection\n";
