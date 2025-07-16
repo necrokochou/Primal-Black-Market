@@ -1,5 +1,5 @@
 CREATE TABLE listings (
-    "ListingID" int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    "ListingID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     "VendorID" int NOT NULL,
     "Title" varchar(256) NOT NULL,
     "Description" text NOT NULL,
