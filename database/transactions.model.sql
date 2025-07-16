@@ -1,5 +1,5 @@
     CREATE TABLE transactions (
-        "TransactionID" int NOT NULL PRIMARY KEY AUTO_INCREMENT, --Primary key--
+        "TransactionID" uuid PRIMARY KEY DEFAULT gen_random_uuid(), --Primary key--
         "BuyerID" int NOT NULL,
         "ListingID" int NOT NULL,
         "Quantity" int NOT NULL,

@@ -10,7 +10,7 @@ try {
     );
 
     $mongo->executeCommand(
-        $mongoEnv['db'],
+        $databases['mongoDB'],
         new MongoDB\Driver\Command(['ping' => 1])
     );
 
