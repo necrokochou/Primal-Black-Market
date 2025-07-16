@@ -17,27 +17,7 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-// ---- 🧱 Run Migrations ----
-echo "\n📦 Running migrations...\n";
-$migrationFiles = [
-    'migrate.users.php',
-    'migrate.categories.php',
-    'migrate.listings.php',
-    'migrate.feedbacks.php',
-    'migrate.transactions.php',
-    'migrate.messages.php',
-];
-
-foreach ($migrationFiles as $file) {
-    $path = MIGRATIONS_PATH . '/' . $file;
-    if (file_exists($path)) {
-        require_once $path;
-    } else {
-        echo "⚠️  Migration file missing: $file\n";
-    }
-}
-
-// ---- 🧹 Truncate Tables ----
+// ---- 🧹 Step 1: Truncate Tables ----
 echo "\n🧹 Truncating tables...\n";
 $tables = [
     'transactions',
@@ -57,15 +37,35 @@ foreach ($tables as $table) {
     }
 }
 
-// ---- 🌱 Run Seeders ----
+// ---- 🧱 Step 2: Run Migrations ----
+echo "\n📦 Running migrations...\n";
+$migrationFiles = [
+    'dbMigrateUsersPostgresql.util.php',
+    'dbMigrateCategoriesPostgresql.util.php',
+    'dbMigrateListingsPostgresql.util.php',
+    'dbMigrateFeedbacksPostgresql.util.php',
+    'dbMigrateTransactionsPostgresql.util.php',
+    'dbMigrateMessagesPostgresql.util.php',
+];
+
+foreach ($migrationFiles as $file) {
+    $path = MIGRATIONS_PATH . '/' . $file;
+    if (file_exists($path)) {
+        require_once $path;
+    } else {
+        echo "⚠️  Migration file missing: $file\n";
+    }
+}
+
+// ---- 🌱 Step 3: Run Seeders ----
 echo "\n🌱 Running seeders...\n";
 $seederFiles = [
-    'seeder.categories.php',
-    'seeder.users.php',
-    'seeder.listings.php',
-    'seeder.feedbacks.php',
-    'seeder.transactions.php',
-    'seeder.messages.php',
+    'dbSeederCategoriesPostgresql.util.php',
+    'dbSeederUsersPostgresql.util.php',
+    'dbSeederListingsPostgresql.util.php',
+    'dbSeederFeedbacksPostgresql.util.php',
+    'dbSeederTransactionsPostgresql.util.php',
+    'dbSeederMessagesPostgresql.util.php',
 ];
 
 foreach ($seederFiles as $file) {
@@ -77,5 +77,4 @@ foreach ($seederFiles as $file) {
     }
 }
 
-echo "\n🎉 Database reset and seeding complete!\n";
-    
+echo "\n🎉 PostgreSQL database reset, migration, and seeding complete!\n";

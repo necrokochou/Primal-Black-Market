@@ -28,7 +28,7 @@ try {
 echo "Seeding listings table...\n";
 
 // Load dummy data
-$dummyListings = require_once DUMMIES_PATH . '/dummydata.listings.php';
+$dummyListings = require_once DUMMIES_PATH . '/listings.staticData.php';
 
 // Clear existing data in proper order (child tables first)
 try {
