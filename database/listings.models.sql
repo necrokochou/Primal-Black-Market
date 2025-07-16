@@ -1,6 +1,6 @@
 CREATE TABLE listings (
     "ListingID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "VendorID" int NOT NULL,
+    "VendorID" uuid NOT NULL,
     "Title" varchar(256) NOT NULL,
     "Description" text NOT NULL,
     "Category" varchar(100) NOT NULL,
