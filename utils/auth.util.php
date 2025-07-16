@@ -11,15 +11,15 @@ class Auth {
     }
 
     public function tryLogin(string $username, string $password): bool {
-        $stmt = $this->account->prepare("SELECT * FROM users WHERE username = :username AND password = :password");
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':password', $password);
-        $stmt->execute();
+        $statement = $this->account->prepare("SELECT * FROM users WHERE username = :username AND password = :password");
+        $statement->bindParam(':username', $username);
+        $statement->bindParam(':password', $password);
+        $statement->execute();
 
-        if ($stmt->rowCount() > 0) {
-            return true; // Login successful
+        if ($statement->rowCount() > 0) {
+            return true; // login successful
         } else {
-            return false; // Login failed
+            return false; // login failed
         }
     }
 }
