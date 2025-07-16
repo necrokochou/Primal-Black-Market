@@ -2,9 +2,11 @@
 require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/envSetter.util.php';
 
+$mongo = getMongoEnv();
+
 try {
     $mongo = new MongoDB\Driver\Manager(
-      "mongodb://{$databases['mongoHost']}:{$databases['mongoPort']}"
+      "mongodb://{$mongo['host']}:{$mongo['port']}"
     );
 
     $mongo->executeCommand(
