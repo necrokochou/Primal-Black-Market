@@ -49,63 +49,53 @@ docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
 
 ---
 
-## 🗃️ Database Migration & Seeding Commands
+## 🚀 Quick Start Commands (Recommended)
 
-### **⚠️ IMPORTANT: Run in this exact order!**
-
-#### 1. **Users Database** (Run First)
+### **🔥 Complete Database Reset (3-Step Process)**
 ```bash
-# Create users table
-docker exec primal-black-market-service php utils/dbMigrateUsersPostgresql.util.php
+# Step 1: Reset database (DELETE ALL DATA)
+docker exec primal-black-market-service php utils/dbResetPostgresql.util.php
 
-# Seed users data
-docker exec primal-black-market-service php utils/dbSeederUsersPostgresql.util.php
+# Step 2: Run all migrations 
+docker exec primal-black-market-service php utils/dbMigrateAllPostgresql.util.php
+
+# Step 3: Run all seeders
+docker exec primal-black-market-service php utils/dbSeederAllPostgresql.util.php
 ```
 
-#### 2. **Categories Database**
+### **🧱 Migrate All Tables**
 ```bash
-# Create categories table
-docker exec primal-black-market-service php utils/dbMigrateCategoriesPostgresql.util.php
-
-# Seed categories data
-docker exec primal-black-market-service php utils/dbSeederCategoriesPostgresql.util.php
+# Run all migrations in correct order
+docker exec primal-black-market-service php utils/dbMigrateAllPostgresql.util.php
 ```
 
-#### 3. **Listings Database** (Requires Users)
+### **🌱 Seed All Tables**
 ```bash
-# Create listings table
-docker exec primal-black-market-service php utils/dbMigrateListingsPostgresql.util.php
-
-# Seed listings data
-docker exec primal-black-market-service php utils/dbSeederListingsPostgresql.util.php
+# Run all seeders in correct order
+docker exec primal-black-market-service php utils/dbSeederAllPostgresql.util.php
 ```
 
-#### 4. **Feedbacks Database** (Requires Users)
-```bash
-# Create feedbacks table
-docker exec primal-black-market-service php utils/dbMigrateFeedbacksPostgresql.util.php
+---
 
-# Seed feedbacks data
-docker exec primal-black-market-service php utils/dbSeederFeedbacksPostgresql.util.php
+## 🔥 Database Reset (Reset Only)
+
+### **🚨 DANGER ZONE: Reset Database**
+```bash
+# This will DELETE ALL DATA only (no migrations/seeders)
+docker exec primal-black-market-service php utils/dbResetPostgresql.util.php
 ```
 
-#### 5. **Messages Database** (Requires Users)
-```bash
-# Create messages table
-docker exec primal-black-market-service php utils/dbMigrateMessagesPostgresql.util.php
+**⚠️ Use this when:**
+- Starting fresh development
+- Database is corrupted
+- Need to clear all data
 
-# Seed messages data
-docker exec primal-black-market-service php utils/dbSeederMessagesPostgresql.util.php
-```
+**✅ This script will:**
+- Give you 5 seconds to cancel
+- Drop all existing tables
+- Clear all data completely
+- Show next steps to run
 
-#### 6. **Transactions Database** (Requires Users & Listings)
-```bash
-# Create transactions table
-docker exec primal-black-market-service php utils/dbMigrateTransactionsPostgresql.util.php
-
-# Seed transactions data
-docker exec primal-black-market-service php utils/dbSeederTransactionsPostgresql.util.php
-```
 
 ---
 
@@ -166,7 +156,21 @@ docker exec primal-black-market-service php utils/dbSeederUsersPostgresql.util.p
 docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
 ```
 
-### **Reset Database** (Nuclear Option)
+### **🔥 Complete Database Reset** (Nuclear Option)
+```bash
+# ⚠️ DANGER: This will delete ALL data and recreate everything!
+# Use the comprehensive reset script
+docker exec primal-black-market-service php utils/dbResetPostgresql.util.php
+```
+
+**What the reset script does:**
+1. **5-second countdown warning** - Gives you time to cancel
+2. **Drops all tables** - Complete clean slate
+3. **Runs all migrations** - Recreates table structure  
+4. **Runs all seeders** - Populates with fresh data
+5. **Verifies results** - Shows final record counts
+
+### **Manual Database Reset** (Alternative)
 ```bash
 # ⚠️ DANGER: This will delete all data!
 docker exec primal-black-market-service php -r "
