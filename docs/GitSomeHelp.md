@@ -93,22 +93,22 @@ git push origin backend-user-auth
     4) Select the _base_ branch - the branch where you plan to merge your feature branch
     5) Select the _compare_ branch - the branch that you will merge to the base branch <br>
 
-    Example: Merging backend branch to the main branch
+    Example: Merging backend-user-auth branch to the main branch
     ```
-    [base: backend] <- [compare: backend-user-auth]
+    [base: main] <- [compare: backend-user-auth]
     ```
 
     6) Add a title "Merge \<compare-branch> to \<base-branch>"
 
     Example:
     ```
-    Merge backend-user-auth to backend
+    Merge backend-user-auth to main
     ```
     7) Click _Create pull request_
     8) DO NOT CLICK _MERGE_. Wait for QA or the respective branch developer to check for conflicts and wait for them to accept/decline the merge pull request.
-7) Your QA shall now check for merging conflicts and review role-specific changes. QA shall accept or decline this pull request accordingly and then merge your feature branch to your role branch if accepted.
+7) Your QA shall now check for merging conflicts and review role-specific changes. QA shall accept or decline this pull request accordingly and then merge your feature branch to the main branch if accepted.
 
-8) Your QA shall open a new pull request to merge your role branch to the main branch and then check for merging conflicts once again.
+8) QA shall now open pull requests to merge the new main branch to all other branches and their respective developers shall check for conflicts.
 
 <br>
 
@@ -116,8 +116,8 @@ git push origin backend-user-auth
 1) Create role branch from main or pull remote role branch to existing role branch.
 2) Create a feature branch then code stuff.
 3) Commit new changes then push to remote feature branch.
-4) Open a pull request to merge feature branch with your role branch.
-5) QA checks pull request then makes another pull request to merge role branch with the main branch.
+4) Open a pull request to merge feature branch with the main branch.
+5) QA checks pull request then makes another pull request to merge main branch other branches.
 ---
 <br>
 
