@@ -31,7 +31,7 @@ echo "Creating transactions table...\n";
 $createTransactionsTable = '
 CREATE TABLE IF NOT EXISTS transactions (
     "TransactionID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "BuyerID" INTEGER NOT NULL,
+    "BuyerID" uuid NOT NULL,
     "ListingID" uuid NOT NULL,
     "Quantity" INTEGER NOT NULL,
     "TotalPrice" INTEGER NOT NULL,
