@@ -17,10 +17,17 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-// Tables in correct truncation order (child → parent)
-$tables = ['transactions', 'messages', 'feedbacks', 'listings', 'categories', 'users'];
-
+// ---- 🧹 Step 1: Truncate Tables ----
 echo "\n🧹 Truncating tables...\n";
+$tables = [
+    'transactions',
+    'messages',
+    'feedbacks',
+    'listings',
+    'categories',
+    'users'
+];
+
 foreach ($tables as $table) {
     try {
         $pdo->exec("TRUNCATE TABLE {$table} RESTART IDENTITY CASCADE;");
@@ -30,4 +37,44 @@ foreach ($tables as $table) {
     }
 }
 
-echo "\n✅ PostgreSQL reset complete (data only).\n";
+// ---- 🧱 Step 2: Run Migrations ----
+echo "\n📦 Running migrations...\n";
+$migrationFiles = [
+    'dbMigrateUsersPostgresql.util.php',
+    'dbMigrateCategoriesPostgresql.util.php',
+    'dbMigrateListingsPostgresql.util.php',
+    'dbMigrateFeedbacksPostgresql.util.php',
+    'dbMigrateTransactionsPostgresql.util.php',
+    'dbMigrateMessagesPostgresql.util.php',
+];
+
+foreach ($migrationFiles as $file) {
+    $path = MIGRATIONS_PATH . '/' . $file;
+    if (file_exists($path)) {
+        require_once $path;
+    } else {
+        echo "⚠️  Migration file missing: $file\n";
+    }
+}
+
+// ---- 🌱 Step 3: Run Seeders ----
+echo "\n🌱 Running seeders...\n";
+$seederFiles = [
+    'dbSeederCategoriesPostgresql.util.php',
+    'dbSeederUsersPostgresql.util.php',
+    'dbSeederListingsPostgresql.util.php',
+    'dbSeederFeedbacksPostgresql.util.php',
+    'dbSeederTransactionsPostgresql.util.php',
+    'dbSeederMessagesPostgresql.util.php',
+];
+
+foreach ($seederFiles as $file) {
+    $path = SEEDERS_PATH . '/' . $file;
+    if (file_exists($path)) {
+        require_once $path;
+    } else {
+        echo "⚠️  Seeder file missing: $file\n";
+    }
+}
+
+echo "\n🎉 PostgreSQL database reset, migration, and seeding complete!\n";
