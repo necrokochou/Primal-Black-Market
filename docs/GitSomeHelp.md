@@ -86,7 +86,7 @@ git push origin backend-user-auth
 ```
 <br>
 
-6) Open a pull request in GitHub to merge your role branch to the main branch
+6) Open a pull request in GitHub to merge your feature branch to the role branch
     1) Go to [Primal Black Market](https://github.com/necrokochou/Primal-Black-Market)
     2) Open the _Pull requests_ tab
     3) Click _New pull request_ button
