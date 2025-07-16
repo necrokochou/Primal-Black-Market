@@ -25,27 +25,22 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-echo "Creating users table...\n";
+echo "Creating categories table...\n";
 
-// Create users table (adapted for PostgreSQL)
-$createUsersTable = '
-CREATE TABLE IF NOT EXISTS users (
-    "UserID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "Username" VARCHAR(256) UNIQUE NOT NULL,
-    "Password" VARCHAR(256) NOT NULL,
-    "Email" VARCHAR(256) NOT NULL,
-    "Alias" VARCHAR(256) NOT NULL,
-    "TrustLevel" REAL DEFAULT 0,
-    "IsVendor" BOOLEAN DEFAULT FALSE,
-    "IsAdmin" BOOLEAN DEFAULT FALSE
+// Create categories table (adapted for PostgreSQL)
+$createCategoriesTable = '
+CREATE TABLE IF NOT EXISTS categories (
+    "CategoriesID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    "Name" VARCHAR(256) UNIQUE NOT NULL,
+    "Description" TEXT NOT NULL
 );
 ';
 
 try {
-    $pdo->exec($createUsersTable);
-    echo "✅ Users table created successfully.\n";
+    $pdo->exec($createCategoriesTable);
+    echo "✅ Categories table created successfully.\n";
 } catch (PDOException $e) {
-    die("❌ Failed to create users table: " . $e->getMessage() . "\n");
+    die("❌ Failed to create categories table: " . $e->getMessage() . "\n");
 }
 
 echo "✅ Migration complete!\n";
