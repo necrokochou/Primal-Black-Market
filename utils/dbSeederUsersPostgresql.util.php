@@ -26,7 +26,7 @@ try {
 }
 
 // Load dummy users from static data
-$users = require_once STATICDATAS_PATH . '/dummies/dummydata.users.php';
+$users = require_once DUMMIES_PATH . '/users.staticData.php';
 
 // Clear existing users (optional - uncomment if you want to reset the table)
 // echo "Clearing existing users...\n";

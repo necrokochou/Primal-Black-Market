@@ -28,7 +28,7 @@ try {
 echo "Seeding categories table...\n";
 
 // Load dummy data
-$dummyCategories = require_once DUMMIES_PATH . '/dummydata.categories.php';
+$dummyCategories = require_once DUMMIES_PATH . '/categories.staticData.php';
 
 // Clear existing data
 $pdo->exec('DELETE FROM categories');

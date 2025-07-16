@@ -28,7 +28,7 @@ try {
 echo "Seeding feedbacks table...\n";
 
 // Load dummy data
-$dummyFeedbacks = require_once DUMMIES_PATH . '/dummydata.feedbacks.php';
+$dummyFeedbacks = require_once DUMMIES_PATH . '/feedbacks.staticData.php';
 
 // Clear existing data
 $pdo->exec('DELETE FROM feedbacks');
