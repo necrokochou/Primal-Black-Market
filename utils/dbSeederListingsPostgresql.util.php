@@ -30,9 +30,20 @@ echo "Seeding listings table...\n";
 // Load dummy data
 $dummyListings = require_once DUMMIES_PATH . '/dummydata.listings.php';
 
-// Clear existing data
-$pdo->exec('DELETE FROM listings');
-echo "✅ Cleared existing listings data.\n";
+// Clear existing data in proper order (child tables first)
+try {
+    $pdo->exec('DELETE FROM transactions');
+    echo "✅ Cleared existing transactions data.\n";
+    
+    $pdo->exec('DELETE FROM feedbacks');
+    echo "✅ Cleared existing feedbacks data.\n";
+    
+    $pdo->exec('DELETE FROM listings');
+    echo "✅ Cleared existing listings data.\n";
+} catch (PDOException $e) {
+    echo "⚠️  Error clearing data: " . $e->getMessage() . "\n";
+    echo "ℹ️  This might happen if tables don't exist yet.\n";
+}
 
 // Get user IDs for vendors (assuming we need to assign listings to existing users)
 $vendorQuery = $pdo->query('SELECT "UserID" FROM users WHERE "IsVendor" = TRUE');
