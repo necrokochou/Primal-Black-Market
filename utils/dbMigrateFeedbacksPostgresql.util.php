@@ -31,8 +31,8 @@ echo "Creating feedbacks table...\n";
 $createFeedbacksTable = '
 CREATE TABLE IF NOT EXISTS feedbacks (
     "FeedbackID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "ReviewerID" INTEGER NOT NULL,
-    "VendorID" INTEGER NOT NULL,
+    "ReviewerID" uuid NOT NULL,
+    "VendorID" uuid NOT NULL,
     "Rating" INTEGER CHECK ("Rating" BETWEEN 0 AND 5),
     "Comments" TEXT NOT NULL,
     "PostedAt" DATE NOT NULL,

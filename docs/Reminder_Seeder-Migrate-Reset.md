@@ -41,6 +41,12 @@ docker cp staticData/ primal-black-market-service:/var/www/html/
 docker cp .env primal-black-market-service:/var/www/html/
 ```
 
+### 5. **Database Connection Test**
+```bash
+# Test database connection
+docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
+```
+
 ---
 
 ## 🗃️ Database Migration & Seeding Commands
@@ -107,7 +113,13 @@ docker exec primal-black-market-service php utils/dbSeederTransactionsPostgresql
 
 ### **Quick Database Check**
 ```bash
-# Check table counts
+# Check table counts using verification script
+docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
+```
+
+### **Manual Database Check** (Alternative)
+```bash
+# Check table counts manually
 docker exec primal-black-market-service php -r "
 try {
     \$pdo = new PDO('pgsql:host=postgresql;port=5432;dbname=primal-black-market', 'user', 'password');
@@ -131,6 +143,28 @@ try {
 2. **File Not Found**: Copy files to container using `docker cp`
 3. **Foreign Key Error**: Run migrations in correct order (Users first!)
 4. **Permission Error**: Ensure proper file permissions
+5. **Foreign Key Constraint Violation**: When re-seeding, dependent tables must be cleared first
+
+### **🔄 Re-seeding Database (Important!)**
+If you need to re-seed data, follow this order to avoid foreign key violations:
+
+```bash
+# Clear and re-seed in dependency order
+docker exec primal-black-market-service php utils/dbSeederTransactionsPostgresql.util.php
+docker exec primal-black-market-service php utils/dbSeederFeedbacksPostgresql.util.php  
+docker exec primal-black-market-service php utils/dbSeederListingsPostgresql.util.php
+docker exec primal-black-market-service php utils/dbSeederMessagesPostgresql.util.php
+docker exec primal-black-market-service php utils/dbSeederCategoriesPostgresql.util.php
+docker exec primal-black-market-service php utils/dbSeederUsersPostgresql.util.php
+```
+
+**⚠️ Note**: The listings seeder now automatically clears dependent tables (transactions, feedbacks) before clearing listings to prevent foreign key violations.
+
+### **Database Verification**
+```bash
+# Use the verification script to check all tables
+docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
+```
 
 ### **Reset Database** (Nuclear Option)
 ```bash

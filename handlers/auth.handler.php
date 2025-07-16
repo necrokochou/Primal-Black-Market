@@ -10,7 +10,7 @@ if ($_POST['action'] === 'login') {
     $auth = new \App\Utils\Auth($pdo);
     session_start();
 
-    if ($auth->login($_POST['username'], $_POST['password'])) {
+    if ($auth->trylogin($_POST['username'], $_POST['password'])) {
         $_SESSION['user'] = $_POST['username'];
         // dashboard or home page
     } else {

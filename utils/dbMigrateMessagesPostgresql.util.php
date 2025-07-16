@@ -31,8 +31,8 @@ echo "Creating messages table...\n";
 $createMessagesTable = '
 CREATE TABLE IF NOT EXISTS messages (
     "MessageID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "SenderID" INTEGER NOT NULL,
-    "ReceiverID" INTEGER NOT NULL,
+    "SenderID" uuid NOT NULL,
+    "ReceiverID" uuid NOT NULL,
     "MessagesContent" TEXT,
     "SentAt" DATE NOT NULL,
     FOREIGN KEY ("SenderID") REFERENCES users("UserID"),
