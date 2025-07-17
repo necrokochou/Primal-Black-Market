@@ -146,8 +146,8 @@ if (empty($userIds) || empty($categoryIds)) {
         $pdo,
         'listings',
         'listings.staticData.php',
-        'INSERT INTO listings (Vendor_ID, Categories_ID, Title, Description, Category, Price, Quantity, Is_Active, Publish_Date)
-         VALUES (:vendor_id, :categories_id, :title, :description, :category, :price, :quantity, :is_active, :publish_date)',
+        'INSERT INTO listings (Vendor_ID, Categories_ID, Title, Description, Category, Price, Quantity, Is_Active, Publish_Date, Item_Image)
+         VALUES (:vendor_id, :categories_id, :title, :description, :category, :price, :quantity, :is_active, :publish_date, :item_image)',
         function($listing) use ($userIds, $categoryIds) {
             return [
                 ':vendor_id' => $userIds[array_rand($userIds)],
@@ -158,7 +158,8 @@ if (empty($userIds) || empty($categoryIds)) {
                 ':price' => $listing['Price'],
                 ':quantity' => $listing['Quantity'],
                 ':is_active' => $listing['IsActive'] ? 'true' : 'false',
-                ':publish_date' => $listing['PublishDate']
+                ':publish_date' => $listing['PublishDate'],
+                ':item_image' => $listing['ItemImage'] ?? null
             ];
         }
     );
