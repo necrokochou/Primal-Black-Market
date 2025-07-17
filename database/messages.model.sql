@@ -1,9 +1,9 @@
 CREATE TABLE messages (
-    "MessageID" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    "SenderID" uuid NOT NULL,
-    "ReceiverID" uuid NOT NULL,
-    "MessagesContent" text,
-    "SentAt" date NOT NULL,
-    FOREIGN KEY (SenderID) REFERENCES users(UserID),
-    FOREIGN KEY (ReceiverID) REFERENCES users(UserID)
+    Message_ID uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    Sender_ID uuid NOT NULL,
+    Receiver_ID uuid NOT NULL,
+    Messages_Content text,
+    Sent_At date NOT NULL,
+    FOREIGN KEY (Sender_ID) REFERENCES users(User_ID),
+    FOREIGN KEY (Receiver_ID) REFERENCES users(User_ID)
 );
