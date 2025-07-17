@@ -3,7 +3,7 @@ CREATE TABLE listings (
     Vendor_ID uuid NOT NULL,
     Categories_ID uuid NOT NULL,
     Title varchar(256) NOT NULL,
-    Description_ text NOT NULL,
+    Description text NOT NULL,
     Category varchar(100) NOT NULL,
     Price real NOT NULL,
     Quantity int NOT NULL,
