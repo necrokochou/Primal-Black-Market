@@ -8,7 +8,8 @@ require_once UTILS_PATH . '/envSetter.util.php';
 echo "🚨 ========================================\n";
 echo "🚨 PRIMAL BLACK MARKET DATABASE RESET    \n";
 echo "🚨 ========================================\n";
-echo "⚠️  THIS WILL DELETE ALL DATABASE DATA!\n";
+echo "⚠️  THIS WILL CLEAR ALL TABLE DATA!\n";
+echo "⚠️  TABLES WILL BE KEPT, ONLY DATA CLEARED\n";
 echo "⚠️  PRESS CTRL+C TO CANCEL IN 5 SECONDS\n";
 echo "🚨 ========================================\n";
 
@@ -34,10 +35,10 @@ try {
 }
 
 // ---- 🧹 Database Reset ----
-echo "\n🧹 Resetting database...\n";
+echo "\n🧹 Clearing table data...\n";
 
-// Drop all tables individually
-echo "🗂️  Dropping tables individually...\n";
+// Clear all tables individually (preserve structure)
+echo "🗂️  Clearing tables individually...\n";
 $tables = [
     'transactions',
     'messages', 
@@ -49,65 +50,74 @@ $tables = [
 
 foreach ($tables as $table) {
     try {
-        $pdo->exec("DROP TABLE IF EXISTS {$table} CASCADE;");
-        echo "✅ Dropped table: {$table}\n";
+        // Check if table exists first
+        $stmt = $pdo->prepare("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = ?)");
+        $stmt->execute([$table]);
+        $tableExists = $stmt->fetchColumn();
+        
+        if ($tableExists) {
+            // Use TRUNCATE for faster clearing with CASCADE to handle foreign keys
+            $pdo->exec("TRUNCATE TABLE {$table} RESTART IDENTITY CASCADE;");
+            echo "✅ Cleared table: {$table}\n";
+        } else {
+            echo "⏭️  Skipped table: {$table} (does not exist)\n";
+        }
     } catch (PDOException $e) {
-        echo "⚠️  Failed to drop {$table}: " . $e->getMessage() . "\n";
+        echo "⚠️  Failed to clear {$table}: " . $e->getMessage() . "\n";
+        // Try alternative DELETE method if TRUNCATE fails
+        try {
+            if ($tableExists) {
+                $pdo->exec("DELETE FROM {$table};");
+                echo "✅ Cleared table using DELETE: {$table}\n";
+            }
+        } catch (PDOException $deleteError) {
+            echo "❌ Could not clear {$table} with DELETE either: " . $deleteError->getMessage() . "\n";
+        }
     }
 }
 
 // Verify reset was successful
-echo "\n🔍 Verifying reset...\n";
+echo "\n🔍 Verifying data clearance...\n";
 $stmt = $pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
-$remainingTables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$existingTables = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-if (empty($remainingTables)) {
-    echo "✅ All tables successfully removed\n";
+if (!empty($existingTables)) {
+    echo "✅ Tables preserved: " . implode(', ', $existingTables) . "\n";
+    
+    // Check if tables are actually empty
+    $allEmpty = true;
+    foreach ($existingTables as $table) {
+        try {
+            $countStmt = $pdo->query("SELECT COUNT(*) FROM {$table}");
+            $count = $countStmt->fetchColumn();
+            if ($count > 0) {
+                echo "⚠️  Table {$table} still has {$count} records\n";
+                $allEmpty = false;
+            } else {
+                echo "✅ Table {$table} is empty\n";
+            }
+        } catch (PDOException $e) {
+            echo "⚠️  Could not verify {$table}: " . $e->getMessage() . "\n";
+        }
+    }
+    
+    if ($allEmpty) {
+        echo "✅ All tables successfully cleared of data\n";
+    } else {
+        echo "⚠️  Some tables may still contain data\n";
+    }
 } else {
-    echo "⚠️  Some tables may still exist: " . implode(', ', $remainingTables) . "\n";
-    echo "🧹 Performing schema reset as backup...\n";
-    
-    // Backup method: Drop entire schema if individual drops failed
-    try {
-        $pdo->exec("DROP SCHEMA IF EXISTS public CASCADE;");
-        echo "✅ Dropped public schema\n";
-    } catch (PDOException $e) {
-        echo "⚠️  Could not drop public schema: " . $e->getMessage() . "\n";
-    }
-    
-    try {
-        $pdo->exec("CREATE SCHEMA public;");
-        echo "✅ Recreated public schema\n";
-    } catch (PDOException $e) {
-        echo "⚠️  Could not create public schema: " . $e->getMessage() . "\n";
-    }
-    
-    // Set schema permissions with error handling
-    try {
-        $pdo->exec("GRANT ALL ON SCHEMA public TO postgres;");
-        echo "✅ Granted permissions to postgres user\n";
-    } catch (PDOException $e) {
-        echo "⚠️  Could not grant permissions to postgres user (role may not exist): " . $e->getMessage() . "\n";
-        echo "ℹ️  This is usually not a problem in Docker environments\n";
-    }
-    
-    try {
-        $pdo->exec("GRANT ALL ON SCHEMA public TO public;");
-        echo "✅ Granted permissions to public\n";
-    } catch (PDOException $e) {
-        echo "⚠️  Could not grant permissions to public: " . $e->getMessage() . "\n";
-    }
-    
-    echo "✅ Schema reset completed with available permissions\n";
+    echo "⚠️  No tables found in the database\n";
 }
 
 // ---- 🎉 Reset Complete ----
 echo "\n🎉 ========================================\n";
 echo "🎉 DATABASE RESET COMPLETE!              \n";
 echo "🎉 ========================================\n";
-echo "🧹 All tables and data have been deleted\n";
-echo "📋 Database is now empty and ready\n";
+echo "🧹 All table data has been cleared\n";
+echo "📋 Table structures are preserved\n";
+echo "� Database is ready for fresh data\n";
 echo "➡️  Next steps:\n";
-echo "   1. Run migrations: php utils/dbMigratePostgresql.util.php\n";
-echo "   2. Run seeders: php utils/dbSeederPostgresql.util.php\n";
+echo "   1. Run seeders: php utils/dbSeederPostgresql.util.php\n";
+echo "   2. Or run migrations first if tables don't exist: php utils/dbMigratePostgresql.util.php\n";
 echo "🎉 ========================================\n";
