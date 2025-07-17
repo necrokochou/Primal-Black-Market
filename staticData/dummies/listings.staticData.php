@@ -10,6 +10,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Triceratops Horn Spear',
@@ -19,6 +20,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Obsidian Arrow Set',
@@ -28,6 +30,7 @@ return [
         'Quantity' => 3,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Saber-Tooth Bone Club',
@@ -37,6 +40,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
 
     // ───── Hunting Equipment ─────
@@ -48,6 +52,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Pterosaur Wing Net Plan',
@@ -57,6 +62,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Spiked Vine Trap Design',
@@ -66,6 +72,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Swamp Pitfall Construction Guide',
@@ -75,6 +82,7 @@ return [
         'Quantity' => 3,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
 
     // ───── Prehistoric Drugs ─────
@@ -86,6 +94,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Jungle Moss Poultice',
@@ -95,6 +104,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Hallucinogenic Spore Pouch',
@@ -104,6 +114,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Tyrant Root Elixir',
@@ -113,6 +124,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
 
     // ───── Food ─────
@@ -124,6 +136,7 @@ return [
         'Quantity' => 10,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Salted Saber-Tooth Jerky',
@@ -133,6 +146,7 @@ return [
         'Quantity' => 6,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Sun-Baked Fish Slabs',
@@ -142,6 +156,7 @@ return [
         'Quantity' => 8,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Fermented Berries',
@@ -151,6 +166,7 @@ return [
         'Quantity' => 9,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
+        'Item_Image' => null,
     ],
 
     // ───── Spices and etc. ─────
@@ -162,6 +178,7 @@ return [
         'Quantity' => 10,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Mammoth Tallow Jar',
@@ -171,6 +188,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Herbal Ash Rub',
@@ -180,6 +198,7 @@ return [
         'Quantity' => 7,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Smoked Pterosaur Grease',
@@ -189,8 +208,9 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
+        'Item_Image' => null,
     ],
-// ───── Clothing ─────
+    // ───── Clothing ─────
     [
         'Title' => 'Saber-Tooth Hide Cloak',
         'Description' => 'Worn by chieftains to intimidate rivals.',
@@ -199,6 +219,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Feathered Raptor Shawl',
@@ -208,6 +229,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Tanned Pterosaur Leathers',
@@ -217,6 +239,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Mammoth Fur Boots',
@@ -226,6 +249,7 @@ return [
         'Quantity' => 3,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
 
     // ───── Forging Materials ─────
@@ -237,6 +261,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Fossilized Bone Core',
@@ -246,6 +271,7 @@ return [
         'Quantity' => 6,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Ancient Amber Nugget',
@@ -255,6 +281,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Meteor Shard',
@@ -264,6 +291,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
+        'Item_Image' => null,
     ],
 
     // ───── Infrastructure ─────
@@ -275,6 +303,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Brontosaur Hide Wall',
@@ -284,6 +313,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Sun-Dried Clay Bricks',
@@ -293,6 +323,7 @@ return [
         'Quantity' => 30,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Saber-Tooth Jaw Gate',
@@ -302,6 +333,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
 
     // ───── Voodoo ─────
@@ -313,6 +345,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Fossil Eye Pendant',
@@ -322,6 +355,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Swamp Fetish Doll',
@@ -331,6 +365,7 @@ return [
         'Quantity' => 3,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Charred Spirit Idol',
@@ -340,6 +375,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
+        'Item_Image' => null,
     ],
 
     // ───── Ritual Artifacts ─────
@@ -351,6 +387,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Ancient Bone Mask',
@@ -360,6 +397,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Mammoth Skull Totem',
@@ -369,6 +407,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Feathered Sacrifice Altar',
@@ -378,9 +417,10 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
 
-    // ───── Pets (New Category) ─────
+    // ───── Pets ─────
     [
         'Title' => 'Juvenile Saber-Tooth Cub',
         'Description' => 'Feral but tamable with patience. Good for guarding.',
@@ -389,6 +429,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Miniature Mammoth Calf',
@@ -398,6 +439,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Tamed Raptor Hatchling',
@@ -407,6 +449,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
+        'Item_Image' => null,
     ],
     [
         'Title' => 'Swamp Glider Lizard',
@@ -416,26 +459,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
+        'Item_Image' => null,
     ],
-      [
-        'Title' => 'Black Men',
-        'Description' => 'Slaves, good for scouting, hunting and farming, YESSIR',
-        'Category' => 'Pets',
-        'Price' => 2.0,
-        'Quantity' => 500,
-        'IsActive' => true,
-        'PublishDate' => '2025-07-11',
-    ],
-
-
-
-
-
-
-
-
-
-
-
 
 ];
