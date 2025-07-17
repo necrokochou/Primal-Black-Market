@@ -148,38 +148,6 @@ docker exec primal-black-market-service php utils/dbSeederCategoriesPostgresql.u
 docker exec primal-black-market-service php utils/dbSeederUsersPostgresql.util.php
 ```
 
-**⚠️ Note**: The listings seeder now automatically clears dependent tables (transactions, feedbacks) before clearing listings to prevent foreign key violations.
-
-### **Database Verification**
-```bash
-# Use the verification script to check all tables
-docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
-```
-
-### **🔥 Complete Database Reset** (Nuclear Option)
-```bash
-# ⚠️ DANGER: This will delete ALL data and recreate everything!
-# Use the comprehensive reset script
-docker exec primal-black-market-service php utils/dbResetPostgresql.util.php
-```
-
-**What the reset script does:**
-1. **5-second countdown warning** - Gives you time to cancel
-2. **Drops all tables** - Complete clean slate
-3. **Runs all migrations** - Recreates table structure  
-4. **Runs all seeders** - Populates with fresh data
-5. **Verifies results** - Shows final record counts
-
-### **Manual Database Reset** (Alternative)
-```bash
-# ⚠️ DANGER: This will delete all data!
-docker exec primal-black-market-service php -r "
-\$pdo = new PDO('pgsql:host=postgresql;port=5432;dbname=primal-black-market', 'user', 'password');
-\$pdo->exec('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');
-echo 'Database reset complete!';
-"
-```
-
 ---
 
 ## 📊 Expected Results
