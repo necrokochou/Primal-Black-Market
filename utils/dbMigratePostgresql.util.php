@@ -5,6 +5,9 @@ require_once 'vendor/autoload.php';
 require_once 'bootstrap.php';
 require_once UTILS_PATH . '/envSetter.util.php';
 
+// Define database schema files path
+define('DATABASE_PATH', __DIR__ . '/../database');
+
 echo "📦 ========================================\n";
 echo "📦 PRIMAL BLACK MARKET - MIGRATE ALL     \n";
 echo "📦 ========================================\n";
@@ -25,15 +28,38 @@ try {
 }
 
 // Migration function
-function runTableMigration($pdo, $tableName, $createTableSQL) {
-    echo "\n📄 Creating table: {$tableName}\n";
+function runTableMigration($pdo, $tableName, $sqlFile) {
+    echo "\n📄 Creating table: {$tableName} from {$sqlFile}\n";
+    
+    // Check if SQL file exists
+    $sqlFilePath = DATABASE_PATH . '/' . $sqlFile;
+    if (!file_exists($sqlFilePath)) {
+        echo "❌ SQL file not found: {$sqlFile}\n";
+        return false;
+    }
+    
+    // Read SQL content from file
+    $createTableSQL = file_get_contents($sqlFilePath);
+    if ($createTableSQL === false) {
+        echo "❌ Failed to read SQL file: {$sqlFile}\n";
+        return false;
+    }
+    
+    // Clean up SQL (remove comments, extra whitespace)
+    $createTableSQL = preg_replace('/--.*$/m', '', $createTableSQL); // Remove SQL comments
+    $createTableSQL = preg_replace('/\s+/', ' ', $createTableSQL); // Normalize whitespace
+    $createTableSQL = trim($createTableSQL);
+    
+    // Convert CREATE TABLE to CREATE TABLE IF NOT EXISTS for safety
+    $createTableSQL = preg_replace('/CREATE TABLE\s+/i', 'CREATE TABLE IF NOT EXISTS ', $createTableSQL);
     
     try {
         $pdo->exec($createTableSQL);
-        echo "✅ Table '{$tableName}' created successfully.\n";
+        echo "✅ Table '{$tableName}' created successfully from {$sqlFile}\n";
         return true;
     } catch (PDOException $e) {
         echo "❌ Failed to create table '{$tableName}': " . $e->getMessage() . "\n";
+        echo "📄 SQL content: " . substr($createTableSQL, 0, 200) . "...\n";
         return false;
     }
 }
@@ -45,119 +71,42 @@ $successCount = 0;
 $failureCount = 0;
 
 // 1. Users Table (Foundation) - Based on users.model.sql
-$createUsersTable = '
-CREATE TABLE IF NOT EXISTS users (
-    User_ID uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    Username varchar(256) UNIQUE NOT NULL,
-    Password varchar(256) NOT NULL,
-    Email varchar(256) NOT NULL,
-    Alias varchar(256) NOT NULL,
-    TrustLevel real DEFAULT 0,
-    Is_Vendor boolean DEFAULT FALSE,
-    Is_Admin boolean DEFAULT FALSE
-);
-';
-
-if (runTableMigration($pdo, 'users', $createUsersTable)) {
+if (runTableMigration($pdo, 'users', 'users.model.sql')) {
     $successCount++;
 } else {
     $failureCount++;
 }
 
 // 2. Categories Table - Based on categories.model.sql
-$createCategoriesTable = '
-CREATE TABLE IF NOT EXISTS categories (
-    Categories_ID uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    Name varchar(256) UNIQUE NOT NULL,
-    Description text NOT NULL
-);
-';
-
-if (runTableMigration($pdo, 'categories', $createCategoriesTable)) {
+if (runTableMigration($pdo, 'categories', 'categories.model.sql')) {
     $successCount++;
 } else {
     $failureCount++;
 }
 
 // 3. Listings Table (Requires Users & Categories) - Based on listings.model.sql
-$createListingsTable = '
-CREATE TABLE IF NOT EXISTS listings (
-    Listing_ID uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    Vendor_ID uuid NOT NULL,
-    Categories_ID uuid NOT NULL,
-    Title varchar(256) NOT NULL,
-    Description text NOT NULL,
-    Category varchar(100) NOT NULL,
-    Price real NOT NULL,
-    Quantity int NOT NULL,
-    Is_Active boolean DEFAULT TRUE,
-    Publish_Date date NOT NULL,
-    FOREIGN KEY (Vendor_ID) REFERENCES users(User_ID),
-    FOREIGN KEY (Categories_ID) REFERENCES categories(Categories_ID)
-);
-';
-
-if (runTableMigration($pdo, 'listings', $createListingsTable)) {
+if (runTableMigration($pdo, 'listings', 'listings.model.sql')) {
     $successCount++;
 } else {
     $failureCount++;
 }
 
 // 4. Feedback Table (Requires Users) - Based on feedbacks.model.sql
-$createFeedbackTable = '
-CREATE TABLE IF NOT EXISTS feedback (
-    Feedback_ID uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    Reviewer_ID uuid NOT NULL,
-    Vendor_ID uuid NOT NULL,
-    Rating int CHECK (Rating BETWEEN 0 AND 5),
-    Comments text NOT NULL,
-    Posted_At date NOT NULL,
-    FOREIGN KEY (Reviewer_ID) REFERENCES users(User_ID),
-    FOREIGN KEY (Vendor_ID) REFERENCES users(User_ID)
-);
-';
-
-if (runTableMigration($pdo, 'feedback', $createFeedbackTable)) {
+if (runTableMigration($pdo, 'feedbacks', 'feedbacks.model.sql')) {
     $successCount++;
 } else {
     $failureCount++;
 }
 
 // 5. Messages Table (Requires Users) - Based on messages.model.sql
-$createMessagesTable = '
-CREATE TABLE IF NOT EXISTS messages (
-    Message_ID uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    Sender_ID uuid NOT NULL,
-    Receiver_ID uuid NOT NULL,
-    Messages_Content text,
-    Sent_At date NOT NULL,
-    FOREIGN KEY (Sender_ID) REFERENCES users(User_ID),
-    FOREIGN KEY (Receiver_ID) REFERENCES users(User_ID)
-);
-';
-
-if (runTableMigration($pdo, 'messages', $createMessagesTable)) {
+if (runTableMigration($pdo, 'messages', 'messages.model.sql')) {
     $successCount++;
 } else {
     $failureCount++;
 }
 
 // 6. Transactions Table (Requires Users & Listings) - Based on transactions.model.sql
-$createTransactionsTable = '
-CREATE TABLE IF NOT EXISTS transactions (
-    Transaction_ID uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    Buyer_ID uuid NOT NULL,
-    Listing_ID uuid NOT NULL,
-    Quantity int NOT NULL,
-    Total_Price int NOT NULL,
-    Transaction_Status varchar(30) NOT NULL,
-    Timestamp date NOT NULL,
-    FOREIGN KEY (Buyer_ID) REFERENCES users(User_ID),
-    FOREIGN KEY (Listing_ID) REFERENCES listings(Listing_ID)
-);
-';
-
-if (runTableMigration($pdo, 'transactions', $createTransactionsTable)) {
+if (runTableMigration($pdo, 'transactions', 'transactions.model.sql')) {
     $successCount++;
 } else {
     $failureCount++;
@@ -166,7 +115,7 @@ if (runTableMigration($pdo, 'transactions', $createTransactionsTable)) {
 // ---- 🔍 Verify Migration Results ----
 echo "\n🔍 Verifying migration results...\n";
 
-$expectedTables = ['users', 'categories', 'listings', 'feedback', 'messages', 'transactions'];
+$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions'];
 $tablesCreated = 0;
 
 foreach ($expectedTables as $table) {
