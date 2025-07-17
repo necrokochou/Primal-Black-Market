@@ -72,7 +72,7 @@ foreach ($listings as $listing) {
     <section class="promo-video-section">
         <div class="promo-banner">
             <span class="promo-label">EXTRA 75% OFF</span>
-            <span class="promo-code">USE PROMO CODE: <b>MANIGGA</b></span>
+            <span class="promo-code">USE PROMO CODE: <b>HGARJFA</b></span>
             <a href="#" class="btn">SHOP NOW</a>
         </div>
         <div class="promo-video">
