@@ -44,7 +44,7 @@ docker cp .env primal-black-market-service:/var/www/html/
 ### 5. **Database Connection Test**
 ```bash
 # Test database connection
-docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
+docker exec primal-black-market-service php utils/dbVerifyTables.util.php
 ```
 
 ---
