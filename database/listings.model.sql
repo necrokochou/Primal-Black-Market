@@ -9,7 +9,6 @@ CREATE TABLE listings (
     Quantity int NOT NULL,
     Is_Active boolean DEFAULT TRUE,
     Publish_Date date NOT NULL,
-    Item_Image varchar(256),
     FOREIGN KEY (Vendor_ID) REFERENCES users(User_ID)
     FOREIGN KEY (Categories_ID) REFERENCES categories(Categories_ID)
 );

@@ -56,7 +56,7 @@ docker exec primal-black-market-service php utils/dbVerifyTables.util.php
 # Step 1: Reset database (DELETE ALL DATA)
 docker exec primal-black-market-service php utils/dbResetPostgresql.util.php
 
-# Step 2: Run all migrations 
+# Step 2: Run all migrations
 docker exec primal-black-market-service php utils/dbMigratePostgresql.util.php
 
 # Step 3: Run all seeders

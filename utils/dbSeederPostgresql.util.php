@@ -28,7 +28,7 @@ try {
 function clearAllTables($pdo) {
     echo "\n🧹 Clearing all tables in correct order...\n";
     
-    $clearOrder = ['transactions', 'feedback', 'messages', 'listings', 'categories', 'users'];
+    $clearOrder = ['transactions', 'feedbacks', 'messages', 'listings', 'categories', 'users'];
     
     foreach ($clearOrder as $table) {
         try {
@@ -179,17 +179,17 @@ if (empty($userIds)) {
 } else {
     $feedbackInserted = seedTable(
         $pdo,
-        'feedback',
+        'feedbacks',
         'feedbacks.staticData.php',
-        'INSERT INTO feedback (Reviewer_ID, Vendor_ID, Rating, Comments, Posted_At)
+        'INSERT INTO feedbacks (Reviewer_ID, Vendor_ID, Rating, Comments, Posted_At)
          VALUES (:reviewer_id, :vendor_id, :rating, :comments, :posted_at)',
-        function($feedback) use ($userIds) {
+        function($feedbacks) use ($userIds) {
             return [
                 ':reviewer_id' => $userIds[array_rand($userIds)],
                 ':vendor_id' => $userIds[array_rand($userIds)],
-                ':rating' => $feedback['Rating'],
-                ':comments' => $feedback['Comments'],
-                ':posted_at' => $feedback['PostedAt']
+                ':rating' => $feedbacks['Rating'],
+                ':comments' => $feedbacks['Comments'],
+                ':posted_at' => $feedbacks['PostedAt']
             ];
         }
     );
@@ -262,7 +262,7 @@ $totalInserted += $transactionsInserted;
 // ---- 🔍 Verify Seeding Results ----
 echo "\n🔍 Verifying seeding results...\n";
 
-$expectedTables = ['users', 'categories', 'listings', 'feedback', 'messages', 'transactions'];
+$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions'];
 $totalRecords = 0;
 
 foreach ($expectedTables as $table) {
