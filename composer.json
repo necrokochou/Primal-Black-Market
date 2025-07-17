@@ -29,8 +29,8 @@
         }
     ],
     "scripts": {
-        "postgresql:seed": "php utils/dbSeederAllPostgresql.util.php",
-        "postgresql:migrate": "php utils/dbMigrateAllPostgresql.util.php",
+        "postgresql:seed": "php utils/dbSeederPostgresql.util.php",
+        "postgresql:migrate": "php utils/dbMigratePostgresql.util.php",
         "postgresql:reset": "php utils/dbResetPostgresql.util.php"
     },
     "require": {
