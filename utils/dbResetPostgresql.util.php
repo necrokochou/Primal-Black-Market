@@ -41,7 +41,7 @@ echo "🗂️  Dropping tables individually...\n";
 $tables = [
     'transactions',
     'messages', 
-    'feedbacks',
+    'feedback',
     'listings',
     'categories',
     'users'
@@ -68,15 +68,37 @@ if (empty($remainingTables)) {
     echo "🧹 Performing schema reset as backup...\n";
     
     // Backup method: Drop entire schema if individual drops failed
-    $pdo->exec("DROP SCHEMA IF EXISTS public CASCADE;");
-    echo "✅ Dropped public schema\n";
+    try {
+        $pdo->exec("DROP SCHEMA IF EXISTS public CASCADE;");
+        echo "✅ Dropped public schema\n";
+    } catch (PDOException $e) {
+        echo "⚠️  Could not drop public schema: " . $e->getMessage() . "\n";
+    }
     
-    $pdo->exec("CREATE SCHEMA public;");
-    echo "✅ Recreated public schema\n";
+    try {
+        $pdo->exec("CREATE SCHEMA public;");
+        echo "✅ Recreated public schema\n";
+    } catch (PDOException $e) {
+        echo "⚠️  Could not create public schema: " . $e->getMessage() . "\n";
+    }
     
-    $pdo->exec("GRANT ALL ON SCHEMA public TO postgres;");
-    $pdo->exec("GRANT ALL ON SCHEMA public TO public;");
-    echo "✅ Set schema permissions\n";
+    // Set schema permissions with error handling
+    try {
+        $pdo->exec("GRANT ALL ON SCHEMA public TO postgres;");
+        echo "✅ Granted permissions to postgres user\n";
+    } catch (PDOException $e) {
+        echo "⚠️  Could not grant permissions to postgres user (role may not exist): " . $e->getMessage() . "\n";
+        echo "ℹ️  This is usually not a problem in Docker environments\n";
+    }
+    
+    try {
+        $pdo->exec("GRANT ALL ON SCHEMA public TO public;");
+        echo "✅ Granted permissions to public\n";
+    } catch (PDOException $e) {
+        echo "⚠️  Could not grant permissions to public: " . $e->getMessage() . "\n";
+    }
+    
+    echo "✅ Schema reset completed with available permissions\n";
 }
 
 // ---- 🎉 Reset Complete ----
@@ -86,6 +108,6 @@ echo "🎉 ========================================\n";
 echo "🧹 All tables and data have been deleted\n";
 echo "📋 Database is now empty and ready\n";
 echo "➡️  Next steps:\n";
-echo "   1. Run migrations: php utils/dbMigrateAllPostgresql.util.php\n";
-echo "   2. Run seeders: php utils/dbSeederAllPostgresql.util.php\n";
+echo "   1. Run migrations: php utils/dbMigratePostgresql.util.php\n";
+echo "   2. Run seeders: php utils/dbSeederPostgresql.util.php\n";
 echo "🎉 ========================================\n";
