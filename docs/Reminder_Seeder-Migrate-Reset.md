@@ -56,23 +56,23 @@ docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
 # Step 1: Reset database (DELETE ALL DATA)
 docker exec primal-black-market-service php utils/dbResetPostgresql.util.php
 
-# Step 2: Run all migrations 
-docker exec primal-black-market-service php utils/dbMigrateAllPostgresql.util.php
+# Step 2: Run all migrations
+docker exec primal-black-market-service php utils/dbMigratePostgresql.util.php
 
 # Step 3: Run all seeders
-docker exec primal-black-market-service php utils/dbSeederAllPostgresql.util.php
+docker exec primal-black-market-service php utils/dbSeederPostgresql.util.php
 ```
 
 ### **🧱 Migrate All Tables**
 ```bash
 # Run all migrations in correct order
-docker exec primal-black-market-service php utils/dbMigrateAllPostgresql.util.php
+docker exec primal-black-market-service php utils/dbMigratePostgresql.util.php
 ```
 
 ### **🌱 Seed All Tables**
 ```bash
 # Run all seeders in correct order
-docker exec primal-black-market-service php utils/dbSeederAllPostgresql.util.php
+docker exec primal-black-market-service php utils/dbSeederPostgresql.util.php
 ```
 
 ---
@@ -113,7 +113,7 @@ docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
 docker exec primal-black-market-service php -r "
 try {
     \$pdo = new PDO('pgsql:host=postgresql;port=5432;dbname=primal-black-market', 'user', 'password');
-    \$tables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions'];
+    \$tables = ['users', 'categories', 'listings', 'feedback', 'messages', 'transactions'];
     foreach(\$tables as \$table) {
         \$stmt = \$pdo->query(\"SELECT COUNT(*) FROM \$table\");
         echo \"\$table: \" . \$stmt->fetchColumn() . \" records\n\";
@@ -136,49 +136,18 @@ try {
 5. **Foreign Key Constraint Violation**: When re-seeding, dependent tables must be cleared first
 
 ### **🔄 Re-seeding Database (Important!)**
-If you need to re-seed data, follow this order to avoid foreign key violations:
+If you need to re-seed data, simply run the consolidated seeder again:
 
 ```bash
-# Clear and re-seed in dependency order
-docker exec primal-black-market-service php utils/dbSeederTransactionsPostgresql.util.php
-docker exec primal-black-market-service php utils/dbSeederFeedbacksPostgresql.util.php  
-docker exec primal-black-market-service php utils/dbSeederListingsPostgresql.util.php
-docker exec primal-black-market-service php utils/dbSeederMessagesPostgresql.util.php
-docker exec primal-black-market-service php utils/dbSeederCategoriesPostgresql.util.php
-docker exec primal-black-market-service php utils/dbSeederUsersPostgresql.util.php
+# The seeder now handles foreign key constraints automatically
+docker exec primal-black-market-service php utils/dbSeederPostgresql.util.php
 ```
 
-**⚠️ Note**: The listings seeder now automatically clears dependent tables (transactions, feedbacks) before clearing listings to prevent foreign key violations.
-
-### **Database Verification**
-```bash
-# Use the verification script to check all tables
-docker exec primal-black-market-service php utils/dbVerifyTablesSimple.util.php
-```
-
-### **🔥 Complete Database Reset** (Nuclear Option)
-```bash
-# ⚠️ DANGER: This will delete ALL data and recreate everything!
-# Use the comprehensive reset script
-docker exec primal-black-market-service php utils/dbResetPostgresql.util.php
-```
-
-**What the reset script does:**
-1. **5-second countdown warning** - Gives you time to cancel
-2. **Drops all tables** - Complete clean slate
-3. **Runs all migrations** - Recreates table structure  
-4. **Runs all seeders** - Populates with fresh data
-5. **Verifies results** - Shows final record counts
-
-### **Manual Database Reset** (Alternative)
-```bash
-# ⚠️ DANGER: This will delete all data!
-docker exec primal-black-market-service php -r "
-\$pdo = new PDO('pgsql:host=postgresql;port=5432;dbname=primal-black-market', 'user', 'password');
-\$pdo->exec('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');
-echo 'Database reset complete!';
-"
-```
+**✅ The seeder now automatically:**
+- Clears tables in correct dependency order (transactions → feedback → messages → listings → categories → users)
+- Handles foreign key violations gracefully
+- Generates foreign key relationships automatically
+- Provides detailed error messages and progress reports
 
 ---
 
@@ -186,6 +155,6 @@ echo 'Database reset complete!';
 - **Users**: 8 records (phantommorphus, necrokochou, etc.)
 - **Categories**: 12 records (Weapons, Hunting Equipment, etc.)
 - **Listings**: ~45 records (Raptor Claw Knife, etc.)
-- **Feedbacks**: 4 records (ratings and comments)
+- **Feedback**: 4 records (ratings and comments)
 - **Messages**: 5 records (prehistoric chat messages)
 - **Transactions**: 3 records (purchase history)

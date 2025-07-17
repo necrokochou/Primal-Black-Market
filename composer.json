@@ -29,8 +29,9 @@
         }
     ],
     "scripts": {
-        "postgresql:seed": "php utils/dbSeederUsersPostgresql.util.php",
-        "postgresql:migrate": "php utils/dbMigrateUsersPostgresql.util.php"
+        "postgresql:seed": "php utils/dbSeederPostgresql.util.php",
+        "postgresql:migrate": "php utils/dbMigratePostgresql.util.php",
+        "postgresql:reset": "php utils/dbResetPostgresql.util.php"
     },
     "require": {
         "vlucas/phpdotenv": "^5.6"
