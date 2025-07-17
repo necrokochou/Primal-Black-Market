@@ -112,10 +112,17 @@ if (runTableMigration($pdo, 'transactions', 'transactions.model.sql')) {
     $failureCount++;
 }
 
+// 7. Cart Table (Requires Users & Listings) - Based on cart.model.sql
+if (runTableMigration($pdo, 'cart', 'cart.model.sql')) {
+    $successCount++;
+} else {
+    $failureCount++;
+}
+
 // ---- 🔍 Verify Migration Results ----
 echo "\n🔍 Verifying migration results...\n";
 
-$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions'];
+$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions', 'cart'];
 $tablesCreated = 0;
 
 foreach ($expectedTables as $table) {
@@ -136,7 +143,7 @@ echo "🎉 ========================================\n";
 echo "📊 Migration Summary:\n";
 echo "   ✅ Successful migrations: {$successCount}\n";
 echo "   ❌ Failed migrations: {$failureCount}\n";
-echo "   📋 Tables created: {$tablesCreated}/6\n";
+echo "   📋 Tables created: {$tablesCreated}/7\n";
 echo "\n➡️  Next step: Run seeders to populate data\n";
 echo "   Command: php utils/dbSeederPostgresql.util.php\n";
 echo "🎉 ========================================\n";

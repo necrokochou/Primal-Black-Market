@@ -6,4 +6,5 @@ return [
     'messages',
     'feedbacks',
     'categories',
+    'cart',
 ];
