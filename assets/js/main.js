@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             setCart(cart);
             this.textContent = 'Added!';
             setTimeout(() => { this.textContent = 'Add to Cart'; }, 1200);
-        });
+        };
     });
 
     // Login/Register modal (frontend only)
@@ -186,3 +186,4 @@ function updateCartCount() {
     if (el) el.textContent = count;
 }
 
+})
