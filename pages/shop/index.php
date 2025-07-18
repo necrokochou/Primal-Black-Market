@@ -9,6 +9,9 @@ $filteredListings = array_filter($listings, function($item) use ($selectedCatego
     return !$selectedCategory || $item['Category'] === $selectedCategory;
 });
 ?>
+
+<!-- Shop Page Specific Styles -->
+<link rel="stylesheet" href="/assets/css/primal-shop.css">
 <main class="shop-main shop-dark-theme">
     
    
@@ -17,9 +20,9 @@ $filteredListings = array_filter($listings, function($item) use ($selectedCatego
         <aside class="shop-sidebar">
             <h3>Categories</h3>
             <ul>
-                <li><a href="/pages/shop/index.php"<?= !$selectedCategory ? ' class="active"' : '' ?>>All</a></li>
+                <li><a href="/pages/shop/index.php"<?= !$selectedCategory ? ' class="active"' : '' ?> data-category="all">All</a></li>
                 <?php foreach ($categories as $cat): ?>
-                    <li><a href="/pages/shop/index.php?category=<?= urlencode($cat['Name']) ?>"<?= $selectedCategory === $cat['Name'] ? ' class="active"' : '' ?>><?= htmlspecialchars($cat['Name']) ?></a></li>
+                    <li><a href="/pages/shop/index.php?category=<?= urlencode($cat['Name']) ?>"<?= $selectedCategory === $cat['Name'] ? ' class="active"' : '' ?> data-category="<?= htmlspecialchars($cat['Name']) ?>"><?= htmlspecialchars($cat['Name']) ?></a></li>
                 <?php endforeach; ?>
             </ul>
         </aside>
@@ -41,4 +44,8 @@ $filteredListings = array_filter($listings, function($item) use ($selectedCatego
         </section>
     </div>
 </main>
+
+<!-- Shop Page JavaScript -->
+<script src="/assets/js/primal-shop.js"></script>
+
 <?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
