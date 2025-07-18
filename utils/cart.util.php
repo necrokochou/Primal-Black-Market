@@ -1,5 +1,5 @@
 <?php
-require_once UTILS_PATH . '/dbConnectPostgresql.util.php';
+require_once UTILS_PATH . '/envSetter.util.php';
 require_once UTILS_PATH . '/auth.util.php';
 
 class CartHandler {
@@ -9,7 +9,19 @@ class CartHandler {
 
     public function __construct() {
         session_start(); // ensure session is started
-        $this->pdo = DBConnectPostgresql::connect();
+        
+        // Initialize database connection using the same pattern as other utils
+        $pgConfig = getPostgresEnv();
+        $dsn = "pgsql:host={$pgConfig['host']};port={$pgConfig['port']};dbname={$pgConfig['db']}";
+        
+        try {
+            $this->pdo = new PDO($dsn, $pgConfig['user'], $pgConfig['password'], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            ]);
+        } catch (PDOException $e) {
+            die("❌ Database connection failed: " . $e->getMessage());
+        }
+        
         $this->auth = new \App\Utils\Auth($this->pdo);
         $this->userID = $this->auth->getLoggedInUserID();
 
@@ -23,11 +35,10 @@ class CartHandler {
 
     public function getCart() {
         $stmt = $this->pdo->prepare("
-            SELECT ci.cart_item_id, ci.product_id, ci.quantity, p.name, p.price
-            FROM cart_items ci
-            JOIN carts c ON c.cart_id = ci.cart_id
-            JOIN products p ON p.product_id = ci.product_id
-            WHERE c.user_id = :userID
+            SELECT c.Cart_ID, c.User_ID, c.Listing_ID, c.Quantity, l.Title, l.Price
+            FROM cart c
+            JOIN listings l ON l.Listing_ID = c.Listing_ID
+            WHERE c.User_ID = :userID
         ");
         $stmt->execute(['userID' => $this->userID]);
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -36,28 +47,29 @@ class CartHandler {
         require TEMPLATES_PATH . '/cart.view.template.php';
     }
 
-    public function addToCart($productID, $quantity) {
-        $cartID = $this->getOrCreateCart();
-
+    public function addToCart($listingID, $quantity) {
+        // Check if item already exists in cart
         $stmt = $this->pdo->prepare("
-            SELECT cart_item_id, quantity FROM cart_items
-            WHERE cart_id = :cartID AND product_id = :productID
+            SELECT Cart_ID, Quantity FROM cart
+            WHERE User_ID = :userID AND Listing_ID = :listingID
         ");
-        $stmt->execute(['cartID' => $cartID, 'productID' => $productID]);
+        $stmt->execute(['userID' => $this->userID, 'listingID' => $listingID]);
         $item = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($item) {
+            // Update existing cart item
             $stmt = $this->pdo->prepare("
-                UPDATE cart_items SET quantity = quantity + :quantity
-                WHERE cart_item_id = :id
+                UPDATE cart SET Quantity = Quantity + :quantity
+                WHERE Cart_ID = :cartID
             ");
-            $stmt->execute(['quantity' => $quantity, 'id' => $item['cart_item_id']]);
+            $stmt->execute(['quantity' => $quantity, 'cartID' => $item['Cart_ID']]);
         } else {
+            // Insert new cart item
             $stmt = $this->pdo->prepare("
-                INSERT INTO cart_items (cart_id, product_id, quantity)
-                VALUES (:cartID, :productID, :quantity)
+                INSERT INTO cart (User_ID, Listing_ID, Quantity, Added_At)
+                VALUES (:userID, :listingID, :quantity, CURRENT_TIMESTAMP)
             ");
-            $stmt->execute(['cartID' => $cartID, 'productID' => $productID, 'quantity' => $quantity]);
+            $stmt->execute(['userID' => $this->userID, 'listingID' => $listingID, 'quantity' => $quantity]);
         }
 
         // After successful add, redirect to cart
@@ -65,40 +77,24 @@ class CartHandler {
         exit;
     }
 
-    public function updateItem($itemID, $quantity) {
+    public function updateItem($cartID, $quantity) {
         $stmt = $this->pdo->prepare("
-            UPDATE cart_items SET quantity = :quantity
-            WHERE cart_item_id = :itemID
+            UPDATE cart SET Quantity = :quantity
+            WHERE Cart_ID = :cartID AND User_ID = :userID
         ");
-        $stmt->execute(['quantity' => $quantity, 'itemID' => $itemID]);
+        $stmt->execute(['quantity' => $quantity, 'cartID' => $cartID, 'userID' => $this->userID]);
 
         header('Location: /pages/cart.php?action=view');
         exit;
     }
 
-    public function removeItem($itemID) {
+    public function removeItem($cartID) {
         $stmt = $this->pdo->prepare("
-            DELETE FROM cart_items WHERE cart_item_id = :itemID
+            DELETE FROM cart WHERE Cart_ID = :cartID AND User_ID = :userID
         ");
-        $stmt->execute(['itemID' => $itemID]);
+        $stmt->execute(['cartID' => $cartID, 'userID' => $this->userID]);
 
         header('Location: /pages/cart.php?action=view');
         exit;
-    }
-
-    private function getOrCreateCart() {
-        $stmt = $this->pdo->prepare("
-            SELECT cart_id FROM carts WHERE user_id = :userID
-        ");
-        $stmt->execute(['userID' => $this->userID]);
-        $cart = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($cart) return $cart['cart_id'];
-
-        $stmt = $this->pdo->prepare("
-            INSERT INTO carts (user_id) VALUES (:userID) RETURNING cart_id
-        ");
-        $stmt->execute(['userID' => $this->userID]);
-        return $stmt->fetch(PDO::FETCH_ASSOC)['cart_id'];
     }
 }
