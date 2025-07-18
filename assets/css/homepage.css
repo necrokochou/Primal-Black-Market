@@ -1,4 +1,4 @@
-/* Modern Header Styling */
+/* Header Styling */
 .site-header.modern-clean-header {
     background: linear-gradient(135deg, 
         rgba(18, 18, 18, 0.95) 0%, 
@@ -306,7 +306,6 @@
     color: #007bff;
 }
 
-/* --- ORIGINAL CART PAGE STRUCTURE CLASSES (for inline css removal) --- */
 .cart-empty-message {
     padding: 2rem;
     text-align: center;
@@ -837,51 +836,43 @@ body, .primal-theme {
 .hero-btn {
     font-size: 1.1rem;
     font-weight: 700;
-    padding: 12px 32px;
-    border-radius: 18px;
-    box-shadow: 0 2px 8px rgba(60,179,113,0.10);
+    padding: 15px 40px;
+    border-radius: 30px;
+    box-shadow: 0 8px 25px rgba(127, 79, 36, 0.4);
     letter-spacing: 1px;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    border: 2px solid transparent;
+    backdrop-filter: blur(10px);
 }
+
+
+
+.hero-btn:hover::before {
+    left: 100%;
+}
+
 .hero-btn.btn-primary {
-    background: var(--accent-green);
-    color: #fffbe6;
-    border: none;
+    background: linear-gradient(135deg, 
+        var(--primal-brown) 0%, 
+        var(--primal-orange) 100%);
+    color: var(--primal-beige-light);
+    border-color: var(--primal-brown-dark);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    box-shadow: 
+        0 8px 25px rgba(127, 79, 36, 0.4),
+        0 0 20px rgba(255, 140, 0, 0.2);
 }
+
 .hero-btn.btn-primary:hover {
     background: var(--accent-yellow);
     color: var(--accent-brown);
 }
 
-.hero-next-row {
-    position: absolute;
-    right: 32px;
-    bottom: 32px;
-    z-index: 4;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-}
-.hero-next-label {
-    color: var(--accent-yellow);
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
-    text-shadow: 0 2px 8px rgba(60,40,10,0.22);
-}
-.hero-next-thumbs {
-    display: flex;
-    gap: 10px;
-}
-.hero-next-thumbs img {
-    width: 64px;
-    height: 48px;
-    object-fit: cover;
-    border-radius: 10px;
-    border: 2px solid var(--accent-yellow);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-}
+
+
 @media (max-width: 900px) {
     .hero-content-special {
         padding: 32px 18px 24px 18px;
@@ -919,7 +910,7 @@ body, .primal-theme {
 /* Modern Hero Section Styling */
 .hero-section.hero-modern {
     position: relative;
-    height: 100vh;
+    height: 90vh;
     width: 100%;
     margin: 0;
     padding: 0;
@@ -977,24 +968,25 @@ body, .primal-theme {
 }
 
 .hero-title-modern {
+    font-family: 'Cinzel', serif;
     font-size: 4rem;
-    font-weight: 900;
+    font-weight: 700;
     line-height: 1.1;
     margin: 1rem 0;
-    background: linear-gradient(135deg, #fff 0%, #007bff 50%, #28a745 100%);
+    background: linear-gradient(135deg, #F5F5DC 0%, #FF8C00 50%, #7F4F24 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
     animation: titleGlow 3s ease-in-out infinite alternate;
 }
 
 @keyframes titleGlow {
     from {
-        filter: drop-shadow(0 0 20px rgba(0, 123, 255, 0.5));
+        filter: drop-shadow(0 0 20px rgba(255, 140, 0, 0.6));
     }
     to {
-        filter: drop-shadow(0 0 40px rgba(40, 167, 69, 0.7));
+        filter: drop-shadow(0 0 40px rgba(127, 79, 36, 0.8));
     }
 }
 
@@ -1007,96 +999,36 @@ body, .primal-theme {
 }
 
 .hero-section.hero-modern .hero-genre-label {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
+    background: linear-gradient(135deg, var(--primal-brown-dark), var(--primal-brown));
+    color: var(--primal-beige-light);
     font-weight: 700;
     font-size: 1rem;
     border-radius: 25px;
     padding: 8px 20px;
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(88, 47, 14, 0.5);
+    border: 2px solid var(--primal-orange);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
 }
+
+
+
 
 .hero-section.hero-modern .hero-badge {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
+    background: linear-gradient(135deg, var(--primal-green), #4A5233);
+    color: var(--primal-beige-light);
     font-weight: 700;
     font-size: 1rem;
     border-radius: 25px;
     padding: 8px 20px;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-}
-
-.hero-section.hero-modern .hero-desc {
-    font-size: 1.2rem;
-    line-height: 1.6;
-    margin: 2rem 0;
-    color: rgba(255, 255, 255, 0.9);
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.hero-section.hero-modern .hero-actions {
-    margin-top: 2rem;
-}
-
-.hero-section.hero-modern .hero-btn {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    padding: 15px 40px;
-    border-radius: 50px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
-    border: none;
-    cursor: pointer;
-}
-
-.hero-section.hero-modern .hero-btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 12px 35px rgba(0, 123, 255, 0.5);
-    background: linear-gradient(135deg, #28a745, #20c997);
-}
-
-.hero-section.hero-modern .hero-next-row {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    z-index: 3;
-    color: white;
-}
-
-.hero-section.hero-modern .hero-next-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-    display: block;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.hero-section.hero-modern .hero-next-thumbs {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
-.hero-section.hero-modern .hero-next-thumbs img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    transition: all 0.3s ease;
-}
-
-.hero-section.hero-modern .hero-next-thumbs img:hover {
-    transform: scale(1.1);
-    border-color: #007bff;
+    box-shadow: 0 4px 15px rgba(101, 109, 74, 0.5);
+    border: 2px solid var(--primal-orange);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
 }
 
 /* Primal Black Market Footer Styling */
