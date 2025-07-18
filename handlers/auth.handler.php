@@ -42,7 +42,6 @@ if ($_POST['action'] === 'register') {
         echo json_encode(['success' => false, 'error' => 'All fields are required.']);
         exit;
     }
-
     // Check if user already exists (must quote columns correctly)
     $stmt = $pdo->prepare('SELECT 1 FROM users WHERE "Username" = :username OR "Email" = :email');
     $stmt->execute([':username' => $username, ':email' => $email]);
@@ -54,7 +53,6 @@ if ($_POST['action'] === 'register') {
     // Hash password and insert
     $hashed = password_hash($password, PASSWORD_DEFAULT);
     $alias = $username;
-
     $stmt = $pdo->prepare('
         INSERT INTO users ("Username", "Email", "Password", "Alias")
         VALUES (:username, :email, :password, :alias)

@@ -91,7 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const card = this.closest('.product-card');
             const title = card.getAttribute('data-title');
             const price = parseFloat(card.getAttribute('data-price'));
-            addToCart({ title, price, qty: 1 });
+            const image = card.getAttribute('data-image');
+            addToCart({ title, price, image, qty: 1 });
             this.textContent = 'Added!';
             setTimeout(() => { this.textContent = 'Add to Cart'; }, 1200);
         });
