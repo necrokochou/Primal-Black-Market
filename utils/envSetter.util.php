@@ -1,13 +1,6 @@
 <?php
 require_once BASE_PATH . '/bootstrap.php';
 
-chdir(BASE_PATH);
-
-require 'vendor/autoload.php';
-
-$dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);
-$dotenv->load();
-
 function getPostgresEnv(): array {
     return [
         'host' => $_ENV['PG_HOST'],
