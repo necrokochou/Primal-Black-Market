@@ -43,7 +43,7 @@ $tables = [
     'cart',
     'transactions',
     'messages', 
-    'feedback',
+    'feedbacks',
     'listings',
     'categories',
     'users'

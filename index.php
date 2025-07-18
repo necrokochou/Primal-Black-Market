@@ -19,23 +19,26 @@ foreach ($listings as $listing) {
 }
 ?>
 
+<!-- Primal Body Styling -->
+<link rel="stylesheet" href="/assets/css/primal-body.css">
+
 <main class="homepage-main">
-    <section class="hero-section hero-special">
+    <section class="hero-section hero-modern">
         <div class="hero-bg-image">
             <img src="/assets/images/heroimg.jpg" alt="primal img" />
         </div>
         <div class="hero-overlay"></div>
-        <div class="hero-content hero-content-special">
+        <div class="hero-content hero-content-modern">
             <div class="hero-label-row">
                 <span class="hero-genre-label">PRIMAL GOODS</span>
                 <span class="hero-badge">EXOTIC</span>
             </div>
-            <h1 class="hero-title-special">UNLEASH THE PRIMAL<br>OWN THE FORBIDDEN</h1>
+            <h1 class="hero-title-modern">UNLEASH THE PRIMAL<br>OWN THE FORBIDDEN</h1>
             <div class="hero-desc">ARGGHH ARGHH ARGHHH<br>
                 Step beyond the civilized world. We deal in rare, primal goods and exotic artifacts items whispered about in the shadows. From tribal relics to untamed luxuries, our marketplace is where instinct meets indulgence. Discreet. Dangerous. Decidedly raw.
             </div>
-            <div class="hero-actions hero-actions-special">
-                <a href="./pages/shop/index.php" class="btn btn-primary hero-btn">SHOP</a>
+            <div class="hero-actions hero-actions-modern">
+                <a href="./pages/shop/index.php" class="btn btn-primary hero-btn">SHOP NOW</a>
             </div>
         </div>
         <div class="hero-next-row">
@@ -104,6 +107,9 @@ foreach ($listings as $listing) {
         <span>FREE DELIVERY FOR EVERY FIRST PURCHASE + RETURN OVER $59.00 | COLLECT FROM STORE</span>
     </div>
 </main>
+
+<!-- Primal Body Interactions -->
+<script src="/assets/js/primal-body.js"></script>
 
 <?php require_once __DIR__ . '/layouts/footer.php'; ?>
 
