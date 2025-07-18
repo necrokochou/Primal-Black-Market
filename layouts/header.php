@@ -3,49 +3,61 @@
 
 $user = $_SESSION['user'] ?? null;
 ?>
-<header class="site-header primal-header-aaa">
+<header class="site-header modern-clean-header">
     <link rel="stylesheet" href="/assets/css/homepage.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <div class="top-bar primal-top-bar">
-        <span><i class="fa fa-crown"></i> Welcome to the <b>Primal Black Market</b>!</span>
-        <div class="top-bar-right">
-            <span class="lang-select">English <i class="fa fa-chevron-down"></i></span>
-            <?php if (!$user): ?>
-                <a href="/pages/login/index.php" class="login-link">Login</a> /
-                <a href="/pages/register/index.php" class="login-link">Register</a>
-            <?php else: ?>
-                <span class="user-welcome"><i class="fa fa-user"></i> <?= htmlspecialchars($user) ?></span> /
-                <a href="/pages/logout/index.php" class="login-link">Logout</a>
-            <?php endif; ?>
-            <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-            <a href="#" class="social-icon"><i class="fab fa-discord"></i></a>
+    
+    <div class="header-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <a href="/" class="logo-link">
+                <img src="/assets/images/CP Logo(ARCL).png" alt="Primal Black Market Logo" class="logo-img">
+            </a>
         </div>
-    </div>
-    <div class="main-nav primal-theme-nav primal-nav-aaa">
-        <div class="logo">
-            <a href="/"><img src="/assets/images/example.png" alt="Primal Black Market Logo" style="height:44px;"></a>
-        </div>
-        <nav>
-            <ul class="nav-list">
-                <li><a href="/index.php">Home</a></li>
-                <li><a href="/pages/shop/index.php">Shop</a></li>
-                <li><a href="/pages/cart/index.php">Cart</a></li>
-                <li><a href="/pages/about/index.php">About</a></li>
+        
+        <!-- Navigation Section -->
+        <nav class="nav-section">
+            <ul class="nav-menu">
+                <li><a href="/index.php" class="nav-link">Home</a></li>
+                <li><a href="/pages/shop/index.php" class="nav-link">Shop</a></li>
+                <li><a href="/pages/cart/index.php" class="nav-link">Cart</a></li>
+                <li><a href="/pages/about/index.php" class="nav-link">About</a></li>
             </ul>
         </nav>
+        
+        <!-- Search Section -->
+        <div class="search-container">
+            <input type="text" placeholder="Search products..." class="search-input">
+            <button class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        
+        <!-- Actions Section -->
         <div class="header-actions">
-            <a href="/pages/cart/index.php" class="cart-link" id="cartBtn">
-                <i class="fa fa-shopping-cart"></i> <span id="cart-count">0</span>
+            <a href="/pages/cart/index.php" class="icon-link cart-link" id="cartBtn">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cart-count">0</span>
             </a>
+            
             <?php if (!$user): ?>
-                <a href="/pages/login/index.php" class="login-link" id="loginBtn">Login</a> /
-                <a href="/pages/register/index.php" class="login-link" id="registerBtn">Register</a>
+                <a href="/pages/login/index.php" class="icon-link user-link" id="loginBtn">
+                    <i class="fas fa-user"></i>
+                </a>
             <?php else: ?>
-                <span class="user-welcome"><i class="fa fa-user"></i> <?= htmlspecialchars($user) ?></span> /
-                <a href="/pages/logout/index.php" class="login-link">Logout</a>
+                <div class="user-dropdown">
+                    <span class="user-welcome">
+                        <i class="fas fa-user"></i>
+                        <?= htmlspecialchars($user) ?>
+                    </span>
+                    <div class="dropdown-content">
+                        <a href="/pages/profile/index.php">Profile</a>
+                        <a href="/pages/logout/index.php">Logout</a>
+                    </div>
+                </div>
             <?php endif; ?>
         </div>
+    </div>
     </div>
     <script>
     // Animate cart count (use pbm_cart and sum qty)
