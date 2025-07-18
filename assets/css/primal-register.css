@@ -1,0 +1,780 @@
+
+
+/* ================================
+   CSS VARIABLES & IMPORTS
+   ================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Primal Black Market Color Palette */
+    --primal-brown-dark: #582F0E;
+    --primal-brown: #7F4F24;
+    --primal-orange: #FF8C00;
+    --primal-green: #656D4A;
+    --primal-beige-light: #F5F5DC;
+    --primal-black: #1A1A1A;
+    --primal-gray-dark: #2A2A2A;
+    --primal-gray-medium: #3A3A3A;
+    
+    /* Register-specific Variables */
+    --register-bg-primary: rgba(26, 26, 26, 0.95);
+    --register-bg-secondary: rgba(30, 30, 30, 0.9);
+    --register-accent: var(--primal-orange);
+    --register-border: rgba(127, 79, 36, 0.3);
+    --register-shadow: rgba(0, 0, 0, 0.4);
+    --register-glow: rgba(255, 140, 0, 0.2);
+}
+
+/* ================================
+   REGISTER PAGE BACKGROUND
+   ================================ */
+
+.primal-auth-bg {
+    background: linear-gradient(135deg, 
+        #0a0a0a 0%, 
+        var(--primal-black) 25%, 
+        #1e1e1e 50%, 
+        var(--primal-black) 75%, 
+        #0a0a0a 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.primal-auth-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 30% 20%, rgba(127, 79, 36, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(101, 109, 74, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 140, 0, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+    animation: registerAmbientGlow 25s ease-in-out infinite;
+}
+
+@keyframes registerAmbientGlow {
+    0%, 100% { opacity: 0.4; }
+    33% { opacity: 0.7; }
+    66% { opacity: 0.5; }
+}
+
+/* ================================
+   REGISTER CARD CONTAINER
+   ================================ */
+
+.primal-auth-card {
+    background: linear-gradient(135deg, 
+        var(--register-bg-primary) 0%, 
+        var(--register-bg-secondary) 100%);
+    border-radius: 25px;
+    padding: 3rem 2.5rem;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 
+        0 20px 60px var(--register-shadow),
+        0 8px 25px rgba(127, 79, 36, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--register-border);
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+    animation: registerCardEntrance 1.2s ease-out;
+}
+
+@keyframes registerCardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(60px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.primal-auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(127, 79, 36, 0.12) 0%, 
+        transparent 50%, 
+        rgba(101, 109, 74, 0.08) 100%);
+    border-radius: 25px;
+    pointer-events: none;
+}
+
+.primal-auth-card::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+        var(--primal-orange), 
+        var(--primal-brown), 
+        var(--primal-green), 
+        var(--primal-brown), 
+        var(--primal-orange));
+    background-size: 400% 400%;
+    border-radius: 25px;
+    z-index: -1;
+    animation: registerBorderGlow 10s ease-in-out infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+@keyframes registerBorderGlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* ================================
+   REGISTER TITLE
+   ================================ */
+
+.primal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: transparent;
+    background: linear-gradient(135deg, 
+        var(--primal-beige-light) 0%, 
+        var(--primal-orange) 40%, 
+        var(--primal-brown) 80%, 
+        var(--primal-green) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-align: center;
+    margin-bottom: 1rem;
+    letter-spacing: 1.5px;
+    text-shadow: 0 4px 20px rgba(255, 140, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.primal-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--primal-orange) 30%, 
+        var(--primal-brown) 70%, 
+        transparent 100%);
+    border-radius: 2px;
+    animation: registerTitleUnderlineGlow 4s ease-in-out infinite;
+}
+
+@keyframes registerTitleUnderlineGlow {
+    0%, 100% { opacity: 0.6; width: 80px; }
+    50% { opacity: 1; width: 120px; }
+}
+
+/* ================================
+   REGISTER SUBTITLE
+   ================================ */
+
+.primal-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: rgba(245, 245, 220, 0.75);
+    text-align: center;
+    margin: -0.5rem 0 2.5rem 0;
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+    line-height: 1.5;
+}
+
+/* ================================
+   REGISTER FORM
+   ================================ */
+
+.primal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* ================================
+   INPUT GROUPS
+   ================================ */
+
+.input-group {
+    position: relative;
+    margin-bottom: 1.8rem;
+}
+
+.input-group .primal-input {
+    margin-bottom: 0;
+}
+
+.input-label {
+    position: absolute;
+    top: -10px;
+    left: 15px;
+    background: var(--register-bg-primary);
+    padding: 0 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primal-orange);
+    border-radius: 4px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.input-group:focus-within .input-label,
+.input-group.has-value .input-label {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ================================
+   INPUT FIELDS
+   ================================ */
+
+.primal-input {
+    padding: 1.3rem 1.6rem;
+    border-radius: 16px;
+    border: 2px solid var(--register-border);
+    background: linear-gradient(135deg, 
+        rgba(42, 42, 42, 0.85) 0%, 
+        rgba(58, 58, 58, 0.65) 100%);
+    color: var(--primal-beige-light);
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    outline: none;
+    backdrop-filter: blur(15px);
+    position: relative;
+    box-shadow: 
+        0 6px 20px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    width: 100%;
+}
+
+.primal-input::placeholder {
+    color: rgba(245, 245, 220, 0.6);
+    font-weight: 400;
+    transition: color 0.3s ease;
+}
+
+.primal-input:focus {
+    border-color: var(--primal-orange);
+    background: linear-gradient(135deg, 
+        rgba(127, 79, 36, 0.25) 0%, 
+        rgba(88, 47, 14, 0.18) 100%);
+    box-shadow: 
+        0 10px 30px rgba(255, 140, 0, 0.35),
+        0 0 25px rgba(255, 140, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+}
+
+.primal-input:focus::placeholder {
+    color: rgba(245, 245, 220, 0.85);
+}
+
+/* Input Validation States */
+.primal-input.valid {
+    border-color: var(--primal-green);
+    box-shadow: 
+        0 6px 20px rgba(101, 109, 74, 0.3),
+        0 0 15px rgba(101, 109, 74, 0.2);
+}
+
+.primal-input.invalid {
+    border-color: #e74c3c;
+    box-shadow: 
+        0 6px 20px rgba(231, 76, 60, 0.3),
+        0 0 15px rgba(231, 76, 60, 0.2);
+}
+
+/* ================================
+   PASSWORD STRENGTH INDICATOR
+   ================================ */
+
+.password-strength {
+    margin-top: 0.5rem;
+    padding: 0 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+}
+
+.strength-bar {
+    height: 4px;
+    background: rgba(127, 79, 36, 0.3);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.strength-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    width: 0%;
+}
+
+.strength-fill.weak { 
+    background: #e74c3c; 
+    width: 25%; 
+}
+
+.strength-fill.fair { 
+    background: #f39c12; 
+    width: 50%; 
+}
+
+.strength-fill.good { 
+    background: var(--primal-orange); 
+    width: 75%; 
+}
+
+.strength-fill.strong { 
+    background: var(--primal-green); 
+    width: 100%; 
+}
+
+.strength-text {
+    color: rgba(245, 245, 220, 0.7);
+    font-weight: 500;
+}
+
+/* ================================
+   FORM OPTIONS
+   ================================ */
+
+.form-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    cursor: pointer;
+    color: rgba(245, 245, 220, 0.8);
+    transition: color 0.3s ease;
+    line-height: 1.4;
+}
+
+.checkbox-group:hover {
+    color: var(--primal-orange);
+}
+
+.checkbox-group input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--register-border);
+    border-radius: 5px;
+    background: transparent;
+    position: relative;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.checkbox-group input:checked + .checkmark {
+    background: var(--primal-orange);
+    border-color: var(--primal-orange);
+    box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+}
+
+.checkbox-group input:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.label-text {
+    user-select: none;
+    font-weight: 500;
+}
+
+.terms-link {
+    color: var(--primal-orange);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.terms-link:hover {
+    color: #ffaa33;
+    border-bottom-color: #ffaa33;
+    text-shadow: 0 2px 8px rgba(255, 140, 0, 0.4);
+}
+
+/* ================================
+   REGISTER BUTTON
+   ================================ */
+
+.primal-btn-primary {
+    background: linear-gradient(135deg, 
+        var(--primal-brown) 0%, 
+        var(--primal-orange) 50%, 
+        var(--primal-brown-dark) 100%);
+    color: var(--primal-beige-light);
+    border: none;
+    border-radius: 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 1.3rem 2rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 10px 30px rgba(127, 79, 36, 0.45),
+        0 0 25px rgba(255, 140, 0, 0.25);
+    border: 2px solid transparent;
+    margin-top: 1.5rem;
+}
+
+.primal-btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(245, 245, 220, 0.35) 50%, 
+        transparent 100%);
+    transition: left 0.7s ease;
+}
+
+.primal-btn-primary:hover {
+    background: linear-gradient(135deg, 
+        var(--primal-orange) 0%, 
+        #ff6b35 50%, 
+        var(--primal-brown) 100%);
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 
+        0 18px 45px rgba(255, 140, 0, 0.55),
+        0 0 35px rgba(255, 140, 0, 0.45);
+    border-color: var(--primal-orange);
+}
+
+.primal-btn-primary:hover::before {
+    left: 100%;
+}
+
+.primal-btn-primary:active {
+    transform: translateY(-2px) scale(1.01);
+    transition: all 0.1s ease;
+}
+
+/* Button Loading State */
+.primal-btn-primary.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.primal-btn-primary.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 22px;
+    height: 22px;
+    border: 2px solid transparent;
+    border-top: 2px solid var(--primal-beige-light);
+    border-radius: 50%;
+    animation: buttonLoading 1s linear infinite;
+}
+
+@keyframes buttonLoading {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ================================
+   REGISTER LINKS
+   ================================ */
+
+.primal-auth-link {
+    text-align: center;
+    margin-top: 2.5rem;
+    font-family: 'Inter', sans-serif;
+    color: rgba(245, 245, 220, 0.8);
+    font-size: 0.95rem;
+    position: relative;
+    z-index: 1;
+}
+
+.primal-link {
+    color: var(--primal-orange);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+}
+
+.primal-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 140, 0, 0.12);
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.primal-link:hover {
+    color: #ffaa33;
+    text-shadow: 0 2px 8px rgba(255, 140, 0, 0.4);
+}
+
+.primal-link:hover::before {
+    opacity: 1;
+}
+
+/* ================================
+   REGISTER FEATURES
+   ================================ */
+
+.register-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(127, 79, 36, 0.25);
+    position: relative;
+    z-index: 1;
+}
+
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    color: rgba(245, 245, 220, 0.65);
+    transition: all 0.3s ease;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.feature-item:hover {
+    color: var(--primal-orange);
+    transform: translateY(-3px);
+    background: rgba(255, 140, 0, 0.08);
+}
+
+.feature-item i {
+    font-size: 1.4rem;
+    color: var(--primal-orange);
+    opacity: 0.75;
+    transition: all 0.3s ease;
+}
+
+.feature-item:hover i {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* ================================
+   VALIDATION MESSAGES
+   ================================ */
+
+.validation-message {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    padding: 0 1rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.validation-message.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.validation-message.success {
+    color: var(--primal-green);
+}
+
+.validation-message.error {
+    color: #e74c3c;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+
+@media (max-width: 768px) {
+    .primal-auth-bg {
+        padding: 1rem;
+    }
+    
+    .primal-auth-card {
+        padding: 2.5rem 1.8rem;
+        max-width: 380px;
+    }
+    
+    .primal-title {
+        font-size: 2.3rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .primal-subtitle {
+        font-size: 0.9rem;
+        margin: -0.3rem 0 2rem 0;
+    }
+    
+    .primal-input {
+        padding: 1.1rem 1.3rem;
+        font-size: 0.95rem;
+    }
+    
+    .primal-btn-primary {
+        padding: 1.1rem 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .register-features {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .feature-item {
+        flex-direction: row;
+        gap: 1rem;
+        text-align: left;
+    }
+}
+
+@media (max-width: 480px) {
+    .primal-auth-card {
+        padding: 2rem 1.2rem;
+        max-width: 340px;
+    }
+    
+    .primal-title {
+        font-size: 2rem;
+    }
+    
+    .primal-form {
+        gap: 1.5rem;
+    }
+    
+    .form-options {
+        font-size: 0.85rem;
+    }
+    
+    .register-features {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+    }
+    
+    .feature-item {
+        font-size: 0.75rem;
+    }
+    
+    .feature-item i {
+        font-size: 1.2rem;
+    }
+}
+
+/* ================================
+   ACCESSIBILITY ENHANCEMENTS
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .primal-auth-card,
+    .primal-input,
+    .primal-btn-primary,
+    .primal-link,
+    .feature-item {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* Focus indicators for keyboard navigation */
+.primal-input:focus-visible,
+.primal-btn-primary:focus-visible,
+.primal-link:focus-visible,
+.checkbox-group:focus-visible {
+    outline: 2px solid var(--primal-orange);
+    outline-offset: 2px;
+}
+
+/* ================================
+   DARK THEME OPTIMIZATION
+   ================================ */
+
+.register-dark-theme {
+    --register-bg-primary: rgba(18, 18, 18, 0.98);
+    --register-bg-secondary: rgba(22, 22, 22, 0.95);
+    --register-border: rgba(127, 79, 36, 0.4);
+    --register-shadow: rgba(0, 0, 0, 0.6);
+    --register-glow: rgba(255, 140, 0, 0.3);
+}
+
+.register-dark-theme .primal-input {
+    background: linear-gradient(135deg, 
+        rgba(30, 30, 30, 0.9) 0%, 
+        rgba(40, 40, 40, 0.75) 100%);
+}
+
+.register-dark-theme .primal-input:focus {
+    background: linear-gradient(135deg, 
+        rgba(127, 79, 36, 0.3) 0%, 
+        rgba(88, 47, 14, 0.25) 100%);
+}
