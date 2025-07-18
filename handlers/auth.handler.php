@@ -1,14 +1,17 @@
+
+
+
+
 <?php
+
 require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/envSetter.util.php';
 require_once UTILS_PATH . '/auth.util.php';
-
 
 header('Content-Type: application/json');
 $dsn = "pgsql:host=" . $_ENV['PG_HOST'] . ";port=" . $_ENV['PG_PORT'] . ";dbname=" . $_ENV['PG_DB'];
 $pdo = new PDO($dsn, $_ENV['PG_USER'], $_ENV['PG_PASS']);
 
-session_start();
 $auth = new \App\Utils\Auth($pdo);
 
 if ($_POST['action'] === 'login') {

@@ -62,50 +62,42 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() {
             const card = btn.closest('.product-card');
             const title = card.getAttribute('data-title');
-            const price = parseFloat(card.getAttribute('data-price'));
-            addToCart({ title, price, qty: 1 });
-        });
-    });
-});
-
-function addToCart(item) {
-    let cart = JSON.parse(localStorage.getItem('pbm_cart') || '[]');
-    const idx = cart.findIndex(i => i.title === item.title && i.price === item.price);
-    if (idx > -1) {
-        cart[idx].qty += 1;
-    } else {
-        cart.push(item);
-    }
-    localStorage.setItem('pbm_cart', JSON.stringify(cart));
-    updateCartCount();
-    alert('Added to cart!');
-}
-
-function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('pbm_cart') || '[]');
-    const count = cart.reduce((sum, item) => sum + item.qty, 0);
-    const el = document.getElementById('cart-count');
-    if (el) el.textContent = count;
-}
-
-// Update cart count on all pages
-updateCartCount();
     function getCart() {
-        return JSON.parse(localStorage.getItem('cart') || '[]');
+        return JSON.parse(localStorage.getItem('pbm_cart') || '[]');
     }
     function setCart(cart) {
-        localStorage.setItem('cart', JSON.stringify(cart));
+        localStorage.setItem('pbm_cart', JSON.stringify(cart));
         updateCartCount();
+    }
+    function addToCart(item) {
+        let cart = getCart();
+        let found = cart.find(i => i.title === item.title && i.price === item.price);
+        if (found) {
+            found.qty += 1;
+        } else {
+            cart.push(item);
+        }
+        setCart(cart);
     }
     function updateCartCount() {
         const cart = getCart();
-        const count = cart.reduce((sum, item) => sum + item.qty, 0);
+        const count = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
         const el = document.getElementById('cart-count');
         if (el) el.textContent = count;
     }
     updateCartCount();
     document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
         btn.addEventListener('click', function() {
+            const card = this.closest('.product-card');
+            const title = card.getAttribute('data-title');
+            const price = parseFloat(card.getAttribute('data-price'));
+            addToCart({ title, price, qty: 1 });
+            this.textContent = 'Added!';
+            setTimeout(() => { this.textContent = 'Add to Cart'; }, 1200);
+        });
+    });
+    if (idx > -1) {
+        cart[idx].qty += 1;
             const card = this.closest('.product-card');
             const title = card.getAttribute('data-title');
             const price = parseFloat(card.getAttribute('data-price'));
@@ -119,7 +111,7 @@ updateCartCount();
             setCart(cart);
             this.textContent = 'Added!';
             setTimeout(() => { this.textContent = 'Add to Cart'; }, 1200);
-        });
+        };
     });
 
     // Login/Register modal (frontend only)
@@ -194,5 +186,4 @@ function updateCartCount() {
     if (el) el.textContent = count;
 }
 
-// Update cart count on all pages
-updateCartCount();
+})
