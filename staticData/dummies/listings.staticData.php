@@ -1,7 +1,7 @@
 <?php
 return [
 
-    // ───── Weapons ─────
+     // ───── Weapons ─────
     [
         'Title' => 'Raptor Claw Knife',
         'Description' => 'A blade carved from the claw of a Velociraptor. Sharp and sacred.',
@@ -10,7 +10,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/Weps/raptorClawKnife.jpg'
     ],
     [
         'Title' => 'Triceratops Horn Spear',
@@ -20,7 +20,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/Weps/TriceratopsHornSpear.png',
     ],
     [
         'Title' => 'Obsidian Arrow Set',
@@ -30,7 +30,7 @@ return [
         'Quantity' => 3,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/Weps/obsidianArrowSets.png',
     ],
     [
         'Title' => 'Saber-Tooth Bone Club',
@@ -40,7 +40,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/Weps/sabertoothBoneClub.png',
     ],
 
     // ───── Hunting Equipment ─────
@@ -136,7 +136,7 @@ return [
         'Quantity' => 10,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/food/DriedMegalocerosMeat.png',
     ],
     [
         'Title' => 'Salted Saber-Tooth Jerky',
@@ -146,7 +146,7 @@ return [
         'Quantity' => 6,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/food/saltedSaberToothJerky.jpg',
     ],
     [
         'Title' => 'Sun-Baked Fish Slabs',
@@ -156,7 +156,7 @@ return [
         'Quantity' => 8,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/food/SunBakedFishSlabs.png',
     ],
     [
         'Title' => 'Fermented Berries',
@@ -166,7 +166,7 @@ return [
         'Quantity' => 9,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/food/fermented-berries.jpg',
     ],
 
     // ───── Spices and etc. ─────
@@ -178,7 +178,7 @@ return [
         'Quantity' => 10,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/spices etc/crushed-bone-salt.jpg',
     ],
     [
         'Title' => 'Mammoth Tallow Jar',
@@ -188,7 +188,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/spices etc/mammoth-tallow-jar.jpg',
     ],
     [
         'Title' => 'Herbal Ash Rub',
@@ -198,7 +198,7 @@ return [
         'Quantity' => 7,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/spices etc/herbalAshRub.jpg',
     ],
     [
         'Title' => 'Smoked Pterosaur Grease',
@@ -208,7 +208,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/spices etc/smokedPterosaurGrease.jpg',
     ],
     // ───── Clothing ─────
     [
@@ -261,7 +261,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/forging-materials/forge-volcanic-obsidian-slab.jpg',
     ],
     [
         'Title' => 'Fossilized Bone Core',
@@ -271,7 +271,7 @@ return [
         'Quantity' => 6,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/forging-materials/forge-fossilized-bone-core.jpg',
     ],
     [
         'Title' => 'Ancient Amber Nugget',
@@ -281,7 +281,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/forging-materials/forge-primal-amber-nugget.jpg',
     ],
     [
         'Title' => 'Meteor Shard',
@@ -291,7 +291,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => null,
+        'Item_Image' => 'assets/images/forging-materials/forge-meteor-shard.jpg',
     ],
 
     // ───── Infrastructure ─────

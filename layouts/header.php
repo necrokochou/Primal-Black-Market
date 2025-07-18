@@ -11,7 +11,7 @@ $user = $_SESSION['user'] ?? null;
         <!-- Logo Section -->
         <div class="logo-section">
             <a href="/" class="logo-link">
-                <img src="/assets/images/CP Logo(ARCL).png" alt="Primal Black Market Logo" class="logo-img">
+                <img src="/assets/images/Logo.png" alt="Primal Black Market Logo" class="logo-img">
             </a>
         </div>
         

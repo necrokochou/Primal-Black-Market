@@ -32,10 +32,11 @@ $filteredListings = array_filter($listings, function($item) use ($selectedCatego
                 <?php foreach ($filteredListings as $product): ?>
                     <?php
                         $isNew = (strtotime($product['PublishDate']) > strtotime('-14 days'));
+                        $imagePath = $product['Item_Image'] ? '/' . $product['Item_Image'] : '/assets/images/example.png';
                         renderProductCard(
                             $product['Title'], 
                             number_format($product['Price'], 2), 
-                            '/assets/images/example.png', 
+                            $imagePath, 
                             $isNew
                         );
                     ?>
