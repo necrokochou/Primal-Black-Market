@@ -213,7 +213,7 @@
     gap: 2.5rem;
     justify-content: center;
     align-items: flex-start;
-    padding: 2.5rem 0;
+    
 }
 .cart-table {
     background: #fff;
@@ -314,7 +314,7 @@
     box-shadow: 0 2px 16px rgba(60,40,10,0.08);
     border: 1.5px solid #ece9e2;
     padding: 2.5rem 2rem;
-    max-width: 600px;
+    max-width: 900px;
     margin: 2.5rem auto;
 }
 .primal-card-secondary {
