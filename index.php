@@ -41,17 +41,10 @@ foreach ($listings as $listing) {
                 <a href="./pages/shop/index.php" class="btn btn-primary hero-btn">SHOP NOW</a>
             </div>
         </div>
-        <div class="hero-next-row">
-            <span class="hero-next-label">WHAT'S NEXT?</span>
-            <div class="hero-next-thumbs">
-                <img src="/assets/images/example.png" alt="Next 1" />
-                <img src="/assets/images/example.png" alt="Next 2" />
-            </div>
-        </div>
     </section>
 
     <section class="featured-products">
-        <h2>#Featured Products</h2>
+        <h2>Featured Products</h2>
         <div class="featured-products-row">
             <?php
             $allProducts = $listings;
@@ -84,7 +77,7 @@ foreach ($listings as $listing) {
     </section>
 
     <section class="weekly-top-selling">
-        <h2>#Weekly Top Selling</h2>
+        <h2>Weekly Top Selling</h2>
         <div class="products-grid">
            <?php
             $allProducts = $listings;
