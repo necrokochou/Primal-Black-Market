@@ -1,6 +1,6 @@
 
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
+
 $user = $_SESSION['user'] ?? null;
 ?>
 <header class="site-header primal-header-aaa">
@@ -48,15 +48,16 @@ $user = $_SESSION['user'] ?? null;
         </div>
     </div>
     <script>
-    // Animate cart count
+    // Animate cart count (use pbm_cart and sum qty)
     document.addEventListener('DOMContentLoaded', function() {
         function updateCartCount() {
             let count = 0;
             try {
-                const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-                count = cart.length;
+                const cart = JSON.parse(localStorage.getItem('pbm_cart') || '[]');
+                count = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
             } catch {}
-            document.getElementById('cart-count').textContent = count;
+            const el = document.getElementById('cart-count');
+            if (el) el.textContent = count;
         }
         updateCartCount();
         window.addEventListener('cartUpdated', updateCartCount);
