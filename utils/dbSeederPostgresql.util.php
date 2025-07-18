@@ -159,7 +159,7 @@ if (empty($userIds) || empty($categoryIds)) {
                 ':quantity' => $listing['Quantity'],
                 ':is_active' => $listing['IsActive'] ? 'true' : 'false',
                 ':publish_date' => $listing['PublishDate'],
-                ':item_image' => $listing['ItemImage'] ?? null
+                ':item_image' => $listing['Item_Image'] ?? null
             ];
         }
     );
