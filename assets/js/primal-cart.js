@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return `
                 <div class="cart-row" data-item-index="${idx}">
                     <div class="cart-row-product">
-                        <img src="/assets/images/example.png" alt="${item.title}" class="cart-row-img">
+                        <img src="${item.image || '/assets/images/example.png'}" alt="${item.title}" class="cart-row-img">
                         <div class="cart-row-info">
                             <div class="cart-row-title">${item.title}</div>
                             <div class="cart-row-color">Set : Colour: <span>${item.color || 'Default'}</span></div>
