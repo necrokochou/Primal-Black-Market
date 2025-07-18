@@ -43,8 +43,8 @@ if ($_POST['action'] === 'register') {
         exit;
     }
 
-    // Check if user already exists (must quote columns correctly)
-    $stmt = $pdo->prepare('SELECT 1 FROM users WHERE "Username" = :username OR "Email" = :email');
+    // Check if user exists
+    $stmt = $pdo->prepare('SELECT 1 FROM users WHERE Username = :username OR Email = :email');
     $stmt->execute([':username' => $username, ':email' => $email]);
     if ($stmt->fetch()) {
         echo json_encode(['success' => false, 'error' => 'Username or email already exists.']);
@@ -53,18 +53,8 @@ if ($_POST['action'] === 'register') {
 
     // Hash password and insert
     $hashed = password_hash($password, PASSWORD_DEFAULT);
-    $alias = $username;
-
-    $stmt = $pdo->prepare('
-        INSERT INTO users ("Username", "Email", "Password", "Alias")
-        VALUES (:username, :email, :password, :alias)
-    ');
-    $ok = $stmt->execute([
-        ':username' => $username,
-        ':email' => $email,
-        ':password' => $hashed,
-        ':alias' => $alias
-    ]);
+    $stmt = $pdo->prepare('INSERT INTO users (Username, Email, Password) VALUES (:username, :email, :password)');
+    $ok = $stmt->execute([':username' => $username, ':email' => $email, ':password' => $hashed]);
 
     if ($ok) {
         $_SESSION['user'] = $username;
