@@ -35,6 +35,6 @@ class Auth
         $statement->execute();
         $result = $statement->fetch();
 
-        return $result ? $result['UserID'] : null;
+        return $result ? $result['User_ID'] : null;
     }
 }
