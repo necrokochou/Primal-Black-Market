@@ -10,7 +10,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
-        'Item_Image' => 'assets/images/Weps/raptorClawKnife.jpg'
+        'Item_Image' => 'assets/images/Weps/raptorClawKnife.png'
     ],
     [
         'Title' => 'Triceratops Horn Spear',
@@ -146,7 +146,7 @@ return [
         'Quantity' => 6,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/food/saltedSaberToothJerky.jpg',
+        'Item_Image' => 'assets/images/food/SaltedSaberToothJerky.png',
     ],
     [
         'Title' => 'Sun-Baked Fish Slabs',
@@ -178,7 +178,7 @@ return [
         'Quantity' => 10,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/spices etc/crushed-bone-salt.jpg',
+        'Item_Image' => 'assets/images/spices-etc/crushed-bone-salt.jpg',
     ],
     [
         'Title' => 'Mammoth Tallow Jar',
@@ -188,7 +188,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/spices etc/mammoth-tallow-jar.jpg',
+        'Item_Image' => 'assets/images/spices-etc/mammoth-tallow-jar.jpg',
     ],
     [
         'Title' => 'Herbal Ash Rub',
@@ -198,7 +198,7 @@ return [
         'Quantity' => 7,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/spices etc/herbalAshRub.jpg',
+        'Item_Image' => 'assets/images/spices-etc/Herbal-Ash-Rub.jpg',
     ],
     [
         'Title' => 'Smoked Pterosaur Grease',
@@ -208,7 +208,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => 'assets/images/spices etc/smokedPterosaurGrease.jpg',
+        'Item_Image' => 'assets/images/spices-etc/Smoked-Pterosaur-Grease.jpg',
     ],
     // ───── Clothing ─────
     [
