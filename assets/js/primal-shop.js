@@ -114,6 +114,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const card = this.closest('.product-card');
             const title = card.getAttribute('data-title');
             const price = parseFloat(card.getAttribute('data-price'));
+            const image = card.getAttribute('data-image');
             
             // Create floating animation (matching homepage)
             const rect = this.getBoundingClientRect();
@@ -158,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (found) {
                 found.qty += 1;
             } else {
-                cart.push({ title, price, qty: 1 });
+                cart.push({ title, price, image, qty: 1 });
             }
             localStorage.setItem('pbm_cart', JSON.stringify(cart));
             

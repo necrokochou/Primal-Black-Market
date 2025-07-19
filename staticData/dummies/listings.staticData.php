@@ -178,7 +178,7 @@ return [
         'Quantity' => 10,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/spices-etc/crushed-bone-salt.jpg',
+        'Item_Image' => 'assets/images/spices etc/crushed-bone-salt.jpg',
     ],
     [
         'Title' => 'Mammoth Tallow Jar',
@@ -188,7 +188,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/spices-etc/mammoth-tallow-jar.jpg',
+        'Item_Image' => 'assets/images/spices etc/mammoth-tallow-jar.jpg',
     ],
     [
         'Title' => 'Herbal Ash Rub',
@@ -198,7 +198,7 @@ return [
         'Quantity' => 7,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/spices-etc/Herbal-Ash-Rub.jpg',
+        'Item_Image' => 'assets/images/spices etc/herbalAshRub.jpg',
     ],
     [
         'Title' => 'Smoked Pterosaur Grease',
@@ -208,7 +208,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => 'assets/images/spices-etc/Smoked-Pterosaur-Grease.jpg',
+        'Item_Image' => 'assets/images/spices etc/smokedPterosaurGrease.jpg',
     ],
     // ───── Clothing ─────
     [
