@@ -226,14 +226,14 @@
     font-weight: 700;
     color: transparent;
     background: linear-gradient(135deg, 
-        var(--primal-beige-light) 0%, 
-        var(--primal-orange) 50%, 
+        var(--primal-green) 0%, 
+        var(--primal-beige-light) 50%, 
         var(--primal-brown) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     margin-bottom: 2rem;
     letter-spacing: 1px;
-    text-shadow: 0 4px 20px rgba(127, 79, 36, 0.3);
+    text-shadow: 0 4px 20px rgba(101, 109, 74, 0.3);
     position: relative;
 }
 

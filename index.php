@@ -52,10 +52,11 @@ foreach ($listings as $listing) {
             $carouselProducts = array_slice($allProducts, 0, 3);
             foreach ($carouselProducts as $product) {
                 $isNew = (strtotime($product['PublishDate']) > strtotime('-14 days'));
+                $imagePath = $product['Item_Image'] ? '/' . $product['Item_Image'] : '/assets/images/example.png';
                 renderProductCard(
                     $product['Title'],
                     number_format($product['Price'], 2),
-                    '/assets/images/example.png',
+                    $imagePath,
                     $isNew
                 );
             }
@@ -85,10 +86,11 @@ foreach ($listings as $listing) {
             $carouselProducts = array_slice($allProducts, 0, 4);
             foreach ($carouselProducts as $product) {
                 $isNew = (strtotime($product['PublishDate']) > strtotime('-14 days'));
+                $imagePath = $product['Item_Image'] ? '/' . $product['Item_Image'] : '/assets/images/example.png';
                 renderProductCard(
                     $product['Title'],
                     number_format($product['Price'], 2),
-                    '/assets/images/example.png',
+                    $imagePath,
                     $isNew
                 );
             }

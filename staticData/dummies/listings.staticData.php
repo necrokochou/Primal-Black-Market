@@ -261,7 +261,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/forging materials/forge-volcanic-obsidian-slab.jpg',
+        'Item_Image' => 'assets/images/forging-materials/forge-volcanic-obsidian-slab.jpg',
     ],
     [
         'Title' => 'Fossilized Bone Core',
@@ -271,7 +271,7 @@ return [
         'Quantity' => 6,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/forging materials/forge-fossilized-bone-core.jpg',
+        'Item_Image' => 'assets/images/forging-materials/forge-fossilized-bone-core.jpg',
     ],
     [
         'Title' => 'Ancient Amber Nugget',
@@ -281,7 +281,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/forging materials/forge-primal-amber-nugget.jpg',
+        'Item_Image' => 'assets/images/forging-materials/forge-primal-amber-nugget.jpg',
     ],
     [
         'Title' => 'Meteor Shard',
@@ -291,7 +291,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => 'assets/images/forging materials/forge-meteor-shard.jpg',
+        'Item_Image' => 'assets/images/forging-materials/forge-meteor-shard.jpg',
     ],
 
     // ───── Infrastructure ─────
