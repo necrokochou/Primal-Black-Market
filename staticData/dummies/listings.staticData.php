@@ -10,7 +10,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
-        'Item_Image' => 'assets/images/Weps/raptorClawKnife.jpg'
+        'Item_Image' => '.../assets/images/Weps/raptorClawKnife.jpg'
     ],
     [
         'Title' => 'Triceratops Horn Spear',
