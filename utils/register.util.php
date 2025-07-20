@@ -9,22 +9,54 @@ function isUsernameTaken(string $username): bool
     return (bool) $stmt->fetchColumn();
 }
 
-function registerUser(string $username, string $password, string $email, string $alias): bool
+function isEmailTaken(string $email): bool
 {
-    if (isUsernameTaken($username)) return false;
+    $pdo = connectPostgres();
+    $stmt = $pdo->prepare("SELECT 1 FROM users WHERE Email = :email");
+    $stmt->execute(['email' => $email]);
+    return (bool) $stmt->fetchColumn();
+}
+
+function isAliasTaken(string $alias): bool
+{
+    $pdo = connectPostgres();
+    $stmt = $pdo->prepare("SELECT 1 FROM users WHERE Alias = :alias");
+    $stmt->execute(['alias' => $alias]);
+    return (bool) $stmt->fetchColumn();
+}
+
+function registerUser(string $username, string $password, string $email, ?string $alias = null): array
+{
+    if ($alias === null) {
+        $alias = $username; // fallback alias
+    }
+
+    if (isUsernameTaken($username)) {
+        return ['success' => false, 'error' => 'Username already exists.'];
+    }
+
+    if (isEmailTaken($email)) {
+        return ['success' => false, 'error' => 'Email already registered.'];
+    }
+
+    if (isAliasTaken($alias)) {
+        return ['success' => false, 'error' => 'Alias is already in use.'];
+    }
 
     $pdo = connectPostgres();
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT); // Securely hash password
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     $stmt = $pdo->prepare("
         INSERT INTO users (Username, Password, Email, Alias)
         VALUES (:username, :password, :email, :alias)
     ");
 
-    return $stmt->execute([
+    $ok = $stmt->execute([
         'username' => $username,
         'password' => $hashedPassword,
         'email'    => $email,
         'alias'    => $alias,
     ]);
+
+    return ['success' => $ok];
 }

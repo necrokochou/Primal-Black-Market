@@ -1,5 +1,13 @@
+<?php
+session_start();
 
-<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
+if (isset($_SESSION['user'])) {
+    header('Location: /index.php');
+    exit;
+}
+
+require_once __DIR__ . '/../../layouts/header.php';
+?>
 <link rel="stylesheet" href="/assets/css/primal-login.css">
 
 <main class="primal-auth-bg">
@@ -7,7 +15,8 @@
         <h1 class="primal-title">Login</h1>
         <p class="primal-subtitle">Access your Primal Black Market account</p>
         
-        <form id="login-form" class="primal-form" method="POST" novalidate>
+        <form id="login-form" class="primal-form" method="POST" action="/handlers/auth.handler.php" novalidate> <!-- TODO: add action -->
+            <input type="hidden" name="action" value="login"> <!-- TODO: add hidden value "login" -->
             <div class="input-group">
                 <input type="text" name="username" class="primal-input" placeholder="Username" required 
                        autocomplete="username" aria-label="Username" />
@@ -53,5 +62,5 @@
     </div>
 </main>
 
-<script src="/assets/js/primal-login.js"></script>
+<script src="/assets/js/auth.js"></script> <!-- TODO: primal-login.js to auth.js -->
 <?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
