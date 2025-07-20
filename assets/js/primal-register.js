@@ -355,7 +355,12 @@ class PrimalRegister {
 
     try {
       await new Promise((resolve) => setTimeout(resolve, 300));
-      const isAvailable = Math.random() > 0.3;
+      const res = await fetch(
+        `/handlers/email-check.handler.php?email=${encodeURIComponent(email)}`
+      );
+      const data = await res.json();
+
+      const isAvailable = data.available;
 
       const emailInput = document.querySelector('input[name="email"]');
       if (isAvailable) {
