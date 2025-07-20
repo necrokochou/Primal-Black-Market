@@ -1,10 +1,7 @@
 <?php
 session_start();
 
-if (isset($_SESSION['user'])) {
-    header('Location: /index.php');
-    exit;
-}
+
 
 require_once __DIR__ . '/../../layouts/header.php';
 ?>
@@ -62,5 +59,5 @@ require_once __DIR__ . '/../../layouts/header.php';
     </div>
 </main>
 
-<script src="/assets/js/auth.js"></script> <!-- TODO: primal-login.js to auth.js -->
+<script src="/assets/js/primal-login.js"></script>
 <?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
