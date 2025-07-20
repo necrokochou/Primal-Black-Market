@@ -138,7 +138,7 @@ return [
         'PublishDate' => '2025-07-11',
         'Item_Image' => 'assets/images/food/DriedMegalocerosMeat.png',
     ],
-    [ 
+    [   
         'Title' => 'Salted Saber-Tooth Jerky',
         'Description' => 'Tough, salty strips from apex predators.',
         'Category' => 'Food',
