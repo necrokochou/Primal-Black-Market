@@ -1,5 +1,13 @@
+<?php
+session_start();
 
-<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
+if (isset($_SESSION['user'])) {
+    header('Location: /index.php');
+    exit;
+}
+
+require_once __DIR__ . '/../../layouts/header.php';
+?>
 <link rel="stylesheet" href="/assets/css/primal-login.css">
 
 <main class="primal-auth-bg">
