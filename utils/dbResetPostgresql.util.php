@@ -42,8 +42,6 @@ echo "🗂️  Clearing tables individually...\n";
 $tables = [
     'cart',
     'transactions',
-    'messages', 
-    'feedbacks',
     'listings',
     'categories',
     'users'
