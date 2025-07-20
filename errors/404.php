@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../layouts/header.php'; ?>
+<?php require_once LAYOUTS_PATH . '/header.php'; ?>
 
 <!-- 404 Error Page Specific Styles -->
 <link rel="stylesheet" href="/assets/css/primal-404.css">
@@ -189,4 +189,5 @@
 <!-- 404 Page JavaScript -->
 <script src="/assets/js/primal-404.js"></script>
 
-<?php require_once __DIR__ . '/../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>
+ 

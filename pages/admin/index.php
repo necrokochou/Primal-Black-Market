@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../../bootstrap.php';
+require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
-require_once __DIR__ . '/../../layouts/header.php';
+require_once LAYOUTS_PATH . '/header.php';
 
 // Demo admin user data for testing (remove session dependencies)
 $username = 'AdminUser';
@@ -255,4 +255,4 @@ try {
 </main>
 
 <script src="/assets/js/primal-admin.js"></script>
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>
