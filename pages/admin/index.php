@@ -6,12 +6,10 @@ if (!isset($_SESSION['user']) || !($_SESSION['is_admin'] ?? false)) {
     header('Location: /pages/login/index.php');
     exit;
 }
-
 // Proceed only if access is valid
 require_once __DIR__ . '/../../bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 require_once __DIR__ . '/../../layouts/header.php';
-
 // Get admin user data
 $username = $_SESSION['user'];
 $alias = $_SESSION['user_alias'] ?? $username;
