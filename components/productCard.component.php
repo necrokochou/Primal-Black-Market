@@ -1,9 +1,8 @@
-
 <?php
 // Product card component
 function renderProductCard($title, $price, $imgSrc, $isNew = false) {
     ?>
-    <div class="product-card" data-title="<?php echo htmlspecialchars($title); ?>" data-price="<?php echo $price; ?>" data-image="<?php echo htmlspecialchars($imgSrc); ?>">
+    <div class="product-card" data-title="<?php echo htmlspecialchars($title); ?>" data-price="<?php echo $price; ?>">
         <?php if ($isNew): ?>
             <span class="product-badge">NEW</span>
         <?php endif; ?>

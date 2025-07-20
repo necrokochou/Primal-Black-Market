@@ -37,11 +37,19 @@ class Auth
         }
 
         $username = $_SESSION['user'];
+<<<<<<< HEAD
+        $statement = $this->account->prepare('SELECT "User_ID" FROM users WHERE "Username" = :username');
+=======
         $statement = $this->account->prepare('SELECT user_id FROM users WHERE username = :username');
+>>>>>>> 6d0a871561d783c75721bdda7e382102b1748681
         $statement->bindParam(':username', $username);
         $statement->execute();
         $result = $statement->fetch();
 
+<<<<<<< HEAD
+        return $result ? $result['User_ID'] : null;
+=======
         return $result ? $result['user_id'] : null;
+>>>>>>> 6d0a871561d783c75721bdda7e382102b1748681
     }
 }

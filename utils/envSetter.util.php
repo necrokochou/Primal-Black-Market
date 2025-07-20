@@ -1,27 +1,30 @@
 <?php
 require_once BASE_PATH . '/bootstrap.php';
-require_once BASE_PATH . '/vendor/autoload.php';
+
+chdir(BASE_PATH);
+
+require 'vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);
 $dotenv->load();
 
 function getPostgresEnv(): array {
     return [
-        'host' => $_ENV['PG_HOST'] ?? 'postgresql',
-        'port' => $_ENV['PG_PORT'] ?? 5432,
-        'db' => $_ENV['PG_DB'] ?? 'primal-black-market',
-        'user' => $_ENV['PG_USER'] ?? 'user',
-        'password' => $_ENV['PG_PASS'] ?? 'password',
+        'host' => $_ENV['PG_HOST'],
+        'port' => $_ENV['PG_PORT'],
+        'db' => $_ENV['PG_DB'],
+        'user' => $_ENV['PG_USER'],
+        'password' => $_ENV['PG_PASS'],
     ];
 }
 
 function getMongoEnv(): array {
     return [
-        'uri' => $_ENV['MONGO_URI'] ?? 'mongodb://root:rootPassword@mongodb:27111',
-        'host' => $_ENV['MONGO_HOST'] ?? 'mongodb',
-        'port' => $_ENV['MONGO_PORT'] ?? 27017,
-        'db' => $_ENV['MONGO_DB'] ?? 'primal-black-market',
-        'user' => $_ENV['MONGO_USER'] ?? 'root',
-        'password' => $_ENV['MONGO_PASS'] ?? 'rootPassword',
+        'uri' => $_ENV['MONGO_URI'],
+        'host' => $_ENV['MONGO_HOST'],
+        'port' => $_ENV['MONGO_PORT'],
+        'db' => $_ENV['MONGO_DB'],
+        'user' => $_ENV['MONGO_USER'],
+        'password' => $_ENV['MONGO_PASS'],
     ];
 }

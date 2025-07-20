@@ -1,7 +1,7 @@
 # Database Migration & Seeding Guide
 
 ## 🚨 IMPORTANT
-Run these commands in terminal whenever you use Seeder, Migrate, and Reset  
+Run these commands in terminal whenever you use Seeder, Migrate, and Reset 
 **⚠️ (With Approval of Head Admin (LJ))**
 
 ---

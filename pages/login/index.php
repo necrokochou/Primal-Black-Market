@@ -1,6 +1,15 @@
 <?php
 session_start();
 
+<<<<<<< HEAD
+<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
+<main class="primal-auth-bg">
+    <div class="primal-card primal-auth-card">
+        <h1 class="primal-title">Login</h1>
+        <form id="login-form" class="primal-form" method="POST">
+            <input type="text" name="username" class="primal-input" placeholder="Username" required />
+            <input type="password" name="password" class="primal-input" placeholder="Password" required />
+=======
 if (isset($_SESSION['user'])) {
     header('Location: /index.php');
     exit;
@@ -38,29 +47,16 @@ require_once __DIR__ . '/../../layouts/header.php';
                 <a href="/pages/forgot-password" class="forgot-password">Forgot password?</a>
             </div>
             
+>>>>>>> 6d0a871561d783c75721bdda7e382102b1748681
             <button type="submit" class="primal-btn-primary">Login</button>
         </form>
-        
-        <div class="primal-auth-link">
-            Don't have an account? <a class="primal-link" href="/pages/register/index.php">Create Account</a>
-        </div>
-        
-        <div class="login-features">
-            <div class="feature-item">
-                <i class="fas fa-shield-alt"></i>
-                <span>Secure Authentication</span>
-            </div>
-            <div class="feature-item">
-                <i class="fas fa-user-shield"></i>
-                <span>Privacy Protected</span>
-            </div>
-            <div class="feature-item">
-                <i class="fas fa-clock"></i>
-                <span>24/7 Access</span>
-            </div>
-        </div>
+        <div class="primal-auth-link">Don't have an account? <a class="primal-link" href="/pages/register/index.php">Register</a></div>
     </div>
 </main>
+<<<<<<< HEAD
+<script src="/assets/js/auth.js"></script>
+=======
 
 <script src="/assets/js/auth.js"></script> <!-- TODO: primal-login.js to auth.js -->
+>>>>>>> 6d0a871561d783c75721bdda7e382102b1748681
 <?php require_once __DIR__ . '/../../layouts/footer.php'; ?>

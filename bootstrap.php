@@ -9,5 +9,3 @@ define('STATICDATAS_PATH', BASE_PATH . "/staticData");
 define('DUMMIES_PATH', BASE_PATH . "/staticData/dummies");
 define('UTILS_PATH', BASE_PATH . "/utils");
 define('ERRORS_PATH', BASE_PATH . "/servers");
-
-chdir(BASE_PATH);

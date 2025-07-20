@@ -1,8 +1,20 @@
 <?php require_once __DIR__ . '/../../layouts/header.php'; ?>
-<link rel="stylesheet" href="/assets/css/primal-register.css">
-
 <main class="primal-auth-bg">
     <div class="primal-card primal-auth-card">
+<<<<<<< HEAD
+        <h1 class="primal-title">Register</h1>
+        <form id="register-form" class="primal-form" method="POST">
+            <input type="text" name="username" class="primal-input" placeholder="Username" required />
+            <input type="email" name="email" class="primal-input" placeholder="Email" required />
+            <input type="password" name="password" class="primal-input" placeholder="Password" required />
+            <button type="submit" class="primal-btn-primary">Register</button>
+        </form>
+        <div class="primal-auth-link">Already have an account? <a class="primal-link" href="/pages/login/index.php">Login</a></div>
+    </div>
+</main>
+<script src="/assets/js/auth.js"></script>
+<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+=======
         <h1 class="primal-title">Join Primal</h1>
         <p class="primal-subtitle">Create your account and unlock exclusive access to the finest marketplace experience</p>
 
@@ -48,3 +60,4 @@
 
 <script src="/assets/js/primal-register.js"></script>
 <?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+>>>>>>> 6d0a871561d783c75721bdda7e382102b1748681
