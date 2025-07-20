@@ -39,9 +39,15 @@ $user = $_SESSION['user'] ?? null;
             </a>
 
             <?php if (!$user): ?>
-                <a href="/pages/login/index.php" class="icon-link user-link" id="loginBtn">
+                <button class="icon-link user-link" id="loginBtn" aria-label="Login">
                     <i class="fas fa-user"></i>
-                </a>
+                </button>
+
+                <script>
+                    document.getElementById('loginBtn').addEventListener('click', () => {
+                        window.location.href = '/pages/login/index.php';
+                    });
+                </script>
             <?php else: ?>
                 <div class="user-dropdown">
                     <span class="user-welcome">
