@@ -49,14 +49,23 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoadingState(submitButton);
             
             try {
-                // Simulate login process (replace with actual login logic)
-                await simulateLogin(username, password);
-                showMessage('Login successful! Redirecting...', 'success');
+                // Authenticate with server
+                const response = await authenticateUser(username, password);
                 
-                // Redirect after successful login
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 1500);
+                if (response.success) {
+                    showMessage('Login successful! Redirecting...', 'success');
+                    
+                    // Redirect based on user role
+                    setTimeout(() => {
+                        if (response.user.isAdmin) {
+                            window.location.href = '/pages/admin';
+                        } else {
+                            window.location.href = '/pages/account';
+                        }
+                    }, 1500);
+                } else {
+                    throw new Error(response.error || 'Login failed');
+                }
                 
             } catch (error) {
                 showMessage(error.message || 'Login failed. Please try again.', 'error');
@@ -385,18 +394,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // SIMULATION FUNCTIONS
     // ================================
     
-    async function simulateLogin(username, password) {
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+    async function authenticateUser(username, password) {
+        const formData = new FormData();
+        formData.append('action', 'login');
+        formData.append('username', username);
+        formData.append('password', password);
         
-        // Simulate different responses for demo purposes
-        if (username === 'demo' && password === 'demo123') {
-            return { success: true, message: 'Login successful' };
-        } else if (username === 'admin' && password === 'admin123') {
-            return { success: true, message: 'Admin login successful' };
-        } else {
-            window.trackFailedAttempt();
-            throw new Error('Invalid username or password');
+        try {
+            const response = await fetch('/handlers/auth.handler.php', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            throw new Error('Network error. Please try again.');
         }
     }
     
