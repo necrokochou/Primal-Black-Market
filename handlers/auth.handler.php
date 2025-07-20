@@ -53,28 +53,16 @@ if ($action === 'register') {
         exit;
     }
 
-    $stmt = $pdo->prepare('SELECT 1 FROM users WHERE Username = :username OR Email = :email');
-    $stmt->execute([':username' => $username, ':email' => $email]);
-    if ($stmt->fetch()) {
-        http_response_code(409);
-        echo json_encode(['success' => false, 'error' => 'Username or email already exists']);
-        exit;
-    }
+    require UTILS_PATH . '/register.util.php';
 
-    $hashed = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare('INSERT INTO users (Username, Email, Password) VALUES (:username, :email, :password)');
-    $ok = $stmt->execute([
-        ':username' => $username,
-        ':email' => $email,
-        ':password' => $hashed,
-    ]);
+    $result = registerUser($username, $password, $email, $alias);
 
-    if ($ok) {
+    if ($result['success']) {
         $_SESSION['user'] = $username;
         echo json_encode(['success' => true]);
     } else {
         http_response_code(500);
-        echo json_encode(['success' => false, 'error' => 'Registration failed. Try again.']);
+        echo json_encode(['success' => false, 'error' => $result['error'] ?? 'Registration failed.']);
     }
     exit;
 }
