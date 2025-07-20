@@ -25,8 +25,12 @@ function isAliasTaken(string $alias): bool
     return (bool) $stmt->fetchColumn();
 }
 
-function registerUser(string $username, string $password, string $email, string $alias): array
+function registerUser(string $username, string $password, string $email, ?string $alias = null): array
 {
+    if ($alias === null) {
+        $alias = $username; // fallback alias
+    }
+
     if (isUsernameTaken($username)) {
         return ['success' => false, 'error' => 'Username already exists.'];
     }
