@@ -127,7 +127,7 @@ echo "🎉 ========================================\n";
 echo "📊 Migration Summary:\n";
 echo "   ✅ Successful migrations: {$successCount}\n";
 echo "   ❌ Failed migrations: {$failureCount}\n";
-echo "   📋 Tables created: {$tablesCreated}/7\n";
+echo "   📋 Tables created: {$tablesCreated}/5\n";
 echo "\n➡️  Next step: Run seeders to populate data\n";
 echo "   Command: php utils/dbSeederPostgresql.util.php\n";
 echo "🎉 ========================================\n";
