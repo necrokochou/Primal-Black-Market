@@ -3,16 +3,10 @@ require_once __DIR__ . '/../../bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 require_once __DIR__ . '/../../layouts/header.php';
 
-// Check if user is logged in and is admin
-session_start();
-if (!isset($_SESSION['user']) || !isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
-    header('Location: /pages/login/index.php');
-    exit;
-}
-
-// Get admin user data
-$username = $_SESSION['user'];
-$alias = $_SESSION['user_alias'] ?? $username;
+// Demo admin user data for testing (remove session dependencies)
+$username = 'AdminUser';
+$alias = 'Supreme Administrator';
+$isAdmin = true;
 
 // Get data from database
 try {
