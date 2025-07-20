@@ -37,33 +37,28 @@ if ($_POST['action'] === 'register') {
     $username = $_POST['username'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
+    // Temporary default alias: use the username
+    $alias = $_POST['alias'] ?? $username;
 
     if (!$username || !$email || !$password) {
         echo json_encode(['success' => false, 'error' => 'All fields are required.']);
         exit;
     }
 
-    // Check if user exists
-    $stmt = $pdo->prepare('SELECT 1 FROM users WHERE Username = :username OR Email = :email');
-    $stmt->execute([':username' => $username, ':email' => $email]);
-    if ($stmt->fetch()) {
-        echo json_encode(['success' => false, 'error' => 'Username or email already exists.']);
-        exit;
-    }
+    require_once UTILS_PATH . '/register.util.php';
 
-    // Hash password and insert
-    $hashed = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare('INSERT INTO users (Username, Email, Password) VALUES (:username, :email, :password)');
-    $ok = $stmt->execute([':username' => $username, ':email' => $email, ':password' => $hashed]);
+    $result = registerUser($username, $password, $email, $alias);
 
-    if ($ok) {
+    if ($result['success']) {
         $_SESSION['user'] = $username;
         echo json_encode(['success' => true]);
     } else {
-        echo json_encode(['success' => false, 'error' => 'Registration failed.']);
+        echo json_encode(['success' => false, 'error' => $result['error'] ?? 'Registration failed.']);
     }
     exit;
 }
+
+
 
 // Invalid action
 http_response_code(400);
