@@ -15,8 +15,8 @@ require_once __DIR__ . '/../../layouts/header.php';
         <h1 class="primal-title">Login</h1>
         <p class="primal-subtitle">Access your Primal Black Market account</p>
         
-        <form id="login-form" class="primal-form" method="POST" action="/handlers/auth.handler.php" novalidate>
-            <input type="hidden" name="action" value="login">
+        <form id="login-form" class="primal-form" method="POST" action="/handlers/auth.handler.php" novalidate> // TODO: add action
+            <input type="hidden" name="action" value="login"> // TODO: add hidden value "login"
             <div class="input-group">
                 <input type="text" name="username" class="primal-input" placeholder="Username" required 
                        autocomplete="username" aria-label="Username" />
@@ -62,5 +62,5 @@ require_once __DIR__ . '/../../layouts/header.php';
     </div>
 </main>
 
-<script src="/assets/js/auth.js"></script>
+<script src="/assets/js/auth.js"></script> // TODO: primal-login.js to auth.js
 <?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
