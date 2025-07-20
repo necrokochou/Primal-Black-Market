@@ -44,6 +44,8 @@ if ($action === 'register') {
     $username = $_POST['username'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
+    // Temporary default alias: use the username
+    $alias = $_POST['alias'] ?? $username;
 
     if (!$username || !$email || !$password) {
         http_response_code(400);
