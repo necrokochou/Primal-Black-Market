@@ -1,6 +1,6 @@
 <?php
 return [
-   [
+    [
         'Username' => 'phantommorphus',
         'Password' => 'phantom06240515543',
         'Email' => 'phantom@primal.market',

@@ -1,39 +1,58 @@
-
-
-
-
 <?php
+
+declare(strict_types=1);
 
 require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/envSetter.util.php';
 require_once UTILS_PATH . '/auth.util.php';
 
+session_start();
+
 header('Content-Type: application/json');
-$dsn = "pgsql:host=" . $_ENV['PG_HOST'] . ";port=" . $_ENV['PG_PORT'] . ";dbname=" . $_ENV['PG_DB'];
-$pdo = new PDO($dsn, $_ENV['PG_USER'], $_ENV['PG_PASS']);
+
+$pdo = new PDO(
+    "pgsql:host={$_ENV['PG_HOST']};port={$_ENV['PG_PORT']};dbname={$_ENV['PG_DB']}",
+    $_ENV['PG_USER'],
+    $_ENV['PG_PASS'],
+    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+);
 
 $auth = new \App\Utils\Auth($pdo);
 
-if ($_POST['action'] === 'login') {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+    exit;
+}
+
+$action = $_POST['action'] ?? '';
+
+if ($action === 'login') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
+
     if ($auth->tryLogin($username, $password)) {
         $_SESSION['user'] = $username;
         echo json_encode(['success' => true]);
     } else {
-        echo json_encode(['success' => false, 'error' => 'Invalid username or password.']);
+        echo json_encode(['success' => false, 'error' => 'Invalid username or password']);
     }
     exit;
 }
 
-if ($_POST['action'] === 'register') {
+if ($action === 'register') {
     $username = $_POST['username'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
+    // Temporary default alias: use the username
+    $alias = $_POST['alias'] ?? $username;
+
     if (!$username || !$email || !$password) {
-        echo json_encode(['success' => false, 'error' => 'All fields are required.']);
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'All fields are required']);
         exit;
     }
+<<<<<<< HEAD
     // Check if user exists
     $stmt = $pdo->prepare('SELECT 1 FROM users WHERE "Username" = :username OR "Email" = :email');
     $stmt->execute([':username' => $username, ':email' => $email]);
@@ -46,10 +65,24 @@ if ($_POST['action'] === 'register') {
     $stmt = $pdo->prepare('INSERT INTO users ("Username", "Email", "Password") VALUES (:username, :email, :password)');
     $ok = $stmt->execute([':username' => $username, ':email' => $email, ':password' => $hashed]);
     if ($ok) {
+=======
+
+    require UTILS_PATH . '/register.util.php';
+
+    $result = registerUser($username, $password, $email, $alias);
+
+    if ($result['success']) {
+>>>>>>> 6d0a871561d783c75721bdda7e382102b1748681
         $_SESSION['user'] = $username;
         echo json_encode(['success' => true]);
     } else {
-        echo json_encode(['success' => false, 'error' => 'Registration failed.']);
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => $result['error'] ?? 'Registration failed.']);
     }
     exit;
 }
+
+// If invalid action
+http_response_code(400);
+echo json_encode(['success' => false, 'error' => 'Invalid action']);
+exit;
