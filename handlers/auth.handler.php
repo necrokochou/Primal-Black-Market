@@ -31,20 +31,30 @@ if ($action === 'login') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    if ($auth->tryLogin($username, $password)) {
-        $_SESSION['user'] = $username;
-        echo json_encode(['success' => true]);
+    $loginResult = $auth->tryLogin($username, $password);
+    if ($loginResult !== null) {
+        $_SESSION['user'] = $loginResult['username'];
+        $_SESSION['is_admin'] = $loginResult['is_admin'] ?? false;
+        $_SESSION['is_vendor'] = $loginResult['is_vendor'] ?? false;
+        $_SESSION['user_email'] = $loginResult['email'] ?? '';
+        $_SESSION['user_alias'] = $loginResult['alias'] ?? $loginResult['username'];
+        $_SESSION['user_trust_level'] = $loginResult['trustlevel'] ?? 0;
+
+        echo json_encode([
+            'success' => true,
+            'is_admin' => $_SESSION['is_admin'],
+        ]);
     } else {
         echo json_encode(['success' => false, 'error' => 'Invalid username or password']);
     }
     exit;
 }
 
+
 if ($action === 'register') {
     $username = $_POST['username'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
-    // Temporary default alias: use the username
     $alias = $_POST['alias'] ?? $username;
 
     if (!$username || !$email || !$password) {

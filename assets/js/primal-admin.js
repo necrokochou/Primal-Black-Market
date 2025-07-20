@@ -362,4 +362,6 @@ function showNotification(message, type = "info") {
       document.body.removeChild(notification);
     }, 300);
   }, 3000);
+
+  const isAdmin = sessionStorage.getItem("is_admin") === "true";
 }

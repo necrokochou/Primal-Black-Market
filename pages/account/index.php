@@ -20,7 +20,7 @@ $isAdmin = $_SESSION['is_admin'] ?? false;
 $userListings = [];
 if ($isVendor && isset($_SESSION['user_id'])) {
     try {
-        require_once BASE_PATH . '/bootsrap.php';
+        require_once BASE_PATH . '/bootstrap.php';
         require_once UTILS_PATH . '/DatabaseService.util.php';
         $db = DatabaseService::getInstance();
         // Note: This would require a method to get listings by vendor ID
@@ -61,7 +61,7 @@ if ($isVendor && isset($_SESSION['user_id'])) {
             </div>
             <div class="account-actions">
                 <?php if ($isAdmin): ?>
-                    <a href="/pages/admin" class="primal-btn-secondary">
+                    <a href="/pages/admin/index.php" class="primal-btn-secondary">
                         <i class="fas fa-shield-alt"></i> Admin Dashboard
                     </a>
                 <?php endif; ?>

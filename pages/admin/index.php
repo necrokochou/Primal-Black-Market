@@ -1,14 +1,16 @@
 <?php
-require_once __DIR__ . '/../../bootstrap.php';
-require_once UTILS_PATH . '/DatabaseService.util.php';
-require_once __DIR__ . '/../../layouts/header.php';
-
-// Check if user is logged in and is admin
+// Start session and validate admin access BEFORE any output
 session_start();
-if (!isset($_SESSION['user']) || !isset($_SESSION['is_admin']) || !$_SESSION['is_admin']) {
+
+if (!isset($_SESSION['user']) || !($_SESSION['is_admin'] ?? false)) {
     header('Location: /pages/login/index.php');
     exit;
 }
+
+// Proceed only if access is valid
+require_once __DIR__ . '/../../bootstrap.php';
+require_once UTILS_PATH . '/DatabaseService.util.php';
+require_once __DIR__ . '/../../layouts/header.php';
 
 // Get admin user data
 $username = $_SESSION['user'];
@@ -32,6 +34,7 @@ try {
     $listings = [];
 }
 ?>
+
 
 <!-- Admin Page Specific Styles -->
 <link rel="stylesheet" href="/assets/css/primal-admin.css">
@@ -99,7 +102,7 @@ try {
                     </select>
                 </div>
             </div>
-            
+
             <div class="users-table-container">
                 <table class="admin-table">
                     <thead>
@@ -115,36 +118,36 @@ try {
                     </thead>
                     <tbody>
                         <?php foreach ($users as $index => $user): ?>
-                        <tr data-user-id="<?php echo $index; ?>">
-                            <td>
-                                <div class="user-info">
-                                    <i class="fas fa-user-circle user-avatar"></i>
-                                    <div>
-                                        <div class="user-name"><?php echo htmlspecialchars($user['username']); ?></div>
-                                        <div class="user-email"><?php echo htmlspecialchars($user['email']); ?></div>
-                                        <div class="user-alias">Alias: <?php echo htmlspecialchars($user['alias']); ?></div>
+                            <tr data-user-id="<?php echo $index; ?>">
+                                <td>
+                                    <div class="user-info">
+                                        <i class="fas fa-user-circle user-avatar"></i>
+                                        <div>
+                                            <div class="user-name"><?php echo htmlspecialchars($user['username']); ?></div>
+                                            <div class="user-email"><?php echo htmlspecialchars($user['email']); ?></div>
+                                            <div class="user-alias">Alias: <?php echo htmlspecialchars($user['alias']); ?></div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
-                            <td><span class="status-badge active">Active</span></td>
-                            <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
-                            <td><?php echo number_format($user['trust_level'], 1); ?></td>
-                            <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn view-user" data-user-id="<?php echo $user['user_id']; ?>" title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="action-btn ban-user" data-user-id="<?php echo $user['user_id']; ?>" title="Ban User">
-                                        <i class="fas fa-ban"></i>
-                                    </button>
-                                    <button class="action-btn delete-user" data-user-id="<?php echo $index; ?>" title="Delete User">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
+                                <td><?php echo number_format($user['trust_level'], 1); ?></td>
+                                <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn view-user" data-user-id="<?php echo $user['user_id']; ?>" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn ban-user" data-user-id="<?php echo $user['user_id']; ?>" title="Ban User">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                        <button class="action-btn delete-user" data-user-id="<?php echo $index; ?>" title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -167,33 +170,33 @@ try {
                     </select>
                 </div>
             </div>
-            
+
             <div class="admin-products-grid">
                 <?php foreach (array_slice($listings, 0, 12) as $listing): ?>
-                <div class="admin-product-item" data-product-id="<?php echo $listing['listing_id']; ?>">
-                    <div class="product-image">
-                        <img src="<?php echo htmlspecialchars($listing['item_image'] ?? '/assets/images/default-product.png'); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
-                        <div class="product-status-indicator <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
+                    <div class="admin-product-item" data-product-id="<?php echo $listing['listing_id']; ?>">
+                        <div class="product-image">
+                            <img src="<?php echo htmlspecialchars($listing['item_image'] ?? '/assets/images/default-product.png'); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
+                            <div class="product-status-indicator <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
+                        </div>
+                        <div class="product-details">
+                            <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
+                            <p class="product-category"><?php echo htmlspecialchars($listing['category_name'] ?? $listing['category']); ?></p>
+                            <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
+                            <p class="product-stock">Stock: <?php echo $listing['quantity']; ?></p>
+                            <p class="product-seller">Seller: User</p>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn edit-product-admin" data-product-id="<?php echo $listing['listing_id']; ?>" title="Edit Product">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn toggle-product-status" data-product-id="<?php echo $listing['listing_id']; ?>" title="Toggle Status">
+                                <i class="fas fa-<?php echo $listing['is_active'] ? 'pause' : 'play'; ?>"></i>
+                            </button>
+                            <button class="action-btn delete-product-admin" data-product-id="<?php echo $listing['listing_id']; ?>" title="Delete Product">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="product-details">
-                        <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
-                        <p class="product-category"><?php echo htmlspecialchars($listing['category_name'] ?? $listing['category']); ?></p>
-                        <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
-                        <p class="product-stock">Stock: <?php echo $listing['quantity']; ?></p>
-                        <p class="product-seller">Seller: User</p>
-                    </div>
-                    <div class="product-actions">
-                        <button class="action-btn edit-product-admin" data-product-id="<?php echo $listing['listing_id']; ?>" title="Edit Product">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn toggle-product-status" data-product-id="<?php echo $listing['listing_id']; ?>" title="Toggle Status">
-                            <i class="fas fa-<?php echo $listing['is_active'] ? 'pause' : 'play'; ?>"></i>
-                        </button>
-                        <button class="action-btn delete-product-admin" data-product-id="<?php echo $listing['listing_id']; ?>" title="Delete Product">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
                 <?php endforeach; ?>
             </div>
         </div>
