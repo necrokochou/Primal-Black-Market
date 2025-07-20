@@ -42,8 +42,6 @@ echo "🗂️  Clearing tables individually...\n";
 $tables = [
     'cart',
     'transactions',
-    'messages', 
-    'feedback',
     'listings',
     'categories',
     'users'
@@ -117,7 +115,7 @@ echo "🎉 DATABASE RESET COMPLETE!              \n";
 echo "🎉 ========================================\n";
 echo "🧹 All table data has been cleared\n";
 echo "📋 Table structures are preserved\n";
-echo "� Database is ready for fresh data\n";
+echo "  Database is ready for fresh data\n";
 echo "➡️  Next steps:\n";
 echo "   1. Run seeders: php utils/dbSeederPostgresql.util.php\n";
 echo "   2. Or run migrations first if tables don't exist: php utils/dbMigratePostgresql.util.php\n";
