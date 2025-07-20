@@ -1,12 +1,12 @@
 <?php
-require_once __DIR__ . '/../../layouts/header.php';
-
 // Check if user is logged in
 session_start();
 if (!isset($_SESSION['user'])) {
     header('Location: /pages/login/index.php');
     exit;
 }
+
+require_once __DIR__ . '/../../layouts/header.php';
 
 // Get user data from session
 $username = $_SESSION['user'];
@@ -20,7 +20,7 @@ $isAdmin = $_SESSION['is_admin'] ?? false;
 $userListings = [];
 if ($isVendor && isset($_SESSION['user_id'])) {
     try {
-        require_once __DIR__ . '/../../bootstrap.php';
+        require_once BASE_PATH . '/bootsrap.php';
         require_once UTILS_PATH . '/DatabaseService.util.php';
         $db = DatabaseService::getInstance();
         // Note: This would require a method to get listings by vendor ID
@@ -46,7 +46,7 @@ if ($isVendor && isset($_SESSION['user_id'])) {
             <div class="account-info">
                 <h1 class="account-name"><?php echo htmlspecialchars($alias); ?></h1>
                 <p class="account-type">
-                    <?php 
+                    <?php
                     if ($isAdmin) {
                         echo 'Administrator Account';
                     } elseif ($isVendor) {
@@ -61,9 +61,9 @@ if ($isVendor && isset($_SESSION['user_id'])) {
             </div>
             <div class="account-actions">
                 <?php if ($isAdmin): ?>
-                <a href="/pages/admin" class="primal-btn-secondary">
-                    <i class="fas fa-shield-alt"></i> Admin Dashboard
-                </a>
+                    <a href="/pages/admin" class="primal-btn-secondary">
+                        <i class="fas fa-shield-alt"></i> Admin Dashboard
+                    </a>
                 <?php endif; ?>
                 <button class="primal-btn-danger" id="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -92,29 +92,29 @@ if ($isVendor && isset($_SESSION['user_id'])) {
                     <i class="fas fa-plus"></i> Add Product
                 </button>
             </div>
-            
+
             <div class="my-products-grid">
                 <?php foreach (array_slice($userListings, 0, 6) as $listing): ?>
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="<?php echo htmlspecialchars($listing['Image']); ?>" alt="<?php echo htmlspecialchars($listing['Name']); ?>" loading="lazy">
-                        <div class="product-status active"></div>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="<?php echo htmlspecialchars($listing['Image']); ?>" alt="<?php echo htmlspecialchars($listing['Name']); ?>" loading="lazy">
+                            <div class="product-status active"></div>
+                        </div>
+                        <div class="product-details">
+                            <h3><?php echo htmlspecialchars($listing['Name']); ?></h3>
+                            <p class="product-category"><?php echo htmlspecialchars($listing['Category']); ?></p>
+                            <p class="product-price">$<?php echo number_format($listing['Price'], 2); ?></p>
+                            <p class="product-description"><?php echo htmlspecialchars($listing['Description']); ?></p>
+                        </div>
+                        <div class="product-actions">
+                            <button class="primal-btn-secondary edit-product" data-product-id="<?php echo $listing['ID']; ?>">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="primal-btn-danger remove-product" data-product-id="<?php echo $listing['ID']; ?>">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
                     </div>
-                    <div class="product-details">
-                        <h3><?php echo htmlspecialchars($listing['Name']); ?></h3>
-                        <p class="product-category"><?php echo htmlspecialchars($listing['Category']); ?></p>
-                        <p class="product-price">$<?php echo number_format($listing['Price'], 2); ?></p>
-                        <p class="product-description"><?php echo htmlspecialchars($listing['Description']); ?></p>
-                    </div>
-                    <div class="product-actions">
-                        <button class="primal-btn-secondary edit-product" data-product-id="<?php echo $listing['ID']; ?>">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="primal-btn-danger remove-product" data-product-id="<?php echo $listing['ID']; ?>">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
-                    </div>
-                </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -138,7 +138,7 @@ if ($isVendor && isset($_SESSION['user_id'])) {
                     </select>
                 </div>
             </div>
-            
+
             <div class="purchase-history-list">
                 <!-- History items will be populated by JavaScript -->
             </div>
@@ -154,7 +154,7 @@ if ($isVendor && isset($_SESSION['user_id'])) {
                         <button type="submit" class="primal-btn-primary">Update Alias</button>
                     </form>
                 </div>
-                
+
                 <div class="settings-section primal-card">
                     <h3><i class="fas fa-key"></i> Change Password</h3>
                     <form id="password-form">
@@ -164,7 +164,7 @@ if ($isVendor && isset($_SESSION['user_id'])) {
                         <button type="submit" class="primal-btn-primary">Update Password</button>
                     </form>
                 </div>
-                
+
                 <div class="settings-section primal-card">
                     <h3><i class="fas fa-envelope"></i> Email Settings</h3>
                     <p class="current-email">Current: <?php echo htmlspecialchars($email); ?></p>
@@ -173,7 +173,7 @@ if ($isVendor && isset($_SESSION['user_id'])) {
                         <button type="submit" class="primal-btn-primary">Update Email</button>
                     </form>
                 </div>
-                
+
                 <div class="settings-section primal-card danger-zone">
                     <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
                     <p>Once you delete your account, there is no going back. Please be certain.</p>
@@ -199,7 +199,7 @@ if ($isVendor && isset($_SESSION['user_id'])) {
                     <label for="product-name">Product Name</label>
                     <input type="text" id="product-name" name="name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="product-category">Category</label>
                     <select id="product-category" name="category" required>
@@ -211,22 +211,22 @@ if ($isVendor && isset($_SESSION['user_id'])) {
                         <option value="forging-materials">Forging Materials</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="product-price">Price ($)</label>
                     <input type="number" id="product-price" name="price" step="0.01" min="0" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="product-description">Description</label>
                     <textarea id="product-description" name="description" rows="4" required></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="product-image">Image URL</label>
                     <input type="url" id="product-image" name="image" placeholder="https://...">
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="submit" class="primal-btn-primary">Save Product</button>
                     <button type="button" class="primal-btn-secondary modal-close">Cancel</button>
