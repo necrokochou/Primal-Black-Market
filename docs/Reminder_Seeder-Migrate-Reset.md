@@ -39,6 +39,7 @@ PG_PASS=password
 docker cp utils/ primal-black-market-service:/var/www/html/
 docker cp staticData/ primal-black-market-service:/var/www/html/
 docker cp .env primal-black-market-service:/var/www/html/
+docker cp database/ primal-black-market-service:/var/www/html/ 
 ```
 
 ### 5. **Database Connection Test**
