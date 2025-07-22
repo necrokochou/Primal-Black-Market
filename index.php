@@ -1,10 +1,11 @@
-
-
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/envSetter.util.php';
-require_once HANDLERS_PATH . '/mongodbChecker.handler.php';
-require_once HANDLERS_PATH . '/postgresChecker.handler.php';
+// require_once HANDLERS_PATH . '/mongodbChecker.handler.php';
+// require_once HANDLERS_PATH . '/postgresChecker.handler.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 require_once __DIR__ . '/layouts/header.php';
 require_once __DIR__ . '/components/productCard.component.php';

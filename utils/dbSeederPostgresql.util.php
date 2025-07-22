@@ -28,7 +28,8 @@ try {
 function clearAllTables($pdo) {
     echo "\n🧹 Clearing all tables in correct order...\n";
     
-    $clearOrder = ['cart', 'transactions', 'feedbacks', 'messages', 'listings', 'categories', 'users'];
+    // $clearOrder = ['cart', 'transactions', 'feedbacks', 'messages', 'listings', 'categories', 'users'];
+    $clearOrder = ['transactions', 'feedbacks', 'messages', 'listings', 'categories', 'users'];
     
     foreach ($clearOrder as $table) {
         try {
@@ -259,42 +260,43 @@ if (empty($userIds) || empty($listingIds)) {
 }
 $totalInserted += $transactionsInserted;
 
-// 7. Cart Data (Requires Users & Listings) - Based on cart.model.sql structure
-echo "\n🌱 Seeding cart with foreign key relationships...\n";
+// // 7. Cart Data (Requires Users & Listings) - Based on cart.model.sql structure
+// echo "\n🌱 Seeding cart with foreign key relationships...\n";
 
-// Get random users and listings for foreign key relationships
-$userStmt = $pdo->query("SELECT User_ID FROM users ORDER BY RANDOM() LIMIT 10");
-$userIds = $userStmt->fetchAll(PDO::FETCH_COLUMN);
+// // Get random users and listings for foreign key relationships
+// $userStmt = $pdo->query("SELECT User_ID FROM users ORDER BY RANDOM() LIMIT 10");
+// $userIds = $userStmt->fetchAll(PDO::FETCH_COLUMN);
 
-$listingStmt = $pdo->query("SELECT Listing_ID FROM listings ORDER BY RANDOM() LIMIT 10");
-$listingIds = $listingStmt->fetchAll(PDO::FETCH_COLUMN);
+// $listingStmt = $pdo->query("SELECT Listing_ID FROM listings ORDER BY RANDOM() LIMIT 10");
+// $listingIds = $listingStmt->fetchAll(PDO::FETCH_COLUMN);
 
-if (empty($userIds) || empty($listingIds)) {
-    echo "⚠️  Cannot seed cart: Missing users or listings data\n";
-    $cartInserted = 0;
-} else {
-    $cartInserted = seedTable(
-        $pdo,
-        'cart',
-        'cart.staticData.php',
-        'INSERT INTO cart (User_ID, Listing_ID, Quantity, Added_At)
-         VALUES (:user_id, :listing_id, :quantity, :added_at)',
-        function($cartItem) use ($userIds, $listingIds) {
-            return [
-                ':user_id' => $userIds[array_rand($userIds)],
-                ':listing_id' => $listingIds[array_rand($listingIds)],
-                ':quantity' => $cartItem['Quantity'],
-                ':added_at' => $cartItem['AddedAt']
-            ];
-        }
-    );
-}
-$totalInserted += $cartInserted;
+// if (empty($userIds) || empty($listingIds)) {
+//     echo "⚠️  Cannot seed cart: Missing users or listings data\n";
+//     $cartInserted = 0;
+// } else {
+//     $cartInserted = seedTable(
+//         $pdo,
+//         'cart',
+//         'cart.staticData.php',
+//         'INSERT INTO cart (User_ID, Listing_ID, Quantity, Added_At)
+//          VALUES (:user_id, :listing_id, :quantity, :added_at)',
+//         function($cartItem) use ($userIds, $listingIds) {
+//             return [
+//                 ':user_id' => $userIds[array_rand($userIds)],
+//                 ':listing_id' => $listingIds[array_rand($listingIds)],
+//                 ':quantity' => $cartItem['Quantity'],
+//                 ':added_at' => $cartItem['AddedAt']
+//             ];
+//         }
+//     );
+// }
+// $totalInserted += $cartInserted;
 
 // ---- 🔍 Verify Seeding Results ----
 echo "\n🔍 Verifying seeding results...\n";
 
-$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions', 'cart'];
+// $expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions', 'cart'];
+$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions'];
 $totalRecords = 0;
 
 foreach ($expectedTables as $table) {

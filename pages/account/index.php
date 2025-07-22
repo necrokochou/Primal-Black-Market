@@ -9,12 +9,13 @@ if (!isset($_SESSION['user'])) {
 require_once __DIR__ . '/../../layouts/header.php';
 
 // Get user data from session
-$username = $_SESSION['user'];
-$alias = $_SESSION['user_alias'] ?? $username;
-$email = $_SESSION['user_email'] ?? '';
-$trustLevel = $_SESSION['user_trust_level'] ?? 0;
-$isVendor = $_SESSION['is_vendor'] ?? false;
-$isAdmin = $_SESSION['is_admin'] ?? false;
+$user = $_SESSION['user'];
+$username = $user['username'];
+$alias = $user['alias'] ?? $username;
+$email = $user['email'] ?? '';
+$trustLevel = $user['trust_level'] ?? 0;
+$isVendor = $user['is_vendor'] ?? false;
+$isAdmin = $user['is_admin'] ?? false;
 // Get user's listings from database (if they are a vendor)
 $userListings = [];
 if ($isVendor) {
