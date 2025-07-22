@@ -10,7 +10,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once __DIR__ . '/../../layouts/header.php';
-require_once __DIR__ . '/../../components/productCard.component.php';
+require_once __DIR__ . '/../../utils/productCard.util.php';
 require_once __DIR__ . '/../../utils/DatabaseService.util.php';
 
 // // Get user data from session

@@ -13,10 +13,12 @@ class CartHandler {
         }
         try {
             $this->pdo = connectPostgres();
-            // echo "Connected to Postgres database successfully.";
         } catch (PDOException $e) {
-            // echo "Connection failed: " . $e->getMessage();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Database connection failed']);
+            exit;
         }
+
         $this->auth = new \App\Utils\Auth($this->pdo);
         $this->userID = $this->auth->getLoggedInUserID();
 
@@ -29,7 +31,8 @@ class CartHandler {
 
     public function getCart(): array {
         $stmt = $this->pdo->prepare("
-            SELECT c.Cart_ID, c.Listing_ID, c.Quantity, l.Name, l.Total_Price
+            SELECT c.Cart_ID, c.Listing_ID, c.Quantity,
+                l.Title AS title, l.Price AS unit_price, l.Item_Image
             FROM cart c
             JOIN listings l ON l.Listing_ID = c.Listing_ID
             WHERE c.User_ID = :userID
@@ -39,7 +42,6 @@ class CartHandler {
     }
 
     public function addToCart($listingID, $quantity) {
-        // Check if item already exists in the user's cart
         $stmt = $this->pdo->prepare("
             SELECT Quantity FROM cart
             WHERE User_ID = :userID AND Listing_ID = :listingID
@@ -48,57 +50,62 @@ class CartHandler {
         $existing = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($existing) {
-            // Update existing item quantity
             $stmt = $this->pdo->prepare("
                 UPDATE cart SET Quantity = Quantity + :quantity
                 WHERE User_ID = :userID AND Listing_ID = :listingID
             ");
-            $stmt->execute(['quantity' => $quantity, 'userID' => $this->userID, 'listingID' => $listingID]);
+            $stmt->execute([
+                'quantity' => $quantity,
+                'userID' => $this->userID,
+                'listingID' => $listingID
+            ]);
         } else {
-            // Insert new item
             $stmt = $this->pdo->prepare("
                 INSERT INTO cart (User_ID, Listing_ID, Quantity)
                 VALUES (:userID, :listingID, :quantity)
             ");
-            $stmt->execute(['userID' => $this->userID, 'listingID' => $listingID, 'quantity' => $quantity]);
+            $stmt->execute([
+                'userID' => $this->userID,
+                'listingID' => $listingID,
+                'quantity' => $quantity
+            ]);
         }
     }
 
-    public function updateItem($itemID, $quantity) {
+    public function updateItem($cartID, $quantity) {
         $stmt = $this->pdo->prepare("
-            UPDATE cart_items SET quantity = :quantity
-            WHERE cart_item_id = :itemID
+            UPDATE cart SET Quantity = :quantity
+            WHERE Cart_ID = :cartID AND User_ID = :userID
         ");
-        $stmt->execute(['quantity' => $quantity, 'itemID' => $itemID]);
+        $stmt->execute([
+            'quantity' => $quantity,
+            'cartID' => $cartID,
+            'userID' => $this->userID
+        ]);
     }
 
-    public function removeItem($listingID) {
+    public function removeItem($cartID) {
         $stmt = $this->pdo->prepare("
-            DELETE FROM cart WHERE User_ID = :userID AND Listing_ID = :listingID
+            DELETE FROM cart WHERE Cart_ID = :cartID AND User_ID = :userID
         ");
-        $stmt->execute(['userID' => $this->userID, 'listingID' => $listingID]);
+        $stmt->execute([
+            'cartID' => $cartID,
+            'userID' => $this->userID
+        ]);
+    }
+
+    public function clearCart($userId) {
+        $stmt = $this->pdo->prepare("DELETE FROM cart WHERE user_id = :user_id");
+        $stmt->execute(['user_id' => $userId]);
     }
 
     public function getCartCount($userID) {
-        $stmt = $this->db->prepare("SELECT SUM(Quantity) AS total FROM cart WHERE User_ID = :uid");
-        $stmt->execute([':uid' => $userID]);
+        $stmt = $this->pdo->prepare("
+            SELECT COALESCE(SUM(Quantity), 0) AS total
+            FROM cart WHERE User_ID = :uid
+        ");
+        $stmt->execute(['uid' => $userID]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row['total'] ?? 0;
     }
-
-    // private function getOrCreateCart() {
-    //     $stmt = $this->pdo->prepare("
-    //         SELECT Cart_ID FROM carts WHERE User_ID = :userID
-    //     ");
-    //     $stmt->execute(['userID' => $this->userID]);
-    //     $cart = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    //     if ($cart) return $cart['Cart_ID'];
-
-    //     $stmt = $this->pdo->prepare("
-    //         INSERT INTO carts (User_ID) VALUES (:userID) RETURNING Cart_ID
-    //     ");
-    //     $stmt->execute(['userID' => $this->userID]);
-    //     return $stmt->fetch(PDO::FETCH_ASSOC)['Cart_ID'];
-    // }
 }

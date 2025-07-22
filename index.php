@@ -8,7 +8,7 @@ require_once UTILS_PATH . '/envSetter.util.php';
 // require_once HANDLERS_PATH . '/postgresChecker.handler.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 require_once __DIR__ . '/layouts/header.php';
-require_once __DIR__ . '/components/productCard.component.php';
+require_once __DIR__ . '/utils/productCard.util.php';
 
 try {
     $db = DatabaseService::getInstance();
@@ -58,6 +58,7 @@ try {
             $carouselProducts = array_slice($displayProducts, 0, 3);
             foreach ($carouselProducts as $product) {
                 // Handle both database format and static format
+                $id = $product['listing_id'];
                 $title = $product['title'] ?? $product['name'] ?? $product['Title'] ?? 'Unknown Product';
                 $price = $product['price'] ?? $product['Price'] ?? 0;
                 $image = $product['item_image'] ?? $product['image_path'] ?? $product['Item_Image'] ?? $product['Image'] ?? null;
@@ -68,6 +69,7 @@ try {
                 
                 renderProductCard(
                     $title,
+                    $id,
                     number_format($price, 2),
                     $imagePath,
                     $isNew
@@ -100,6 +102,7 @@ try {
             $carouselProducts = array_slice($displayProducts, 0, 4);
             foreach ($carouselProducts as $product) {
                 // Handle both database format and static format
+                $id = $product['listing_id'];
                 $title = $product['title'] ?? $product['name'] ?? $product['Title'] ?? 'Unknown Product';
                 $price = $product['price'] ?? $product['Price'] ?? 0;
                 $image = $product['item_image'] ?? $product['image_path'] ?? $product['Item_Image'] ?? $product['Image'] ?? null;
@@ -110,6 +113,7 @@ try {
                 
                 renderProductCard(
                     $title,
+                    $id,
                     number_format($price, 2),
                     $imagePath,
                     $isNew

@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/../logs/php-error.log'); // set correct path
+ini_set('error_log', __DIR__ . '/../logs/php-error.log');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -41,36 +41,57 @@ switch ($action) {
     case 'get':
         $items = $cart->getCart();
         echo json_encode(['success' => true, 'items' => $items]);
-        exit;
+        break;
+
+    case 'update':
+        $cartID = $_POST['cart_id'] ?? null;
+        $quantity = $_POST['quantity'] ?? null;
+
+        if (!$cartID || $quantity === null) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Missing cart_id or quantity']);
+            exit;
+        }
+
+        $cart->updateItem($cartID, (int)$quantity);
+        echo json_encode(['success' => true]);
+        break;
 
     case 'remove':
-        $itemID = $_POST['item_id'] ?? '';
-        if (!$itemID) {
+        $cartID = $_POST['cart_id'] ?? '';
+        if (!$cartID) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Missing item ID']);
             exit;
         }
-        $cart->removeItem($itemID);
+
+        $cart->removeItem($cartID);
         echo json_encode(['success' => true, 'message' => 'Item removed from cart']);
-        exit;
+        break;
 
     case 'count':
-        $userId = $user['id'] ?? null;
-
-        if (!$userId) {
+        if (!$user || !isset($user['id'])) {
             echo json_encode(['success' => false, 'error' => 'User not authenticated']);
             exit;
         }
 
-        $stmt = $pdo->prepare("SELECT COALESCE(SUM(Quantity), 0) FROM cart WHERE User_ID = ?");
-        $stmt->execute([$userId]);
-        $count = $stmt->fetchColumn();
-
+        $count = $cart->getCartCount($user['id']);
         echo json_encode(['success' => true, 'count' => $count]);
-        exit;
+        break;
+
+    case 'clear':
+        if (!$user || !isset($user['id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'User not authenticated']);
+            exit;
+        }
+
+        $cart->clearCart($user['id']);
+        echo json_encode(['success' => true, 'message' => 'Cart cleared']);
+        break;
 
     default:
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Invalid action']);
-        exit;
+        break;
 }
