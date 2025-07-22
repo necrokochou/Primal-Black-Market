@@ -139,7 +139,7 @@ try {
                     </thead>
                     <tbody>
                         <?php foreach ($users as $index => $user): ?>
-                            <tr data-user-id="<?php echo $index; ?>">
+                            <tr data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>">
                                 <td>
                                     <div class="user-info">
                                         <i class="fas fa-user-circle user-avatar"></i>
@@ -163,7 +163,7 @@ try {
                                         <button class="action-btn ban-user" data-user-id="<?php echo $user['user_id']; ?>" title="Ban User">
                                             <i class="fas fa-ban"></i>
                                         </button>
-                                        <button class="action-btn delete-user" data-user-id="<?php echo $index; ?>" title="Delete User">
+                                        <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>" title="Delete User">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>

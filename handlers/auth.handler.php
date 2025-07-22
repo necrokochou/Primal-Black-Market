@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -93,6 +94,19 @@ if ($action === 'register') {
         http_response_code(500);
         echo json_encode(['success' => false, 'error' => $result['error'] ?? 'Registration failed.']);
     }
+    exit;
+}
+
+if ($action === 'get_session_user') {
+    if (!isset($_SESSION['user'])) {
+        echo json_encode(['success' => false, 'error' => 'Not logged in']);
+        exit;
+    }
+
+    echo json_encode([
+        'success' => true,
+        'user' => $_SESSION['user']
+    ]);
     exit;
 }
 
