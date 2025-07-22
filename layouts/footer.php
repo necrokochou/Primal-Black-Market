@@ -3,7 +3,7 @@
     <div class="footer-main">
         <div class="footer-brand">
             <div class="logo">
-                <a href="/"><img src="/assets/images/CP Logo(ARCL).png" alt="Primal Black Market Logo"></a>
+                <a href="/"><img src="/assets/images/Logo.png" alt="Primal Black Market Logo"></a>
             </div>
             <p><b>Primal Black Market</b> &mdash; The wildest deals, the rarest finds. Shop the primal way.</p>
             <div class="footer-social">
@@ -46,10 +46,10 @@
     <div class="footer-bottom">
         <p>&copy; <?= date('Y') ?> Primal Black Market. All rights reserved.</p>
         <div class="footer-payments">
-            <img src="/assets/images/paypal.png" alt="PayPal">
+            <img src="/assets/images/pp.png" alt="PayPal">
             <img src="/assets/images/visa.png" alt="Visa">
-            <img src="/assets/images/mastercard.png" alt="Mastercard">
-            <img src="/assets/images/bitcoin.png" alt="Bitcoin">
+            <img src="/assets/images/mc.png" alt="Mastercard">
+            <img src="/assets/images/bc.png" alt="Bitcoin">
         </div>
     </div>
     <script src="/assets/js/main.js"></script>

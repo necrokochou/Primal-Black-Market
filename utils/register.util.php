@@ -58,5 +58,13 @@ function registerUser(string $username, string $password, string $email, ?string
         'alias'    => $alias,
     ]);
 
-    return ['success' => $ok];
+    if ($ok) {
+        $userIdStmt = $pdo->prepare("SELECT User_ID FROM users WHERE Username = :username");
+        $userIdStmt->execute(['username' => $username]);
+        $userId = $userIdStmt->fetchColumn();
+
+        return ['success' => true, 'user_id' => $userId];
+    }
+
+    return ['success' => false];
 }

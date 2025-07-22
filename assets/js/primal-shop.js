@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             
             const card = this.closest('.product-card');
+            const listingID = card.getAttribute('data-id');
             const title = card.getAttribute('data-title');
             const price = parseFloat(card.getAttribute('data-price'));
             const image = card.getAttribute('data-image');
@@ -154,14 +155,26 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'scale(0.95)';
             
             // Add to cart logic (matching homepage)
-            let cart = JSON.parse(localStorage.getItem('pbm_cart') || '[]');
-            let found = cart.find(item => item.title === title);
-            if (found) {
-                found.qty += 1;
-            } else {
-                cart.push({ title, price, image, qty: 1 });
-            }
-            localStorage.setItem('pbm_cart', JSON.stringify(cart));
+            fetch('/handlers/cart.handler.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'add',
+                    listing_id: listingID,
+                    quantity: 1
+                })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error(`Server returned ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                if (!data.success) throw new Error(data.error);
+                console.log('Cart updated:', data);
+            })
+            .catch(err => {
+                console.error('Network/cart error:', err);
+            });
             
             // Trigger cart update event
             window.dispatchEvent(new Event('cartUpdated'));

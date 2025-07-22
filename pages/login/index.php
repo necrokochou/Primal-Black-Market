@@ -1,8 +1,7 @@
 <?php
 session_start();
-
 if (isset($_SESSION['user'])) {
-    header('Location: /index.php');
+    header('Location: /pages/account/index.php');
     exit;
 }
 
