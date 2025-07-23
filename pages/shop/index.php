@@ -1,8 +1,13 @@
-
 <?php
-require_once LAYOUTS_PATH . '/header.php';
-require_once COMPONENTS_PATH . '/productCard.component.php';
-require_once UTILS_PATH . '/DatabaseService.util.php';
+
+
+// // Get user data from session
+// $username = $_SESSION['user_username'];
+// $alias = $_SESSION['user_alias'] ?? $username;
+// $email = $_SESSION['user_email'] ?? '';
+// $trustLevel = $_SESSION['user_trust_level'] ?? 0;
+// $isVendor = $_SESSION['is_vendor'] ?? false;
+// $isAdmin = $_SESSION['is_admin'] ?? false;
 
 try {
     $db = DatabaseService::getInstance();
@@ -48,6 +53,7 @@ try {
                 <?php foreach ($filteredListings as $product): ?>
                     <?php
                         // Handle both database format and static format
+                        $id = $product['listing_id'];
                         $title = $product['title'] ?? $product['name'] ?? $product['Title'] ?? 'Unknown Product';
                         $price = $product['price'] ?? $product['Price'] ?? 0;
                         $image = $product['item_image'] ?? $product['image_path'] ?? $product['Item_Image'] ?? $product['Image'] ?? null;
@@ -58,6 +64,7 @@ try {
                         
                         renderProductCard(
                             $title, 
+                            $id,
                             number_format($price, 2), 
                             $imagePath, 
                             $isNew

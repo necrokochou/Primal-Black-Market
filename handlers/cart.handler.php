@@ -1,125 +1,97 @@
 <?php
+error_reporting(E_ALL);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../logs/php-error.log');
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once __DIR__ . '/../bootstrap.php';
-require_once UTILS_PATH . '/DatabaseService.util.php';
+$user = $_SESSION['user'] ?? null;
+
+require_once __DIR__ . '/../utils/cart.util.php';
 
 header('Content-Type: application/json');
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
-if ($action === 'add') {
-    $productId = $_POST['product_id'] ?? '';
-    $title = $_POST['title'] ?? '';
-    $price = floatval($_POST['price'] ?? 0);
-    $image = $_POST['image'] ?? '';
-    $quantity = intval($_POST['quantity'] ?? 1);
+try {
+    $cart = new CartHandler();
+} catch (Exception $e) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+    exit;
+}
 
-    if (!$title || !$price) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Missing product information']);
-        exit;
-    }
+switch ($action) {
+    case 'add':
+        $listingID = $_POST['listing_id'] ?? null;
+        $quantity = $_POST['quantity'] ?? 1;
 
-    // Initialize cart if not exists
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
-
-    // Check if item already exists in cart
-    $found = false;
-    foreach ($_SESSION['cart'] as &$item) {
-        if ($item['title'] === $title && $item['price'] === $price) {
-            $item['quantity'] += $quantity;
-            $found = true;
-            break;
+        if (!$listingID || $listingID === 'null') {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid listing ID']);
+            exit;
         }
-    }
 
-    // If not found, add new item
-    if (!$found) {
-        $_SESSION['cart'][] = [
-            'product_id' => $productId,
-            'title' => $title,
-            'price' => $price,
-            'image' => $image,
-            'quantity' => $quantity
-        ];
-    }
+        $cart->addToCart($listingID, (int)$quantity);
+        echo json_encode(['success' => true]);
+        break;
 
-    // Calculate cart count
-    $cartCount = 0;
-    foreach ($_SESSION['cart'] as $item) {
-        $cartCount += $item['quantity'];
-    }
+    case 'get':
+        $items = $cart->getCart();
+        echo json_encode(['success' => true, 'items' => $items]);
+        break;
 
-    echo json_encode([
-        'success' => true,
-        'cart_count' => $cartCount,
-        'message' => 'Item added to cart'
-    ]);
-    exit;
+    case 'update':
+        $cartID = $_POST['cart_id'] ?? null;
+        $quantity = $_POST['quantity'] ?? null;
+
+        if (!$cartID || $quantity === null) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Missing cart_id or quantity']);
+            exit;
+        }
+
+        $cart->updateItem($cartID, (int)$quantity);
+        echo json_encode(['success' => true]);
+        break;
+
+    case 'remove':
+        $cartID = $_POST['cart_id'] ?? '';
+        if (!$cartID) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Missing item ID']);
+            exit;
+        }
+
+        $cart->removeItem($cartID);
+        echo json_encode(['success' => true, 'message' => 'Item removed from cart']);
+        break;
+
+    case 'count':
+        if (!$user || !isset($user['id'])) {
+            echo json_encode(['success' => false, 'error' => 'User not authenticated']);
+            exit;
+        }
+
+        $count = $cart->getCartCount($user['id']);
+        echo json_encode(['success' => true, 'count' => $count]);
+        break;
+
+    case 'clear':
+        if (!$user || !isset($user['id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'User not authenticated']);
+            exit;
+        }
+
+        $cart->clearCart($user['id']);
+        echo json_encode(['success' => true, 'message' => 'Cart cleared']);
+        break;
+
+    default:
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Invalid action']);
+        break;
 }
-
-if ($action === 'get') {
-    $cart = $_SESSION['cart'] ?? [];
-    $cartCount = 0;
-    foreach ($cart as $item) {
-        $cartCount += $item['quantity'];
-    }
-
-    echo json_encode([
-        'success' => true,
-        'cart' => $cart,
-        'cart_count' => $cartCount
-    ]);
-    exit;
-}
-
-if ($action === 'remove') {
-    $title = $_POST['title'] ?? '';
-    $price = floatval($_POST['price'] ?? 0);
-
-    if (!isset($_SESSION['cart'])) {
-        $_SESSION['cart'] = [];
-    }
-
-    // Remove item from cart
-    $_SESSION['cart'] = array_filter($_SESSION['cart'], function($item) use ($title, $price) {
-        return !($item['title'] === $title && $item['price'] === $price);
-    });
-
-    // Reindex array
-    $_SESSION['cart'] = array_values($_SESSION['cart']);
-
-    // Calculate cart count
-    $cartCount = 0;
-    foreach ($_SESSION['cart'] as $item) {
-        $cartCount += $item['quantity'];
-    }
-
-    echo json_encode([
-        'success' => true,
-        'cart_count' => $cartCount,
-        'message' => 'Item removed from cart'
-    ]);
-    exit;
-}
-
-if ($action === 'clear') {
-    $_SESSION['cart'] = [];
-    
-    echo json_encode([
-        'success' => true,
-        'cart_count' => 0,
-        'message' => 'Cart cleared'
-    ]);
-    exit;
-}
-
-// If invalid action
-http_response_code(400);
-echo json_encode(['success' => false, 'error' => 'Invalid action']);
-exit;

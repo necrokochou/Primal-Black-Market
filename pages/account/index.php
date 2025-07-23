@@ -1,22 +1,21 @@
-<?php
-require_once BASE_PATH . '/bootstrap.php';
-require_once UTILS_PATH . '/DatabaseService.util.php';
 
-// For now, use hardcoded user data instead of session
-// This will be replaced with proper session handling later
 
-// Hardcoded user data for testing/demo purposes
-$username = 'DemoUser';
-$alias = 'Primal Trader';
-$email = 'demo@primal.market';
-$trustLevel = 7.5;
-$isVendor = true; // Change to false to test regular user view
-$isAdmin = false; // Change to true to test admin view
+require_once __DIR__ . '/../../layouts/header.php';
 
+// Get user data from session
+$user = $_SESSION['user'];
+$username = $user['username'];
+$alias = $user['alias'] ?? $username;
+$email = $user['email'] ?? '';
+$trustLevel = $user['trust_level'] ?? 0;
+$isVendor = $user['is_vendor'] ?? false;
+$isAdmin = $user['is_admin'] ?? false;
 // Get user's listings from database (if they are a vendor)
 $userListings = [];
 if ($isVendor) {
     try {
+        require_once BASE_PATH . '/bootstrap.php';
+        require_once UTILS_PATH . '/DatabaseService.util.php';
         $db = DatabaseService::getInstance();
         // Note: This would require a method to get listings by vendor ID
         // For now, we'll show empty array until that method is implemented
@@ -43,7 +42,7 @@ require_once __DIR__ . '/../../layouts/header.php';
             <div class="account-info">
                 <h1 class="account-name"><?php echo htmlspecialchars($alias); ?></h1>
                 <p class="account-type">
-                    <?php 
+                    <?php
                     if ($isAdmin) {
                         echo '<i class="fas fa-crown"></i> Administrator Account';
                     } elseif ($isVendor) {
@@ -65,9 +64,9 @@ require_once __DIR__ . '/../../layouts/header.php';
             </div>
             <div class="account-actions">
                 <?php if ($isAdmin): ?>
-                <a href="/pages/admin" class="primal-btn-secondary">
-                    <i class="fas fa-shield-alt"></i> Admin Dashboard
-                </a>
+                    <a href="/pages/admin/index.php" class="primal-btn-secondary">
+                        <i class="fas fa-shield-alt"></i> Admin Dashboard
+                    </a>
                 <?php endif; ?>
                 <a href="/handlers/logout.handler.php" class="primal-btn-danger" id="logout-btn">
                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -107,8 +106,7 @@ require_once __DIR__ . '/../../layouts/header.php';
                     <i class="fas fa-plus"></i> Add New Product
                 </button>
                 <?php endif; ?>
-            </div>
-            
+            </div> 
             <?php if ($isVendor): ?>
             <!-- Vendor Products Grid -->
             <div class="my-products-grid">
@@ -185,7 +183,6 @@ require_once __DIR__ . '/../../layouts/header.php';
                     </select>
                 </div>
             </div>
-            
             <div class="purchase-history-list primal-card">
                 <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
                     <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
@@ -214,7 +211,7 @@ require_once __DIR__ . '/../../layouts/header.php';
                         </button>
                     </form>
                 </div>
-                
+
                 <div class="settings-section primal-card">
                     <h3><i class="fas fa-key"></i> Security Settings</h3>
                     <form id="password-form">
@@ -235,7 +232,7 @@ require_once __DIR__ . '/../../layouts/header.php';
                         </button>
                     </form>
                 </div>
-                
+
                 <div class="settings-section primal-card">
                     <h3><i class="fas fa-envelope"></i> Email Management</h3>
                     <p class="current-email">
@@ -251,7 +248,6 @@ require_once __DIR__ . '/../../layouts/header.php';
                         </button>
                     </form>
                 </div>
-                
                 <?php if ($isVendor): ?>
                 <div class="settings-section primal-card">
                     <h3><i class="fas fa-store"></i> Vendor Settings</h3>
@@ -340,7 +336,7 @@ require_once __DIR__ . '/../../layouts/header.php';
                     <label for="product-name"><i class="fas fa-tag"></i> Product Name</label>
                     <input type="text" id="product-name" name="name" placeholder="Enter product name" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="product-category"><i class="fas fa-list"></i> Category</label>
                     <select id="product-category" name="category" required>
@@ -357,7 +353,7 @@ require_once __DIR__ . '/../../layouts/header.php';
                         <option value="voodoo">🔮 Voodoo Items</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="product-price"><i class="fas fa-dollar-sign"></i> Price (USD)</label>
                     <input type="number" id="product-price" name="price" step="0.01" min="0" placeholder="0.00" required>
@@ -367,12 +363,12 @@ require_once __DIR__ . '/../../layouts/header.php';
                     <label for="product-quantity"><i class="fas fa-boxes"></i> Quantity Available</label>
                     <input type="number" id="product-quantity" name="quantity" min="1" placeholder="1" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="product-description"><i class="fas fa-align-left"></i> Description</label>
                     <textarea id="product-description" name="description" rows="4" placeholder="Describe your primal offering..." required></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="product-image"><i class="fas fa-image"></i> Product Image URL</label>
                     <input type="url" id="product-image" name="image" placeholder="https://example.com/image.jpg">
@@ -380,7 +376,7 @@ require_once __DIR__ . '/../../layouts/header.php';
                         Optional: Provide a direct link to your product image
                     </small>
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="submit" class="primal-btn-primary">
                         <i class="fas fa-save"></i> Save Product
@@ -395,4 +391,4 @@ require_once __DIR__ . '/../../layouts/header.php';
 </div>
 
 <script src="/assets/js/primal-account.js"></script>
-<?php require_once LAYOUTS_PATH . '/footer.php'; ?>
+

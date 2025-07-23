@@ -1,12 +1,5 @@
 <?php
-require_once BASE_PATH . '/bootstrap.php';
-require_once UTILS_PATH . '/DatabaseService.util.php';
-require_once LAYOUTS_PATH . '/header.php';
 
-// Demo admin user data for testing (remove session dependencies)
-$username = 'AdminUser';
-$alias = 'Supreme Administrator';
-$isAdmin = true;
 
 // Get data from database
 try {
@@ -15,7 +8,16 @@ try {
     $listingCount = $db->getListingCount(false); // Total listings
     $activeListingCount = $db->getListingCount(true); // Active listings only
     $users = $db->getAllUsers();
-    $listings = $db->getListings(null, null, 0, true); // Include inactive listings for admin
+    $listings = $db->getListings(null, null, 0, true);
+    echo '<pre>';
+    echo "✅ Users loaded: " . count($users) . "\n";
+    echo "✅ Listings loaded: " . count($listings) . "\n";
+    echo "Host: " . ($_ENV['PG_HOST'] ?? 'not set') . "\n";
+    echo "Port: " . ($_ENV['PG_PORT'] ?? 'not set') . "\n";
+    echo "DB: " . ($_ENV['PG_DB'] ?? 'not set') . "\n";
+    echo "User: " . ($_ENV['PG_USER'] ?? 'not set') . "\n";
+    echo '</pre>';
+    echo '</pre>'; // Include inactive listings for admin
 } catch (Exception $e) {
     error_log("Database error in admin dashboard: " . $e->getMessage());
     // Set default values if database fails
@@ -24,8 +26,15 @@ try {
     $activeListingCount = 0;
     $users = [];
     $listings = [];
+
+    echo '<pre>';
+    echo "❌ Error: " . $e->getMessage() . "\n";
+    echo "✅ Users fallback: " . count($users) . "\n";
+    echo "✅ Listings fallback: " . count($listings) . "\n";
+    echo '</pre>';
 }
 ?>
+
 
 <!-- Admin Page Specific Styles -->
 <link rel="stylesheet" href="/assets/css/primal-admin.css">
@@ -93,7 +102,7 @@ try {
                     </select>
                 </div>
             </div>
-            
+
             <div class="users-table-container">
                 <table class="admin-table">
                     <thead>
@@ -109,36 +118,36 @@ try {
                     </thead>
                     <tbody>
                         <?php foreach ($users as $index => $user): ?>
-                        <tr data-user-id="<?php echo $index; ?>">
-                            <td>
-                                <div class="user-info">
-                                    <i class="fas fa-user-circle user-avatar"></i>
-                                    <div>
-                                        <div class="user-name"><?php echo htmlspecialchars($user['username']); ?></div>
-                                        <div class="user-email"><?php echo htmlspecialchars($user['email']); ?></div>
-                                        <div class="user-alias">Alias: <?php echo htmlspecialchars($user['alias']); ?></div>
+                            <tr data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>">
+                                <td>
+                                    <div class="user-info">
+                                        <i class="fas fa-user-circle user-avatar"></i>
+                                        <div>
+                                            <div class="user-name"><?php echo htmlspecialchars($user['username']); ?></div>
+                                            <div class="user-email"><?php echo htmlspecialchars($user['email']); ?></div>
+                                            <div class="user-alias">Alias: <?php echo htmlspecialchars($user['alias']); ?></div>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
-                            <td><span class="status-badge active">Active</span></td>
-                            <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
-                            <td><?php echo number_format($user['trust_level'], 1); ?></td>
-                            <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn view-user" data-user-id="<?php echo $user['user_id']; ?>" title="View Details">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="action-btn ban-user" data-user-id="<?php echo $user['user_id']; ?>" title="Ban User">
-                                        <i class="fas fa-ban"></i>
-                                    </button>
-                                    <button class="action-btn delete-user" data-user-id="<?php echo $index; ?>" title="Delete User">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
+                                <td><?php echo number_format($user['trustlevel'], 1); ?></td>
+                                <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn view-user" data-user-id="<?php echo $user['user_id']; ?>" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn ban-user" data-user-id="<?php echo $user['user_id']; ?>" title="Ban User">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                        <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>" title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -161,33 +170,33 @@ try {
                     </select>
                 </div>
             </div>
-            
+
             <div class="admin-products-grid">
                 <?php foreach (array_slice($listings, 0, 12) as $listing): ?>
-                <div class="admin-product-item" data-product-id="<?php echo $listing['listing_id']; ?>">
-                    <div class="product-image">
-                        <img src="<?php echo htmlspecialchars($listing['item_image'] ?? '/assets/images/default-product.png'); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
-                        <div class="product-status-indicator <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
+                    <div class="admin-product-item" data-product-id="<?php echo $listing['listing_id']; ?>">
+                        <div class="product-image">
+                            <img src="<?php echo htmlspecialchars($listing['item_image'] ?? '/assets/images/default-product.png'); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
+                            <div class="product-status-indicator <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
+                        </div>
+                        <div class="product-details">
+                            <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
+                            <p class="product-category"><?php echo htmlspecialchars($listing['category_name'] ?? $listing['category']); ?></p>
+                            <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
+                            <p class="product-stock">Stock: <?php echo $listing['quantity']; ?></p>
+                            <p class="product-seller">Seller: User</p>
+                        </div>
+                        <div class="product-actions">
+                            <button class="action-btn edit-product-admin" data-product-id="<?php echo $listing['listing_id']; ?>" title="Edit Product">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn toggle-product-status" data-product-id="<?php echo $listing['listing_id']; ?>" title="Toggle Status">
+                                <i class="fas fa-<?php echo $listing['is_active'] ? 'pause' : 'play'; ?>"></i>
+                            </button>
+                            <button class="action-btn delete-product-admin" data-product-id="<?php echo $listing['listing_id']; ?>" title="Delete Product">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="product-details">
-                        <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
-                        <p class="product-category"><?php echo htmlspecialchars($listing['category_name'] ?? $listing['category']); ?></p>
-                        <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
-                        <p class="product-stock">Stock: <?php echo $listing['quantity']; ?></p>
-                        <p class="product-seller">Seller: User</p>
-                    </div>
-                    <div class="product-actions">
-                        <button class="action-btn edit-product-admin" data-product-id="<?php echo $listing['listing_id']; ?>" title="Edit Product">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn toggle-product-status" data-product-id="<?php echo $listing['listing_id']; ?>" title="Toggle Status">
-                            <i class="fas fa-<?php echo $listing['is_active'] ? 'pause' : 'play'; ?>"></i>
-                        </button>
-                        <button class="action-btn delete-product-admin" data-product-id="<?php echo $listing['listing_id']; ?>" title="Delete Product">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -255,4 +264,3 @@ try {
 </main>
 
 <script src="/assets/js/primal-admin.js"></script>
-<?php require_once LAYOUTS_PATH . '/footer.php'; ?>

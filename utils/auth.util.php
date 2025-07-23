@@ -13,7 +13,7 @@ class Auth
         $this->account = $account;
     }
 
-    public function tryLogin(string $username, string $password): bool
+    public function tryLogin(string $username, string $password): ?array
     {
         $field = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
@@ -22,12 +22,15 @@ class Auth
         $statement->execute();
         $user = $statement->fetch(PDO::FETCH_ASSOC);
 
-        // Prevent null or undefined access
         if (!$user || !isset($user['password'])) {
-            return false;
+            return null;
         }
 
-        return password_verify($password, $user['password']);
+        if (password_verify($password, $user['password'])) {
+            return $user;
+        }
+
+        return null;
     }
 
     public function getLoggedInUserID(): ?string
@@ -36,12 +39,26 @@ class Auth
             return null;
         }
 
-        $username = $_SESSION['user'];
+        // Now that $_SESSION['user'] is an array, extract the username:
+        $username = $_SESSION['user']['username'] ?? null;
+        if (!$username) {
+            return null;
+        }
+        
         $statement = $this->account->prepare('SELECT user_id FROM users WHERE username = :username');
         $statement->bindParam(':username', $username);
         $statement->execute();
-        $result = $statement->fetch();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         return $result ? $result['user_id'] : null;
+    }
+
+    public function getUserData(string $username): ?array
+    {
+        $field = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $stmt = $this->account->prepare("SELECT * FROM users WHERE {$field} = :username");
+        $stmt->bindParam(':username', $username);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

@@ -1,5 +1,4 @@
 
-<?php require_once LAYOUTS_PATH . '/header.php'; ?>
 
 <!-- About Page Specific Styles -->
 <link rel="stylesheet" href="/assets/css/primal-about.css">
