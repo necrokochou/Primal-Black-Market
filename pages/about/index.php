@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
+
 
 <!-- About Page Specific Styles -->
 <link rel="stylesheet" href="/assets/css/primal-about.css">
@@ -161,4 +161,4 @@
 <!-- About Page JavaScript -->
 <script src="/assets/js/primal-about.js"></script>
 
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>

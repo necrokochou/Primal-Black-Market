@@ -385,13 +385,14 @@
     font-weight: 700;
     color: transparent;
     background: linear-gradient(135deg, 
-        var(--primal-orange) 0%, 
-        #ff6b35 100%);
+        var(--primal-green) 0%, 
+        var(--primal-beige-light) 50%, 
+        var(--primal-brown) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     margin-bottom: 1rem;
     letter-spacing: 1px;
-    text-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+    text-shadow: 0 4px 15px rgba(101, 109, 74, 0.3);
     position: relative;
     z-index: 1;
 }

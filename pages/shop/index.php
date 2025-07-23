@@ -1,17 +1,5 @@
 <?php
-// Check if user is logged in
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-if (!isset($_SESSION['user'])) {
-    header('Location: /pages/login/index.php');
-    exit;
-}
-
-require_once __DIR__ . '/../../layouts/header.php';
-require_once __DIR__ . '/../../utils/productCard.util.php';
-require_once __DIR__ . '/../../utils/DatabaseService.util.php';
 
 // // Get user data from session
 // $username = $_SESSION['user_username'];
@@ -91,4 +79,4 @@ try {
 <!-- Shop Page JavaScript -->
 <script src="/assets/js/primal-shop.js"></script>
 
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>

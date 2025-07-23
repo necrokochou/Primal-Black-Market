@@ -1,4 +1,4 @@
-<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
+<?php require_once LAYOUTS_PATH . '/header.php'; ?>
 <link rel="stylesheet" href="/assets/css/primal-register.css">
 
 <main class="primal-auth-bg">
@@ -47,4 +47,4 @@
 </main>
 
 <script src="/assets/js/primal-register.js"></script>
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>
