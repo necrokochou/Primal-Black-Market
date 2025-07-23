@@ -1,4 +1,10 @@
-
+<?php
+// Check if user is logged in
+session_start();
+if (!isset($_SESSION['user'])) {
+    header('Location: /pages/login/index.php');
+    exit;
+}
 
 require_once __DIR__ . '/../../layouts/header.php';
 
@@ -391,4 +397,4 @@ require_once __DIR__ . '/../../layouts/header.php';
 </div>
 
 <script src="/assets/js/primal-account.js"></script>
-
+<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
