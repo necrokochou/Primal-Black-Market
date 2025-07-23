@@ -2,17 +2,25 @@
 // Start session and validate admin access BEFORE any output
 session_start();
 
-if (!isset($_SESSION['user']) || !($_SESSION['is_admin'] ?? false)) {
+
+if (!isset($_SESSION['user']) || !($_SESSION['user']['is_admin'] ?? false)) {
     header('Location: /pages/login/index.php');
     exit;
 }
+
+// Get admin user data
+$user = $_SESSION['user'];
+$username = $user['username'] ?? 'Unknown';
+$alias = $user['alias'] ?? $username;
+
 // Proceed only if access is valid
 require_once __DIR__ . '/../../bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 require_once __DIR__ . '/../../layouts/header.php';
 // Get admin user data
-$username = $_SESSION['user'];
-$alias = $_SESSION['user_alias'] ?? $username;
+$user = $_SESSION['user'];
+$username = $user['username'] ?? 'Unknown';
+$alias = $user['alias'] ?? $username;
 
 // Get data from database
 try {
@@ -21,7 +29,16 @@ try {
     $listingCount = $db->getListingCount(false); // Total listings
     $activeListingCount = $db->getListingCount(true); // Active listings only
     $users = $db->getAllUsers();
-    $listings = $db->getListings(null, null, 0, true); // Include inactive listings for admin
+    $listings = $db->getListings(null, null, 0, true);
+    echo '<pre>';
+    echo "✅ Users loaded: " . count($users) . "\n";
+    echo "✅ Listings loaded: " . count($listings) . "\n";
+    echo "Host: " . ($_ENV['PG_HOST'] ?? 'not set') . "\n";
+    echo "Port: " . ($_ENV['PG_PORT'] ?? 'not set') . "\n";
+    echo "DB: " . ($_ENV['PG_DB'] ?? 'not set') . "\n";
+    echo "User: " . ($_ENV['PG_USER'] ?? 'not set') . "\n";
+    echo '</pre>';
+    echo '</pre>'; // Include inactive listings for admin
 } catch (Exception $e) {
     error_log("Database error in admin dashboard: " . $e->getMessage());
     // Set default values if database fails
@@ -30,6 +47,12 @@ try {
     $activeListingCount = 0;
     $users = [];
     $listings = [];
+
+    echo '<pre>';
+    echo "❌ Error: " . $e->getMessage() . "\n";
+    echo "✅ Users fallback: " . count($users) . "\n";
+    echo "✅ Listings fallback: " . count($listings) . "\n";
+    echo '</pre>';
 }
 ?>
 
@@ -116,7 +139,7 @@ try {
                     </thead>
                     <tbody>
                         <?php foreach ($users as $index => $user): ?>
-                            <tr data-user-id="<?php echo $index; ?>">
+                            <tr data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>">
                                 <td>
                                     <div class="user-info">
                                         <i class="fas fa-user-circle user-avatar"></i>
@@ -130,7 +153,7 @@ try {
                                 <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
                                 <td><span class="status-badge active">Active</span></td>
                                 <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
-                                <td><?php echo number_format($user['trust_level'], 1); ?></td>
+                                <td><?php echo number_format($user['trustlevel'], 1); ?></td>
                                 <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
                                 <td>
                                     <div class="action-buttons">
@@ -140,7 +163,7 @@ try {
                                         <button class="action-btn ban-user" data-user-id="<?php echo $user['user_id']; ?>" title="Ban User">
                                             <i class="fas fa-ban"></i>
                                         </button>
-                                        <button class="action-btn delete-user" data-user-id="<?php echo $index; ?>" title="Delete User">
+                                        <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>" title="Delete User">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>

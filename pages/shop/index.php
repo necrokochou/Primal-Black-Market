@@ -1,8 +1,25 @@
-
 <?php
+// Check if user is logged in
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user'])) {
+    header('Location: /pages/login/index.php');
+    exit;
+}
+
 require_once __DIR__ . '/../../layouts/header.php';
-require_once __DIR__ . '/../../components/productCard.component.php';
+require_once __DIR__ . '/../../utils/productCard.util.php';
 require_once __DIR__ . '/../../utils/DatabaseService.util.php';
+
+// // Get user data from session
+// $username = $_SESSION['user_username'];
+// $alias = $_SESSION['user_alias'] ?? $username;
+// $email = $_SESSION['user_email'] ?? '';
+// $trustLevel = $_SESSION['user_trust_level'] ?? 0;
+// $isVendor = $_SESSION['is_vendor'] ?? false;
+// $isAdmin = $_SESSION['is_admin'] ?? false;
 
 try {
     $db = DatabaseService::getInstance();
@@ -48,6 +65,7 @@ try {
                 <?php foreach ($filteredListings as $product): ?>
                     <?php
                         // Handle both database format and static format
+                        $id = $product['listing_id'];
                         $title = $product['title'] ?? $product['name'] ?? $product['Title'] ?? 'Unknown Product';
                         $price = $product['price'] ?? $product['Price'] ?? 0;
                         $image = $product['item_image'] ?? $product['image_path'] ?? $product['Item_Image'] ?? $product['Image'] ?? null;
@@ -58,6 +76,7 @@ try {
                         
                         renderProductCard(
                             $title, 
+                            $id,
                             number_format($price, 2), 
                             $imagePath, 
                             $isNew

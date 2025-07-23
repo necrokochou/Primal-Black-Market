@@ -39,11 +39,16 @@ class Auth
             return null;
         }
 
-        $username = $_SESSION['user'];
+        // Now that $_SESSION['user'] is an array, extract the username:
+        $username = $_SESSION['user']['username'] ?? null;
+        if (!$username) {
+            return null;
+        }
+        
         $statement = $this->account->prepare('SELECT user_id FROM users WHERE username = :username');
         $statement->bindParam(':username', $username);
         $statement->execute();
-        $result = $statement->fetch();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
 
         return $result ? $result['user_id'] : null;
     }

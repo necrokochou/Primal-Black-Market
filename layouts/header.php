@@ -1,6 +1,10 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $user = $_SESSION['user'] ?? null;
 ?>
+
 <header class="site-header modern-clean-header">
     <link rel="stylesheet" href="/assets/css/homepage.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -52,10 +56,10 @@ $user = $_SESSION['user'] ?? null;
                 <div class="user-dropdown">
                     <span class="user-welcome">
                         <i class="fas fa-user"></i>
-                        <?= htmlspecialchars($user) ?>
+                        <?= htmlspecialchars($user['alias'] ?? $user['username']) ?>
                     </span>
                     <div class="dropdown-content">
-                        <a href="/pages/profile/index.php">Profile</a>
+                        <a href="/pages/account/index.php">Profile</a>
                         <a href="/handlers/logout.handler.php">Logout</a>
                     </div>
                 </div>
@@ -64,17 +68,23 @@ $user = $_SESSION['user'] ?? null;
     </div>
     </div>
     <script>
-        // Animate cart count (use pbm_cart and sum qty)
         document.addEventListener('DOMContentLoaded', function() {
             function updateCartCount() {
-                let count = 0;
-                try {
-                    const cart = JSON.parse(localStorage.getItem('pbm_cart') || '[]');
-                    count = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-                } catch {}
-                const el = document.getElementById('cart-count');
-                if (el) el.textContent = count;
+                fetch('/handlers/cart.handler.php?action=count', {
+                    credentials: 'include', // ✅ This sends PHPSESSID with request
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const el = document.getElementById('cart-count');
+                        if (el) el.textContent = data.count;
+                    } else {
+                        console.warn('Cart count error:', data.error);
+                    }
+                })
+                .catch(err => console.error('Failed to fetch cart count', err));
             }
+
             updateCartCount();
             window.addEventListener('cartUpdated', updateCartCount);
         });
