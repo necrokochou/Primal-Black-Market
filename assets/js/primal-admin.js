@@ -12,7 +12,40 @@ function initializeAdminDashboard() {
   setupUserActions();
   setupSearchAndFilters();
   setupAnimations();
+  protectAdminFromSelfActions();
   console.log("🛡️ Primal Admin Dashboard initialized");
+}
+
+function protectAdminFromSelfActions() {
+  fetch("/handlers/auth.handler.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: "action=get_session_user",
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success && data.user) {
+        const currentUserId = data.user.id;
+
+        // Hide Ban/Delete buttons for self
+        document.querySelectorAll(`.admin-table tbody tr`).forEach((row) => {
+          const userId = row.dataset.userId;
+
+          if (userId === currentUserId) {
+            const banBtn = row.querySelector(".ban-user");
+            const deleteBtn = row.querySelector(".delete-user");
+
+            if (banBtn) banBtn.remove();
+            if (deleteBtn) deleteBtn.remove();
+          }
+        });
+      }
+    })
+    .catch(() => {
+      console.warn("⚠️ Failed to fetch current session user.");
+    });
 }
 
 // Tab Navigation with smooth transitions
