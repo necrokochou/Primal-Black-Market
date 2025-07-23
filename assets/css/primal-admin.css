@@ -36,13 +36,19 @@
     border: 1px solid rgba(255, 140, 0, 0.3);
     border-radius: 20px;
     padding: 2rem;
-    display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 2rem;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
     box-shadow: 
         0 8px 32px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.admin-info {
+    flex: 1;
+    min-width: 200px;
 }
 
 .admin-info h1 {
@@ -67,7 +73,10 @@
 /* Admin Stats */
 .admin-stats {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex: 0 0 auto;
 }
 
 .stat-item {
@@ -98,6 +107,8 @@
 .admin-actions {
     display: flex;
     gap: 1rem;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 .primal-btn-secondary, .primal-btn-danger {
