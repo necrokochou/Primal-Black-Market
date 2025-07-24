@@ -14,7 +14,7 @@ try {
     echo "✅ Database connection successful!\n\n";
 
     // List of expected tables
-    $tables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions'];
+    $tables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions', 'purchase_history'];
 
     foreach ($tables as $table) {
         try {

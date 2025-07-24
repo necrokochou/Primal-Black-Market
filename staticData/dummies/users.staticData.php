@@ -7,7 +7,8 @@ return [
         'Alias' => 'ルイくん',
         'TrustLevel' => 10.0,
         'IsVendor' => true,
-        'IsAdmin' => true
+        'IsAdmin' => true,
+        'IsBanned' => false
     ],
     [
         'Username' => 'Auditore',
@@ -16,7 +17,8 @@ return [
         'Alias' => 'Aiden',
         'TrustLevel' => 6.1,
         'IsVendor' => false,
-        "IsAdmin" => true
+        "IsAdmin" => true,
+        'IsBanned' => false
     ],
     [
         'Username' => 'necrokochou',
@@ -25,7 +27,8 @@ return [
         'Alias' => 'Otep',
         'TrustLevel' => 10.0,
         'IsVendor' => true,
-        'IsAdmin' => true
+        'IsAdmin' => true,
+        'IsBanned' => false
     ],
     [
         'Username' => 'LlenG',
@@ -34,7 +37,8 @@ return [
         'Alias' => 'Allen',
         'TrustLevel' => 10.0,
         'IsVendor' => true,
-        'IsAdmin' => true
+        'IsAdmin' => true,
+        'IsBanned' => false
     ],
     [
         'Username' => 'Cj',
@@ -43,7 +47,8 @@ return [
         'Alias' => 'Mother',
         'TrustLevel' => 10.0,
         'IsVendor' => true,
-        'IsAdmin' => true
+        'IsAdmin' => true,
+        'IsBanned' => false
     ],
     [
         'Username' => 'Ikari',
@@ -52,7 +57,8 @@ return [
         'Alias' => 'Ika',
         'TrustLevel' => 8.0,
         'IsVendor' => false,
-        'IsAdmin' => false
+        'IsAdmin' => false,
+        'IsBanned' => false
     ],
     [
         'Username' => 'Boris',
@@ -61,7 +67,8 @@ return [
         'Alias' => 'Bor Bor',
         'TrustLevel' => 8.9,
         'IsVendor' => false,
-        'IsAdmin' => false
+        'IsAdmin' => false,
+        'IsBanned' => false
     ],
     [
         'Username' => 'LingLingPing',
@@ -70,6 +77,7 @@ return [
         'Alias' => 'JM',
         'TrustLevel' => 8.9,
         'IsVendor' => false,
-        'IsAdmin' => false
+        'IsAdmin' => false,
+        'IsBanned' => true
     ]
 ];
