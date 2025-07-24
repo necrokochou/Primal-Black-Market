@@ -59,5 +59,41 @@ return [
         'Payment_Method' => 'PayPal',
         'Delivery_Status' => 'Cancelled',
         'Notes' => 'Customer changed mind about saber-tooth hide cloak'
-    ]
+    ],
+    [
+        'User_ID' => null,
+        'Listing_ID' => null,
+        'Transaction_ID' => null,
+        'Quantity' => 3,
+        'Price_Each' => 35.00,
+        'Total_Price' => 35.00,
+        'Purchase_Date' => '2025-01-20 14:22:00',
+        'Payment_Method' => 'Bitcoin',
+        'Delivery_Status' => 'Shipped',
+        'Notes' => null
+    ],
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ];

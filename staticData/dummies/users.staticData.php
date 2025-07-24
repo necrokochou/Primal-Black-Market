@@ -7,8 +7,9 @@ return [
         'Alias' => 'ルイくん',
         'TrustLevel' => 10.0,
         'IsVendor' => true,
-        'IsAdmin' => true,
-        'IsBanned' => false
+        'IsAdmin'  => true,
+        'IsBanned' => false,
+        'created'  =>  '2025-07-03',
     ],
     [
         'Username' => 'Auditore',
@@ -18,7 +19,8 @@ return [
         'TrustLevel' => 6.1,
         'IsVendor' => false,
         "IsAdmin" => true,
-        'IsBanned' => false
+        'IsBanned' => false,
+        'created'  =>  '2025-07-03',
     ],
     [
         'Username' => 'necrokochou',
@@ -28,7 +30,8 @@ return [
         'TrustLevel' => 10.0,
         'IsVendor' => true,
         'IsAdmin' => true,
-        'IsBanned' => false
+        'IsBanned' => false,
+        'created'  =>  '2025-07-03',
     ],
     [
         'Username' => 'LlenG',
@@ -38,7 +41,8 @@ return [
         'TrustLevel' => 10.0,
         'IsVendor' => true,
         'IsAdmin' => true,
-        'IsBanned' => false
+        'IsBanned' => false,
+        'created'  =>  '2025-07-03',
     ],
     [
         'Username' => 'Cj',
@@ -48,7 +52,8 @@ return [
         'TrustLevel' => 10.0,
         'IsVendor' => true,
         'IsAdmin' => true,
-        'IsBanned' => false
+        'IsBanned' => false,
+        'created'  =>  '2025-07-03',
     ],
     [
         'Username' => 'Ikari',
@@ -58,7 +63,8 @@ return [
         'TrustLevel' => 8.0,
         'IsVendor' => false,
         'IsAdmin' => false,
-        'IsBanned' => false
+        'IsBanned' => false,
+        'created'  =>  '2025-07-03',
     ],
     [
         'Username' => 'Boris',
@@ -68,7 +74,8 @@ return [
         'TrustLevel' => 8.9,
         'IsVendor' => false,
         'IsAdmin' => false,
-        'IsBanned' => false
+        'IsBanned' => false,
+        'created'  =>  '2025-07-03',
     ],
     [
         'Username' => 'LingLingPing',
@@ -78,6 +85,7 @@ return [
         'TrustLevel' => 8.9,
         'IsVendor' => false,
         'IsAdmin' => false,
-        'IsBanned' => true
+        'IsBanned' => true,
+        'created'  =>  '2025-07-03',
     ]
 ];
