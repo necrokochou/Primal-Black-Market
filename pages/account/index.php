@@ -83,20 +83,20 @@ require_once __DIR__ . '/../../layouts/header.php';
         <!-- Account Navigation -->
         <div class="account-nav primal-card">
             <button class="nav-tab active" data-tab="products">
-                <i class="fas fa-box"></i> 
+                <i class="fas fa-box"></i>
                 <?php echo $isVendor ? 'My Products' : 'My Purchases'; ?>
             </button>
             <button class="nav-tab" data-tab="history">
-                <i class="fas fa-history"></i> 
+                <i class="fas fa-history"></i>
                 <?php echo $isVendor ? 'Sales History' : 'Purchase History'; ?>
             </button>
             <button class="nav-tab" data-tab="settings">
                 <i class="fas fa-cog"></i> Account Settings
             </button>
             <?php if ($isAdmin): ?>
-            <button class="nav-tab" data-tab="admin-tools">
-                <i class="fas fa-tools"></i> Admin Tools
-            </button>
+                <button class="nav-tab" data-tab="admin-tools">
+                    <i class="fas fa-tools"></i> Admin Tools
+                </button>
             <?php endif; ?>
         </div>
 
@@ -108,62 +108,62 @@ require_once __DIR__ . '/../../layouts/header.php';
                     <?php echo $isVendor ? 'My Products' : 'My Purchases'; ?>
                 </h2>
                 <?php if ($isVendor): ?>
-                <button class="primal-btn-primary" id="add-product-btn">
-                    <i class="fas fa-plus"></i> Add New Product
-                </button>
+                    <button class="primal-btn-primary" id="add-product-btn">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
                 <?php endif; ?>
-            </div> 
+            </div>
             <?php if ($isVendor): ?>
-            <!-- Vendor Products Grid -->
-            <div class="my-products-grid">
-                <?php if (empty($userListings)): ?>
-                <div class="empty-state primal-card">
-                    <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
-                        <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Products Yet</h3>
-                        <p>Start building your primal marketplace by adding your first product.</p>
-                        <button class="primal-btn-primary" style="margin-top: 1rem;" onclick="document.getElementById('add-product-btn').click();">
-                            <i class="fas fa-plus"></i> Add Your First Product
-                        </button>
-                    </div>
+                <!-- Vendor Products Grid -->
+                <div class="my-products-grid">
+                    <?php if (empty($userListings)): ?>
+                        <div class="empty-state primal-card">
+                            <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
+                                <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Products Yet</h3>
+                                <p>Start building your primal marketplace by adding your first product.</p>
+                                <button class="primal-btn-primary" style="margin-top: 1rem;" onclick="document.getElementById('add-product-btn').click();">
+                                    <i class="fas fa-plus"></i> Add Your First Product
+                                </button>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach (array_slice($userListings, 0, 6) as $listing): ?>
+                            <div class="product-card">
+                                <div class="product-image">
+                                    <img src="<?php echo htmlspecialchars($listing['item_image'] ?? '/assets/images/default-product.png'); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
+                                    <div class="product-status <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
+                                </div>
+                                <div class="product-details">
+                                    <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
+                                    <p class="product-category"><?php echo htmlspecialchars($listing['category']); ?></p>
+                                    <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
+                                    <p class="product-description"><?php echo htmlspecialchars($listing['description']); ?></p>
+                                </div>
+                                <div class="product-actions">
+                                    <button class="primal-btn-secondary edit-product" data-product-id="<?php echo $listing['listing_id']; ?>">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="primal-btn-danger remove-product" data-product-id="<?php echo $listing['listing_id']; ?>">
+                                        <i class="fas fa-trash"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <?php else: ?>
-                <?php foreach (array_slice($userListings, 0, 6) as $listing): ?>
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="<?php echo htmlspecialchars($listing['item_image'] ?? '/assets/images/default-product.png'); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
-                        <div class="product-status <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
-                    </div>
-                    <div class="product-details">
-                        <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
-                        <p class="product-category"><?php echo htmlspecialchars($listing['category']); ?></p>
-                        <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
-                        <p class="product-description"><?php echo htmlspecialchars($listing['description']); ?></p>
-                    </div>
-                    <div class="product-actions">
-                        <button class="primal-btn-secondary edit-product" data-product-id="<?php echo $listing['listing_id']; ?>">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="primal-btn-danger remove-product" data-product-id="<?php echo $listing['listing_id']; ?>">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
-                    </div>
-                </div>
-                <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
             <?php else: ?>
-            <!-- Member Purchases -->
-            <div class="purchases-section primal-card">
-                <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
-                    <i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Purchases Yet</h3>
-                    <p>Explore the primal marketplace and discover unique items.</p>
-                    <a href="/pages/shop" class="primal-btn-primary" style="margin-top: 1rem;">
-                        <i class="fas fa-store"></i> Browse Products
-                    </a>
+                <!-- Member Purchases -->
+                <div class="purchases-section primal-card">
+                    <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
+                        <i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Purchases Yet</h3>
+                        <p>Explore the primal marketplace and discover unique items.</p>
+                        <a href="/pages/shop" class="primal-btn-primary" style="margin-top: 1rem;">
+                            <i class="fas fa-store"></i> Browse Products
+                        </a>
+                    </div>
                 </div>
-            </div>
             <?php endif; ?>
         </div>
 
@@ -203,7 +203,7 @@ require_once __DIR__ . '/../../layouts/header.php';
             <div class="section-header">
                 <h2><i class="fas fa-user-cog"></i> Account Settings</h2>
             </div>
-            
+
             <div class="settings-grid">
                 <div class="settings-section primal-card">
                     <h3><i class="fas fa-user-edit"></i> Update Profile</h3>
@@ -255,76 +255,76 @@ require_once __DIR__ . '/../../layouts/header.php';
                     </form>
                 </div>
                 <?php if ($isVendor): ?>
-                <div class="settings-section primal-card">
-                    <h3><i class="fas fa-store"></i> Vendor Settings</h3>
-                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">
-                        Manage your vendor account preferences and store settings.
-                    </p>
-                    <button class="primal-btn-secondary" style="width: 100%;">
-                        <i class="fas fa-cog"></i> Configure Store Settings
-                    </button>
-                </div>
+                    <div class="settings-section primal-card">
+                        <h3><i class="fas fa-store"></i> Vendor Settings</h3>
+                        <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">
+                            Manage your vendor account preferences and store settings.
+                        </p>
+                        <button class="primal-btn-secondary" style="width: 100%;">
+                            <i class="fas fa-cog"></i> Configure Store Settings
+                        </button>
+                    </div>
                 <?php endif; ?>
-                
+
                 <?php if (!$isAdmin): ?>
-                <div class="settings-section primal-card danger-zone">
-                    <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
-                    <p>Once you delete your account, there is no going back. All your data, including purchases and vendor information, will be permanently removed.</p>
-                    <button class="primal-btn-danger" id="delete-account-btn" style="width: 100%;">
-                        <i class="fas fa-trash-alt"></i> Delete Account Permanently
-                    </button>
-                </div>
+                    <div class="settings-section primal-card danger-zone">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+                        <p>Once you delete your account, there is no going back. All your data, including purchases and vendor information, will be permanently removed.</p>
+                        <button class="primal-btn-danger" id="delete-account-btn" style="width: 100%;">
+                            <i class="fas fa-trash-alt"></i> Delete Account Permanently
+                        </button>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
-        
+
         <?php if ($isAdmin): ?>
-        <!-- Admin Tools Tab -->
-        <div id="admin-tools-content" class="tab-content">
-            <div class="section-header">
-                <h2><i class="fas fa-shield-alt"></i> Administrative Tools</h2>
-            </div>
-            
-            <div class="settings-grid">
-                <div class="settings-section primal-card">
-                    <h3><i class="fas fa-tachometer-alt"></i> Quick Actions</h3>
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <a href="/pages/admin" class="primal-btn-primary" style="text-decoration: none; text-align: center;">
-                            <i class="fas fa-desktop"></i> Full Admin Dashboard
-                        </a>
-                        <button class="primal-btn-secondary" style="width: 100%;">
-                            <i class="fas fa-users"></i> View All Users
+            <!-- Admin Tools Tab -->
+            <div id="admin-tools-content" class="tab-content">
+                <div class="section-header">
+                    <h2><i class="fas fa-shield-alt"></i> Administrative Tools</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="settings-section primal-card">
+                        <h3><i class="fas fa-tachometer-alt"></i> Quick Actions</h3>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <a href="/pages/admin/index.php" class="primal-btn-primary" style="text-decoration: none; text-align: center;">
+                                <i class="fas fa-desktop"></i> Full Admin Dashboard
+                            </a>
+                            <button class="primal-btn-secondary" style="width: 100%;">
+                                <i class="fas fa-users"></i> View All Users
+                            </button>
+                            <button class="primal-btn-secondary" style="width: 100%;">
+                                <i class="fas fa-box"></i> Manage Products
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section primal-card">
+                        <h3><i class="fas fa-chart-bar"></i> System Overview</h3>
+                        <div style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
+                            <p><strong>Account Type:</strong> Administrator</p>
+                            <p><strong>Privileges:</strong> Full System Access</p>
+                            <p><strong>Last Login:</strong> <?php echo date('M d, Y g:i A'); ?></p>
+                            <p><strong>Trust Level:</strong> Maximum (<?php echo number_format($trustLevel, 1); ?>)</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-section primal-card">
+                        <h3><i class="fas fa-cogs"></i> System Settings</h3>
+                        <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">
+                            Access advanced system configuration and maintenance tools.
+                        </p>
+                        <button class="primal-btn-secondary" style="width: 100%; margin-bottom: 0.75rem;">
+                            <i class="fas fa-database"></i> Database Management
                         </button>
                         <button class="primal-btn-secondary" style="width: 100%;">
-                            <i class="fas fa-box"></i> Manage Products
+                            <i class="fas fa-file-alt"></i> System Logs
                         </button>
                     </div>
                 </div>
-                
-                <div class="settings-section primal-card">
-                    <h3><i class="fas fa-chart-bar"></i> System Overview</h3>
-                    <div style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
-                        <p><strong>Account Type:</strong> Administrator</p>
-                        <p><strong>Privileges:</strong> Full System Access</p>
-                        <p><strong>Last Login:</strong> <?php echo date('M d, Y g:i A'); ?></p>
-                        <p><strong>Trust Level:</strong> Maximum (<?php echo number_format($trustLevel, 1); ?>)</p>
-                    </div>
-                </div>
-                
-                <div class="settings-section primal-card">
-                    <h3><i class="fas fa-cogs"></i> System Settings</h3>
-                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">
-                        Access advanced system configuration and maintenance tools.
-                    </p>
-                    <button class="primal-btn-secondary" style="width: 100%; margin-bottom: 0.75rem;">
-                        <i class="fas fa-database"></i> Database Management
-                    </button>
-                    <button class="primal-btn-secondary" style="width: 100%;">
-                        <i class="fas fa-file-alt"></i> System Logs
-                    </button>
-                </div>
             </div>
-        </div>
         <?php endif; ?>
     </div>
 </main>
@@ -364,7 +364,7 @@ require_once __DIR__ . '/../../layouts/header.php';
                     <label for="product-price"><i class="fas fa-dollar-sign"></i> Price (USD)</label>
                     <input type="number" id="product-price" name="price" step="0.01" min="0" placeholder="0.00" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="product-quantity"><i class="fas fa-boxes"></i> Quantity Available</label>
                     <input type="number" id="product-quantity" name="quantity" min="1" placeholder="1" required>
