@@ -29,6 +29,7 @@ function clearAllTables($pdo) {
     echo "\n🧹 Clearing all tables in correct order...\n";
     
     $clearOrder = ['cart', 'transactions', 'feedbacks', 'messages', 'listings', 'categories', 'users'];
+    // $clearOrder = ['transactions', 'feedbacks', 'messages', 'listings', 'categories', 'users'];
     
     foreach ($clearOrder as $table) {
         try {
@@ -295,6 +296,7 @@ $totalInserted += $cartInserted;
 echo "\n🔍 Verifying seeding results...\n";
 
 $expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions', 'cart'];
+// $expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions'];
 $totalRecords = 0;
 
 foreach ($expectedTables as $table) {
