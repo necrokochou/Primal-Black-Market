@@ -9,7 +9,7 @@ return [
         'Is_Vendor' => true,
         'Is_Admin'  => true,
         'Is_Banned' => false,
-        'Created_At'  =>  '2025-07-18',
+        'Created_At'  => '2025-07-18',
     ],
     [
         'Username' => 'Auditore',
@@ -20,7 +20,7 @@ return [
         'Is_Vendor' => false,
         "Is_Admin" => true,
         'Is_Banned' => false,
-        'Created_At'  =>  '2025-03-19',
+        'Created_At'  => '2025-03-19',
     ],
     [
         'Username' => 'necrokochou',
@@ -31,7 +31,7 @@ return [
         'Is_Vendor' => true,
         'Is_Admin' => true,
         'Is_Banned' => false,
-        'Created_At'  =>  '2025-07-15',
+        'Created_At'  => '2025-07-15',
     ],
     [
         'Username' => 'LlenG',
@@ -42,7 +42,7 @@ return [
         'Is_Vendor' => true,
         'Is_Admin' => true,
         'Is_Banned' => false,
-        'Created_At'  =>  '2025-07-15',
+        'Created_At'  => '2025-07-15',
     ],
     [
         'Username' => 'Cj',
@@ -53,7 +53,7 @@ return [
         'Is_Vendor' => true,
         'Is_Admin' => true,
         'Is_Banned' => false,
-        'Created_At'  =>  '2025-07-16',
+        'Created_At'  => '2025-07-16',
     ],
     [
         'Username' => 'Ikari',
@@ -64,7 +64,7 @@ return [
         'Is_Vendor' => false,
         'Is_Admin' => false,
         'Is_Banned' => false,
-        'Created_At'  =>  '2025-07-22',
+        'Created_At'  => '2025-07-22',
     ],
     [
         'Username' => 'Boris',
@@ -75,7 +75,7 @@ return [
         'Is_Vendor' => false,
         'Is_Admin' => false,
         'Is_Banned' => false,
-        'Created_At'  =>  '2025-07-20',
+        'Created_At'  => '2025-07-20',
     ],
     [
         'Username' => 'LingLingPing',
@@ -86,6 +86,6 @@ return [
         'Is_Vendor' => false,
         'Is_Admin' => false,
         'Is_Banned' => true,
-        'Created_At'  =>  '2025-07-19',
+        'Created_At'  => '2025-07-19',
     ]
 ];
