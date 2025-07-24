@@ -7,4 +7,5 @@ return [
     'feedbacks',
     'categories',
     'cart',
+    'purchase_history',
 ];

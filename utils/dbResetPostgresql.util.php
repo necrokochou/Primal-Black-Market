@@ -40,6 +40,7 @@ echo "\n🧹 Clearing table data...\n";
 // Clear all tables individually (preserve structure)
 echo "🗂️  Clearing tables individually...\n";
 $tables = [
+    'purchase_history',
     'cart',
     'transactions',
     'messages', 

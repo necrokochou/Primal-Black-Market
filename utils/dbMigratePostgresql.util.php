@@ -50,10 +50,12 @@ function runTableMigration($pdo, $tableName, $sqlFile) {
     $createTableSQL = preg_replace('/\s+/', ' ', $createTableSQL); // Normalize whitespace
     $createTableSQL = trim($createTableSQL);
     
-    // Convert CREATE TABLE to CREATE TABLE IF NOT EXISTS for safety
-    $createTableSQL = preg_replace('/CREATE TABLE\s+/i', 'CREATE TABLE IF NOT EXISTS ', $createTableSQL);
-    
     try {
+        // Drop table if it exists to ensure we get the latest schema
+        $dropSQL = "DROP TABLE IF EXISTS {$tableName} CASCADE";
+        $pdo->exec($dropSQL);
+        
+        // Create the table with the current schema
         $pdo->exec($createTableSQL);
         echo "✅ Table '{$tableName}' created successfully from {$sqlFile}\n";
         return true;
@@ -119,10 +121,17 @@ if (runTableMigration($pdo, 'cart', 'cart.model.sql')) {
     $failureCount++;
 }
 
+// 8. Purchase History Table (Requires Users, Listings & Transactions) - Based on purchase_history.model.sql
+if (runTableMigration($pdo, 'purchase_history', 'purchase_history.model.sql')) {
+    $successCount++;
+} else {
+    $failureCount++;
+}
+
 // ---- 🔍 Verify Migration Results ----
 echo "\n🔍 Verifying migration results...\n";
 
-$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions', 'cart'];
+$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions', 'cart', 'purchase_history'];
 $tablesCreated = 0;
 
 foreach ($expectedTables as $table) {
@@ -143,7 +152,7 @@ echo "🎉 ========================================\n";
 echo "📊 Migration Summary:\n";
 echo "   ✅ Successful migrations: {$successCount}\n";
 echo "   ❌ Failed migrations: {$failureCount}\n";
-echo "   📋 Tables created: {$tablesCreated}/7\n";
+echo "   📋 Tables created: {$tablesCreated}/8\n";
 echo "\n➡️  Next step: Run seeders to populate data\n";
 echo "   Command: php utils/dbSeederPostgresql.util.php\n";
 echo "🎉 ========================================\n";
