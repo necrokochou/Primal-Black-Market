@@ -107,10 +107,10 @@ $usersInserted = seedTable(
             ':email' => $user['Email'] ?? $user['Username'] . '@example.com',
             ':alias' => $user['Alias'],
             ':trustlevel' => $user['TrustLevel'],
-            ':created_at' => date('Y-m-d'),
-            ':is_vendor' => $user['IsVendor'] ? 'true' : 'false',
-            ':is_admin' => $user['IsAdmin'] ? 'true' : 'false',
-            ':is_banned' => $user['IsBanned'] ? 'true' : 'false'
+            ':created_at' => $user['Created_At'] ?? date('Y-m-d'),
+            ':is_vendor' => $user['Is_Vendor'] ? 'true' : 'false',
+            ':is_admin' => $user['Is_Admin'] ? 'true' : 'false',
+            ':is_banned' => $user['Is_Banned'] ? 'true' : 'false'
         ];
     }
 );

@@ -6,9 +6,10 @@ return [
         'Email' => 'phantom@primal.market',
         'Alias' => 'ルイくん',
         'TrustLevel' => 10.0,
-        'IsVendor' => true,
-        'IsAdmin' => true,
-        'IsBanned' => false
+        'Is_Vendor' => true,
+        'Is_Admin'  => true,
+        'Is_Banned' => false,
+        'Created_At'  => '2025-07-18',
     ],
     [
         'Username' => 'Auditore',
@@ -16,9 +17,10 @@ return [
         'Email' => '202312060@fit.edu.ph',
         'Alias' => 'Aiden',
         'TrustLevel' => 6.1,
-        'IsVendor' => false,
-        "IsAdmin" => true,
-        'IsBanned' => false
+        'Is_Vendor' => false,
+        "Is_Admin" => true,
+        'Is_Banned' => false,
+        'Created_At'  => '2025-03-19',
     ],
     [
         'Username' => 'necrokochou',
@@ -26,9 +28,10 @@ return [
         'Email' => 'necro@primal.market',
         'Alias' => 'Otep',
         'TrustLevel' => 10.0,
-        'IsVendor' => true,
-        'IsAdmin' => true,
-        'IsBanned' => false
+        'Is_Vendor' => true,
+        'Is_Admin' => true,
+        'Is_Banned' => false,
+        'Created_At'  => '2025-07-15',
     ],
     [
         'Username' => 'LlenG',
@@ -36,9 +39,10 @@ return [
         'Email' => 'allen@primal.market',
         'Alias' => 'Allen',
         'TrustLevel' => 10.0,
-        'IsVendor' => true,
-        'IsAdmin' => true,
-        'IsBanned' => false
+        'Is_Vendor' => true,
+        'Is_Admin' => true,
+        'Is_Banned' => false,
+        'Created_At'  => '2025-07-15',
     ],
     [
         'Username' => 'Cj',
@@ -46,9 +50,10 @@ return [
         'Email' => 'cj@primal.market',
         'Alias' => 'Mother',
         'TrustLevel' => 10.0,
-        'IsVendor' => true,
-        'IsAdmin' => true,
-        'IsBanned' => false
+        'Is_Vendor' => true,
+        'Is_Admin' => true,
+        'Is_Banned' => false,
+        'Created_At'  => '2025-07-16',
     ],
     [
         'Username' => 'Ikari',
@@ -56,9 +61,10 @@ return [
         'Email' => 'ikari@primal.market',
         'Alias' => 'Ika',
         'TrustLevel' => 8.0,
-        'IsVendor' => false,
-        'IsAdmin' => false,
-        'IsBanned' => false
+        'Is_Vendor' => false,
+        'Is_Admin' => false,
+        'Is_Banned' => false,
+        'Created_At'  => '2025-07-22',
     ],
     [
         'Username' => 'Boris',
@@ -66,9 +72,10 @@ return [
         'Email' => 'boris@primal.market',
         'Alias' => 'Bor Bor',
         'TrustLevel' => 8.9,
-        'IsVendor' => false,
-        'IsAdmin' => false,
-        'IsBanned' => false
+        'Is_Vendor' => false,
+        'Is_Admin' => false,
+        'Is_Banned' => false,
+        'Created_At'  => '2025-07-20',
     ],
     [
         'Username' => 'LingLingPing',
@@ -76,8 +83,9 @@ return [
         'Email' => 'jm@primal.market',
         'Alias' => 'JM',
         'TrustLevel' => 8.9,
-        'IsVendor' => false,
-        'IsAdmin' => false,
-        'IsBanned' => true
+        'Is_Vendor' => false,
+        'Is_Admin' => false,
+        'Is_Banned' => true,
+        'Created_At'  => '2025-07-19',
     ]
 ];
