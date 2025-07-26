@@ -3,6 +3,7 @@
 namespace App\Utils;
 
 use PDO;
+use Exception;
 
 class Auth
 {
@@ -60,5 +61,68 @@ class Auth
         $stmt->bindParam(':username', $username);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function tryRegister(string $username, string $email, string $password, string $alias = '', string $accountType = 'buyer'): array
+    {
+        try {
+            // Check if username already exists
+            $stmt = $this->account->prepare("SELECT user_id FROM users WHERE username = :username");
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            if ($stmt->fetch()) {
+                return ['success' => false, 'error' => 'Username already exists'];
+            }
+
+            // Check if email already exists
+            $stmt = $this->account->prepare("SELECT user_id FROM users WHERE email = :email");
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            if ($stmt->fetch()) {
+                return ['success' => false, 'error' => 'Email already exists'];
+            }
+
+            // Hash password
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            
+            // Use username as alias if not provided
+            if (empty($alias)) {
+                $alias = $username;
+            }
+
+            // Insert new user
+            $stmt = $this->account->prepare("
+                INSERT INTO users (username, email, password, alias, account_type, trustlevel, is_admin, is_vendor, created_at) 
+                VALUES (:username, :email, :password, :alias, :account_type, 0, false, :is_vendor, NOW())
+            ");
+            
+            $isVendor = ($accountType === 'seller');
+            
+            $stmt->bindParam(':username', $username);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':password', $hashedPassword);
+            $stmt->bindParam(':alias', $alias);
+            $stmt->bindParam(':account_type', $accountType);
+            $stmt->bindParam(':is_vendor', $isVendor, PDO::PARAM_BOOL);
+            
+            if ($stmt->execute()) {
+                $userId = $this->account->lastInsertId();
+                return [
+                    'success' => true,
+                    'user_id' => $userId,
+                    'username' => $username,
+                    'email' => $email,
+                    'alias' => $alias,
+                    'trustlevel' => 0,
+                    'is_admin' => false,
+                    'is_vendor' => $isVendor
+                ];
+            } else {
+                return ['success' => false, 'error' => 'Failed to create account'];
+            }
+        } catch (Exception $e) {
+            error_log('Registration error: ' . $e->getMessage());
+            return ['success' => false, 'error' => 'Registration failed: ' . $e->getMessage()];
+        }
     }
 }
