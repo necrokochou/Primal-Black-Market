@@ -86,6 +86,11 @@ require_once __DIR__ . '/../../layouts/header.php';
                 <i class="fas fa-box"></i>
                 <?php echo $isVendor ? 'My Products' : 'My Purchases'; ?>
             </button>
+            <?php if ($isVendor): ?>
+                <button class="nav-tab" data-tab="product-management">
+                    <i class="fas fa-cogs"></i> Product Management
+                </button>
+            <?php endif; ?>
             <button class="nav-tab" data-tab="history">
                 <i class="fas fa-history"></i>
                 <?php echo $isVendor ? 'Sales History' : 'Purchase History'; ?>
@@ -166,6 +171,112 @@ require_once __DIR__ . '/../../layouts/header.php';
                 </div>
             <?php endif; ?>
         </div>
+
+        <?php if ($isVendor): ?>
+        <!-- Product Management Tab (Only for Sellers) -->
+        <div id="product-management-content" class="tab-content">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-cogs"></i> Product Management
+                </h2>
+                <div class="section-filters">
+                    <input type="text" id="seller-product-search" class="search-input" placeholder="Search my products...">
+                    <select id="seller-product-category-filter" class="filter-select">
+                        <option value="all">All Categories</option>
+                        <option value="clothing">Clothing & Accessories</option>
+                        <option value="food">Food & Sustenance</option>
+                        <option value="forging-materials">Forging Materials</option>
+                        <option value="hunting-materials">Hunting Materials</option>
+                        <option value="infrastructure">Infrastructure</option>
+                        <option value="pets">Pets & Companions</option>
+                        <option value="prehistoric-drugs">Prehistoric Remedies</option>
+                        <option value="ritual-artifacts">Ritual Artifacts</option>
+                        <option value="spices-etc">Spices & Seasonings</option>
+                        <option value="voodoo">Voodoo Items</option>
+                        <option value="weapons">Weapons & Tools</option>
+                    </select>
+                    <select id="seller-product-status-filter" class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <button class="primal-btn-primary" id="add-new-product-btn">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
+                </div>
+            </div>
+
+            <div class="seller-products-management-grid">
+                <?php if (empty($userListings)): ?>
+                    <div class="empty-state primal-card">
+                        <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
+                            <i class="fas fa-boxes" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Products to Manage</h3>
+                            <p>Start adding products to your inventory to manage them here.</p>
+                            <button class="primal-btn-primary" style="margin-top: 1rem;" onclick="document.getElementById('add-new-product-btn').click();">
+                                <i class="fas fa-plus"></i> Add Your First Product
+                            </button>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($userListings as $listing): ?>
+                        <div class="seller-product-management-item" data-product-id="<?php echo $listing['listing_id']; ?>">
+                            <div class="product-image">
+                                <img src="<?php echo htmlspecialchars($listing['item_image'] ?? '/assets/images/default-product.png'); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
+                                <div class="product-status-indicator <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
+                            </div>
+                            <div class="product-details">
+                                <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
+                                <p class="product-category"><?php echo htmlspecialchars($listing['category_name'] ?? $listing['category']); ?></p>
+                                <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
+                                <p class="product-stock">Stock: <?php echo $listing['quantity']; ?></p>
+                                <p class="product-views">Views: <?php echo $listing['views'] ?? 0; ?></p>
+                                <p class="product-sales">Sales: <?php echo $listing['sales'] ?? 0; ?></p>
+                            </div>
+                            <div class="product-management-actions">
+                                <button class="action-btn edit-seller-product" data-product-id="<?php echo $listing['listing_id']; ?>" title="Edit Product">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="action-btn toggle-seller-product-status" data-product-id="<?php echo $listing['listing_id']; ?>" title="Toggle Status">
+                                    <i class="fas fa-<?php echo $listing['is_active'] ? 'pause' : 'play'; ?>"></i>
+                                    <?php echo $listing['is_active'] ? 'Deactivate' : 'Activate'; ?>
+                                </button>
+                                <button class="action-btn duplicate-seller-product" data-product-id="<?php echo $listing['listing_id']; ?>" title="Duplicate Product">
+                                    <i class="fas fa-copy"></i> Duplicate
+                                </button>
+                                <button class="action-btn delete-seller-product" data-product-id="<?php echo $listing['listing_id']; ?>" title="Delete Product">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <!-- Product Management Statistics -->
+            <div class="seller-product-stats primal-card">
+                <h3><i class="fas fa-chart-bar"></i> Product Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number"><?php echo count($userListings); ?></span>
+                        <span class="stat-label">Total Products</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number"><?php echo count(array_filter($userListings, function($l) { return $l['is_active']; })); ?></span>
+                        <span class="stat-label">Active Products</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number"><?php echo count(array_filter($userListings, function($l) { return !$l['is_active']; })); ?></span>
+                        <span class="stat-label">Inactive Products</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">$<?php echo number_format(array_sum(array_column($userListings, 'price')), 2); ?></span>
+                        <span class="stat-label">Total Value</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Purchase/Sales History Tab -->
         <div id="history-content" class="tab-content">
@@ -395,6 +506,13 @@ require_once __DIR__ . '/../../layouts/header.php';
         </div>
     </div>
 </div>
+
+<?php 
+// Include seller product modal for vendors
+if ($isVendor) {
+    include __DIR__ . '/../../components/sellerProductModal.component.php';
+}
+?>
 
 <script src="/assets/js/primal-account.js"></script>
 <?php require_once __DIR__ . '/../../layouts/footer.php'; ?>

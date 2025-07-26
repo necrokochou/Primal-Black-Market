@@ -25,7 +25,7 @@ function isAliasTaken(string $alias): bool
     return (bool) $stmt->fetchColumn();
 }
 
-function registerUser(string $username, string $password, string $email, ?string $alias = null): array
+function registerUser(string $username, string $password, string $email, ?string $alias = null, bool $is_vendor = false): array
 {
     if ($alias === null) {
         $alias = $username; // fallback alias
@@ -47,8 +47,8 @@ function registerUser(string $username, string $password, string $email, ?string
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     $stmt = $pdo->prepare("
-        INSERT INTO users (Username, Password, Email, Alias)
-        VALUES (:username, :password, :email, :alias)
+        INSERT INTO users (Username, Password, Email, Alias, Is_Vendor)
+        VALUES (:username, :password, :email, :alias, :is_vendor)
     ");
 
     $ok = $stmt->execute([
@@ -56,14 +56,27 @@ function registerUser(string $username, string $password, string $email, ?string
         'password' => $hashedPassword,
         'email'    => $email,
         'alias'    => $alias,
+        'is_vendor' => $is_vendor,
     ]);
 
     if ($ok) {
-        $userIdStmt = $pdo->prepare("SELECT User_ID FROM users WHERE Username = :username");
-        $userIdStmt->execute(['username' => $username]);
-        $userId = $userIdStmt->fetchColumn();
+        $userStmt = $pdo->prepare("
+            SELECT User_ID, Username, Email, Alias, TrustLevel, Is_Admin, Is_Vendor 
+            FROM users WHERE Username = :username
+        ");
+        $userStmt->execute(['username' => $username]);
+        $user = $userStmt->fetch(PDO::FETCH_ASSOC);
 
-        return ['success' => true, 'user_id' => $userId];
+        return [
+            'success' => true, 
+            'user_id' => $user['user_id'],
+            'username' => $user['username'],
+            'email' => $user['email'],
+            'alias' => $user['alias'],
+            'trustlevel' => $user['trustlevel'],
+            'is_admin' => $user['is_admin'],
+            'is_vendor' => $user['is_vendor']
+        ];
     }
 
     return ['success' => false];
