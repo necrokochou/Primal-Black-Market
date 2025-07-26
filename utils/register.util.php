@@ -47,7 +47,7 @@ function registerUser(string $username, string $password, string $email, ?string
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     $stmt = $pdo->prepare("
-        INSERT INTO users (Username, Password, Email, Alias, Is_Vendor)
+        INSERT INTO user (Username, Password, Email, Alias, Is_Vendor)
         VALUES (:username, :password, :email, :alias, :is_vendor)
     ");
 

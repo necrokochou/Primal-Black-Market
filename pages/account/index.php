@@ -384,6 +384,9 @@ require_once __DIR__ . '/../../layouts/header.php';
                         <button class="primal-btn-danger" id="delete-account-btn" style="width: 100%;">
                             <i class="fas fa-trash-alt"></i> Delete Account Permanently
                         </button>
+                        <form id="delete-account-form" style="display: none;">
+                            <input type="hidden" name="confirm" value="true">
+                        </form>
                     </div>
                 <?php endif; ?>
             </div>
