@@ -46,11 +46,12 @@ if ($action === 'login') {
         // $_SESSION['user_trust_level'] = $loginResult['trustlevel'] ?? 0;
 
         $_SESSION['user'] = [
-            'id' => $loginResult['user_id'],
+            'user_id' => $loginResult['user_id'],
             'username' => $loginResult['username'],
             'email' => $loginResult['email'],
             'alias' => $loginResult['alias'] ?? $loginResult['username'],
             'trust_level' => $loginResult['trustlevel'],
+            'is_vendor' => $loginResult['is_vendor'],
             'is_admin' => $loginResult['is_admin'] ?? false
         ];
 
@@ -82,11 +83,12 @@ if ($action === 'register') {
 
     if ($result['success']) {
         $_SESSION['user'] = [
-            'id' => $result['user_id'],
+            'user_id' => $result['user_id'],
             'username' => $result['username'],
             'email' => $result['email'],
             'alias' => $result['alias'] ?? $result['username'],
             'trust_level' => $result['trustlevel'],
+            'is_vendor' => $user['is_vendor'],
             'is_admin' => $result['is_admin'] ?? false
         ];
         echo json_encode(['success' => true]);

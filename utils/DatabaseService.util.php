@@ -274,7 +274,18 @@ class DatabaseService
             FROM users";
 
         $stmt = $this->pdo->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        //return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        // Ensure created_at is always set to a valid value
+        foreach ($users as &$user) {
+            if (empty($user['created_at']) || strtotime($user['created_at']) === false) {
+                $user['created_at'] = date('Y-m-d H:i:s');
+            }
+        }
+
+        return $users;
     }
 
     //use this when created_at is added to users.model.sql
