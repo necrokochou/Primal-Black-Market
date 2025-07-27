@@ -114,11 +114,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function validateUsername(username) {
-    return (
-      username.length >= 3 &&
-      username.length <= 20 &&
-      /^[a-zA-Z0-9_]+$/.test(username)
-    );
+    const isUsername = /^[a-zA-Z0-9_]{3,20}$/.test(username);
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username);
+    return isUsername || isEmail;
   }
 
   function validatePassword(password) {

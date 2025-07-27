@@ -45,7 +45,7 @@ class Auth
         if (!$username) {
             return null;
         }
-        
+
         $statement = $this->account->prepare('SELECT user_id FROM users WHERE username = :username');
         $statement->bindParam(':username', $username);
         $statement->execute();
@@ -84,7 +84,7 @@ class Auth
 
             // Hash password
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            
+
             // Use username as alias if not provided
             if (empty($alias)) {
                 $alias = $username;
@@ -95,16 +95,16 @@ class Auth
                 INSERT INTO users (username, email, password, alias, account_type, trustlevel, is_admin, is_vendor, created_at) 
                 VALUES (:username, :email, :password, :alias, :account_type, 0, false, :is_vendor, NOW())
             ");
-            
+
             $isVendor = ($accountType === 'seller');
-            
+
             $stmt->bindParam(':username', $username);
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':password', $hashedPassword);
             $stmt->bindParam(':alias', $alias);
             $stmt->bindParam(':account_type', $accountType);
             $stmt->bindParam(':is_vendor', $isVendor, PDO::PARAM_BOOL);
-            
+
             if ($stmt->execute()) {
                 $userId = $this->account->lastInsertId();
                 return [

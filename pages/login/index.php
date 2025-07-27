@@ -17,8 +17,8 @@ require_once __DIR__ . '/../../layouts/header.php';
         <form id="login-form" class="primal-form" method="POST" action="/handlers/auth.handler.php" novalidate>
             <input type="hidden" name="action" value="login">
             <div class="input-group">
-                <input type="text" name="username" class="primal-input" placeholder="Username" required
-                    autocomplete="username" aria-label="Username" />
+                <input type="text" name="username" class="primal-input" placeholder="Username or Email" required
+                    autocomplete="username" aria-label="Username or Email" />
                 <div class="input-highlight"></div>
             </div>
 
