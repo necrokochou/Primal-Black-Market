@@ -521,10 +521,12 @@ function debounce(func, wait) {
     timeout = setTimeout(later, wait);
   };
 }
+
 function formatDateTime(dateString) {
   const date = new Date(dateString);
   return date.toLocaleString(); // e.g., "7/27/2025, 8:00:00 PM"
 }
+
 function showNotification(message, type = "info") {
   // Create notification element
   const notification = document.createElement("div");

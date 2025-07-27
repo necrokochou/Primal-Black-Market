@@ -47,9 +47,9 @@ function registerUser(string $username, string $password, string $email, ?string
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     $stmt = $pdo->prepare("
-        INSERT INTO user (Username, Password, Email, Alias, Is_Vendor)
-        VALUES (:username, :password, :email, :alias, :is_vendor)
-    ");
+    INSERT INTO users (Username, Password, Email, Alias, Is_Vendor, Created_At)
+    VALUES (:username, :password, :email, :alias, :is_vendor, NOW())
+");
 
     $ok = $stmt->execute([
         'username' => $username,
@@ -68,7 +68,7 @@ function registerUser(string $username, string $password, string $email, ?string
         $user = $userStmt->fetch(PDO::FETCH_ASSOC);
 
         return [
-            'success' => true, 
+            'success' => true,
             'user_id' => $user['user_id'],
             'username' => $user['username'],
             'email' => $user['email'],
