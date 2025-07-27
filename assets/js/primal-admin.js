@@ -183,7 +183,6 @@ function showUserModal(userId, userRow) {
     `User Details:\n\nName: ${userName}\nEmail: ${userEmail}\nAlias: ${userAlias}\nJoined: ${userDate}`
   );
 }
-
 function banUser(userId, userRow) {
   const userName = userRow.querySelector(".user-name").textContent;
   const confirmation = confirm(`Are you sure you want to ban ${userName}?`);

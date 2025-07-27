@@ -149,7 +149,7 @@ try {
                                             <div class="user-alias">Alias: <?php echo htmlspecialchars($user['alias']); ?></div>
                                         </div>
                                     </div>
-                                </td>
+                               </td>
                                 <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
                                 <td><span class="status-badge active">Active</span></td>
                                 <td class="user-created-at"><?php echo $user['created_at']; ?></td>
