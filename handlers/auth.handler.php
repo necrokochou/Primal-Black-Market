@@ -41,7 +41,7 @@ try {
     $db = $_ENV['PG_DB'] ?? 'primal-black-market';
     $user = $_ENV['PG_USER'] ?? 'user';
     $pass = $_ENV['PG_PASS'] ?? 'password';
-    
+
     $pdo = new PDO(
         "pgsql:host={$host};port={$port};dbname={$db}",
         $user,
@@ -69,7 +69,8 @@ try {
 }
 
 // Helper function to ensure clean JSON output
-function outputJson($data, $statusCode = 200) {
+function outputJson($data, $statusCode = 200)
+{
     ob_clean();
     http_response_code($statusCode);
     header('Content-Type: application/json');
@@ -85,88 +86,87 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 try {
     $action = $_POST['action'] ?? '';
 
-if ($action === 'login') {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
+    if ($action === 'login') {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
 
-    $loginResult = $auth->tryLogin($username, $password);
-    if ($loginResult !== null) {
-        // $_SESSION['user'] = $loginResult['username'];
-        // $_SESSION['is_admin'] = $loginResult['is_admin'] ?? false;
-        // $_SESSION['is_vendor'] = $loginResult['is_vendor'] ?? false;
-        // $_SESSION['user_email'] = $loginResult['email'] ?? '';
-        // $_SESSION['user_alias'] = $loginResult['alias'] ?? $loginResult['username'];
-        // $_SESSION['user_trust_level'] = $loginResult['trustlevel'] ?? 0;
+        $loginResult = $auth->tryLogin($username, $password);
+        if ($loginResult !== null) {
+            // $_SESSION['user'] = $loginResult['username'];
+            // $_SESSION['is_admin'] = $loginResult['is_admin'] ?? false;
+            // $_SESSION['is_vendor'] = $loginResult['is_vendor'] ?? false;
+            // $_SESSION['user_email'] = $loginResult['email'] ?? '';
+            // $_SESSION['user_alias'] = $loginResult['alias'] ?? $loginResult['username'];
+            // $_SESSION['user_trust_level'] = $loginResult['trustlevel'] ?? 0;
 
-        $_SESSION['user'] = [
-            'user_id' => $loginResult['user_id'],
-            'username' => $loginResult['username'],
-            'email' => $loginResult['email'],
-            'alias' => $loginResult['alias'] ?? $loginResult['username'],
-            'trust_level' => $loginResult['trustlevel'],
-            'is_vendor' => $loginResult['is_vendor'],
-            'is_admin' => $loginResult['is_admin'] ?? false
-        ];
+            $_SESSION['user'] = [
+                'user_id' => $loginResult['user_id'],
+                'username' => $loginResult['username'],
+                'email' => $loginResult['email'],
+                'alias' => $loginResult['alias'] ?? $loginResult['username'],
+                'trust_level' => $loginResult['trustlevel'],
+                'is_vendor' => $loginResult['is_vendor'],
+                'is_admin' => $loginResult['is_admin'] ?? false
+            ];
+
+            echo json_encode([
+                'success' => true
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'error' => 'Invalid username or password']);
+        }
+        exit;
+    }
+
+
+    if ($action === 'register') {
+        $username = $_POST['username'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $alias = $_POST['alias'] ?? $username;
+        $account_type = $_POST['account_type'] ?? 'buyer';
+
+        if (!$username || !$email || !$password) {
+            outputJson(['success' => false, 'error' => 'All fields are required'], 400);
+            exit;
+        }
+
+        $is_vendor = ($account_type === 'seller');
+
+        require UTILS_PATH . '/register.util.php';
+
+        $result = registerUser($username, $password, $email, $alias, $is_vendor);
+
+        if ($result['success']) {
+            $_SESSION['user'] = [
+                'user_id' => $result['user_id'],
+                'username' => $result['username'],
+                'email' => $result['email'],
+                'alias' => $result['alias'] ?? $result['username'],
+                'trust_level' => $result['trustlevel'],
+                'is_admin' => $result['is_admin'] ?? false,
+                'is_vendor' => $result['is_vendor'] ?? false
+            ];
+            outputJson(['success' => true]);
+        } else {
+            outputJson(['success' => false, 'error' => $result['error'] ?? 'Registration failed.'], 500);
+        }
+    }
+
+    if ($action === 'get_session_user') {
+        if (!isset($_SESSION['user'])) {
+            echo json_encode(['success' => false, 'error' => 'Not logged in']);
+            exit;
+        }
 
         echo json_encode([
-            'success' => true
+            'success' => true,
+            'user' => $_SESSION['user']
         ]);
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Invalid username or password']);
-    }
-    exit;
-}
-
-
-if ($action === 'register') {
-    $username = $_POST['username'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $alias = $_POST['alias'] ?? $username;
-    $account_type = $_POST['account_type'] ?? 'buyer';
-
-    if (!$username || !$email || !$password) {
-        outputJson(['success' => false, 'error' => 'All fields are required'], 400);
-        exit;
     }
 
-    $is_vendor = ($account_type === 'seller');
-
-    require UTILS_PATH . '/register.util.php';
-
-    $result = registerUser($username, $password, $email, $alias, $is_vendor);
-
-    if ($result['success']) {
-        $_SESSION['user'] = [
-            'user_id' => $result['user_id'],
-            'username' => $result['username'],
-            'email' => $result['email'],
-            'alias' => $result['alias'] ?? $result['username'],
-            'trust_level' => $result['trustlevel'],
-            'is_admin' => $result['is_admin'] ?? false,
-            'is_vendor' => $result['is_vendor'] ?? false
-        ];
-        outputJson(['success' => true]);
-    } else {
-        outputJson(['success' => false, 'error' => $result['error'] ?? 'Registration failed.'], 500);
-    }
-}
-
-if ($action === 'get_session_user') {
-    if (!isset($_SESSION['user'])) {
-        echo json_encode(['success' => false, 'error' => 'Not logged in']);
-        exit;
-    }
-
-    echo json_encode([
-        'success' => true,
-        'user' => $_SESSION['user']
-    ]);
-}
-
-// If invalid action
-outputJson(['success' => false, 'error' => 'Invalid action'], 400);
-
+    // If invalid action
+    outputJson(['success' => false, 'error' => 'Invalid action'], 400);
 } catch (Exception $e) {
     error_log('Auth handler error: ' . $e->getMessage());
     outputJson(['success' => false, 'error' => 'Server error occurred'], 500);
