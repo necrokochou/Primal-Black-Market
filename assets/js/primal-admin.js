@@ -177,12 +177,12 @@ function showUserModal(userId, userRow) {
   const userName = userRow.querySelector(".user-name").textContent;
   const userEmail = userRow.querySelector(".user-email").textContent;
   const userAlias = userRow.querySelector(".user-alias").textContent;
+  const userDate = userRow.querySelector(".user-created-at")?.textContent;
 
   alert(
-    `User Details:\n\nName: ${userName}\nEmail: ${userEmail}\n${userAlias}\n\n(Full modal implementation coming soon!)`
+    `User Details:\n\nName: ${userName}\nEmail: ${userEmail}\nAlias: ${userAlias}\nJoined: ${userDate}`
   );
 }
-
 function banUser(userId, userRow) {
   const userName = userRow.querySelector(".user-name").textContent;
   const confirmation = confirm(`Are you sure you want to ban ${userName}?`);
@@ -521,7 +521,10 @@ function debounce(func, wait) {
     timeout = setTimeout(later, wait);
   };
 }
-
+function formatDateTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleString(); // e.g., "7/27/2025, 8:00:00 PM"
+}
 function showNotification(message, type = "info") {
   // Create notification element
   const notification = document.createElement("div");
