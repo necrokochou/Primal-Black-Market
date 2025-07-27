@@ -152,7 +152,7 @@ try {
                                 </td>
                                 <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
                                 <td><span class="status-badge active">Active</span></td>
-                                <td><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
+                                <td class="user-created-at"><?php echo $user['created_at']; ?></td>
                                 <td><?php echo number_format($user['trustlevel'], 1); ?></td>
                                 <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
                                 <td>

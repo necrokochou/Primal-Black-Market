@@ -177,9 +177,10 @@ function showUserModal(userId, userRow) {
   const userName = userRow.querySelector(".user-name").textContent;
   const userEmail = userRow.querySelector(".user-email").textContent;
   const userAlias = userRow.querySelector(".user-alias").textContent;
+  const userDate = userRow.querySelector(".user-created-at")?.textContent;
 
   alert(
-    `User Details:\n\nName: ${userName}\nEmail: ${userEmail}\n${userAlias}\n\n(Full modal implementation coming soon!)`
+    `User Details:\n\nName: ${userName}\nEmail: ${userEmail}\nAlias: ${userAlias}\nJoined: ${userDate}`
   );
 }
 
@@ -520,6 +521,11 @@ function debounce(func, wait) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
+}
+
+function formatDateTime(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleString(); // e.g., "7/27/2025, 8:00:00 PM"
 }
 
 function showNotification(message, type = "info") {
