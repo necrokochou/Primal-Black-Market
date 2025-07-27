@@ -72,7 +72,7 @@ try {
                         $publishDate = $product['publish_date'] ?? $product['created_at'] ?? $product['PublishDate'] ?? date('Y-m-d');
                         
                         $isNew = (strtotime($publishDate) > strtotime('-14 days'));
-                        $imagePath = $image ? '/' . $image : '/assets/images/example.png';
+                        $imagePath = $image ? $image : '/assets/images/example.png';
                         
                         renderProductCard(
                             $title, 
