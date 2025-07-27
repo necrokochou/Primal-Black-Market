@@ -52,29 +52,10 @@ $tables = [
 
 foreach ($tables as $table) {
     try {
-        // Check if table exists first
-        $stmt = $pdo->prepare("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = ?)");
-        $stmt->execute([$table]);
-        $tableExists = $stmt->fetchColumn();
-        
-        if ($tableExists) {
-            // Use TRUNCATE for faster clearing with CASCADE to handle foreign keys
-            $pdo->exec("TRUNCATE TABLE {$table} RESTART IDENTITY CASCADE;");
-            echo "✅ Cleared table: {$table}\n";
-        } else {
-            echo "⏭️  Skipped table: {$table} (does not exist)\n";
-        }
+        $pdo->exec("DROP TABLE IF EXISTS {$table} CASCADE;");
+        echo "✅ Dropped table: {$table}\n";
     } catch (PDOException $e) {
-        echo "⚠️  Failed to clear {$table}: " . $e->getMessage() . "\n";
-        // Try alternative DELETE method if TRUNCATE fails
-        try {
-            if ($tableExists) {
-                $pdo->exec("DELETE FROM {$table};");
-                echo "✅ Cleared table using DELETE: {$table}\n";
-            }
-        } catch (PDOException $deleteError) {
-            echo "❌ Could not clear {$table} with DELETE either: " . $deleteError->getMessage() . "\n";
-        }
+        echo "❌ Failed to drop {$table}: " . $e->getMessage() . "\n";
     }
 }
 
