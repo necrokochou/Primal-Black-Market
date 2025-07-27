@@ -8,14 +8,14 @@ require_once UTILS_PATH . '/envSetter.util.php';
 echo "🚨 ========================================\n";
 echo "🚨 PRIMAL BLACK MARKET DATABASE RESET    \n";
 echo "🚨 ========================================\n";
-echo "⚠️  THIS WILL CLEAR ALL TABLE DATA!\n";
-echo "⚠️  TABLES WILL BE KEPT, ONLY DATA CLEARED\n";
+echo "⚠️  THIS WILL DROP ALL TABLES COMPLETELY!\n";
+echo "⚠️  ALL DATA AND TABLE STRUCTURES WILL BE DESTROYED\n";
 echo "⚠️  PRESS CTRL+C TO CANCEL IN 5 SECONDS\n";
 echo "🚨 ========================================\n";
 
 // Countdown warning
 for ($i = 5; $i > 0; $i--) {
-    echo "⏱️  Resetting in {$i} seconds...\n";
+    echo "⏱️  Dropping tables in {$i} seconds...\n";
     sleep(1);
 }
 
@@ -34,20 +34,20 @@ try {
     die("❌ Connection failed: " . $e->getMessage() . "\n");
 }
 
-// ---- 🧹 Database Reset ----
-echo "\n🧹 Clearing table data...\n";
+// ---- 🔥 Database Reset (DROP TABLES) ----
+echo "\n🔥 Dropping all tables...\n";
 
-// Clear all tables individually (preserve structure)
-echo "🗂️  Clearing tables individually...\n";
+// Drop all tables in reverse dependency order (children first, parents last)
+echo "🗂️  Dropping tables in dependency order...\n";
 $tables = [
-    'purchase_history',
-    'cart',
-    'transactions',
-    'messages', 
-    'feedbacks',
-    'listings',
-    'categories',
-    'users'
+    'purchase_history',  // Has FK to users, listings, transactions
+    'cart',             // Has FK to users, listings
+    'transactions',     // Has FK to users, listings
+    'messages',         // Has FK to users (sender/receiver)
+    'feedbacks',        // Has FK to users (reviewer/vendor)
+    'listings',         // Has FK to users, categories
+    'categories',       // No dependencies
+    'users'            // No dependencies (base table)
 ];
 
 foreach ($tables as $table) {
@@ -59,48 +59,28 @@ foreach ($tables as $table) {
     }
 }
 
-// Verify reset was successful
-echo "\n🔍 Verifying data clearance...\n";
+// Verify all tables are dropped
+echo "\n🔍 Verifying tables are dropped...\n";
 $stmt = $pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
-$existingTables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$remainingTables = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-if (!empty($existingTables)) {
-    echo "✅ Tables preserved: " . implode(', ', $existingTables) . "\n";
-    
-    // Check if tables are actually empty
-    $allEmpty = true;
-    foreach ($existingTables as $table) {
-        try {
-            $countStmt = $pdo->query("SELECT COUNT(*) FROM {$table}");
-            $count = $countStmt->fetchColumn();
-            if ($count > 0) {
-                echo "⚠️  Table {$table} still has {$count} records\n";
-                $allEmpty = false;
-            } else {
-                echo "✅ Table {$table} is empty\n";
-            }
-        } catch (PDOException $e) {
-            echo "⚠️  Could not verify {$table}: " . $e->getMessage() . "\n";
-        }
-    }
-    
-    if ($allEmpty) {
-        echo "✅ All tables successfully cleared of data\n";
-    } else {
-        echo "⚠️  Some tables may still contain data\n";
-    }
+if (empty($remainingTables)) {
+    echo "✅ All tables successfully dropped from database\n";
 } else {
-    echo "⚠️  No tables found in the database\n";
+    echo "⚠️  Some tables still exist: " . implode(', ', $remainingTables) . "\n";
+    foreach ($remainingTables as $table) {
+        echo "   - {$table}\n";
+    }
 }
 
 // ---- 🎉 Reset Complete ----
 echo "\n🎉 ========================================\n";
 echo "🎉 DATABASE RESET COMPLETE!              \n";
 echo "🎉 ========================================\n";
-echo "🧹 All table data has been cleared\n";
-echo "📋 Table structures are preserved\n";
-echo "� Database is ready for fresh data\n";
+echo "🔥 All tables have been completely dropped\n";
+echo "📋 Database is now empty and clean\n";
+echo "🆕 Database is ready for fresh schema\n";
 echo "➡️  Next steps:\n";
-echo "   1. Run seeders: php utils/dbSeederPostgresql.util.php\n";
-echo "   2. Or run migrations first if tables don't exist: php utils/dbMigratePostgresql.util.php\n";
+echo "   1. REQUIRED: Run migrations first: php utils/dbMigratePostgresql.util.php\n";
+echo "   2. THEN: Run seeders: php utils/dbSeederPostgresql.util.php\n";
 echo "🎉 ========================================\n";
