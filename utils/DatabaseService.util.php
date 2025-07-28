@@ -268,36 +268,36 @@ class DatabaseService
     }
 
     // Get all users (for admin dashboard)
-    public function getAllUsers()
-    {
-        $sql = "SELECT user_id, username, email, alias, trustlevel, is_vendor, is_admin
-            FROM users";
-
-        $stmt = $this->pdo->query($sql);
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        //return $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-        // Ensure created_at is always set to a valid value
-        foreach ($users as &$user) {
-            if (empty($user['created_at']) || strtotime($user['created_at']) === false) {
-                $user['created_at'] = date('Y-m-d H:i:s');
-            }
-        }
-
-        return $users;
-    }
-
-    //use this when created_at is added to users.model.sql
     // public function getAllUsers()
     // {
-    //     $sql = "SELECT user_id, username, email, alias, trustlevel, is_vendor, is_admin, created_at 
-    //         FROM users 
-    //         ORDER BY created_at DESC";
+    //     $sql = "SELECT user_id, username, email, alias, trustlevel, is_vendor, is_admin, 
+    //         FROM users";
 
     //     $stmt = $this->pdo->query($sql);
-    //     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //     //return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+    //     // Ensure created_at is always set to a valid value
+    //     foreach ($users as &$user) {
+    //         if (empty($user['created_at']) || strtotime($user['created_at']) === false) {
+    //             $user['created_at'] = date('Y-m-d H:i:s');
+    //         }
+    //     }
+
+    //     return $users;
     // }
+
+    //use this when created_at is added to users.model.sql
+    public function getAllUsers()
+    {
+        $sql = "SELECT user_id, username, email, alias, trustlevel, is_vendor, is_admin, created_at 
+            FROM users 
+            ORDER BY created_at DESC";
+
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     // Get user count
     public function getUserCount()
