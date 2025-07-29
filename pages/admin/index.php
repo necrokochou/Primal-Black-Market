@@ -183,11 +183,30 @@ try {
                     <input type="text" id="product-search" class="search-input" placeholder="Search products...">
                     <select id="product-category-filter" class="filter-select">
                         <option value="all">All Categories</option>
-                        <option value="weapons">Weapons</option>
-                        <option value="armor">Armor</option>
-                        <option value="potions">Potions</option>
-                        <option value="accessories">Accessories</option>
-                        <option value="forging-materials">Forging Materials</option>
+                        <?php 
+                        $categories = require_once __DIR__ . '/../../staticData/dummies/categories.staticData.php';
+                        foreach ($categories as $category): 
+                            $categoryValue = strtolower(str_replace(' ', '-', $category['Name']));
+                            $icon = match($category['Name']) {
+                                'Weapons' => '⚔️',
+                                'Hunting Equipment' => '🏹',
+                                'Prehistoric Drugs' => '🧪',
+                                'Food' => '🍖',
+                                'Spices and etc.' => '🌿',
+                                'General Equipment' => '🔧',
+                                'Forging Materials' => '⛏️',
+                                'Clothing' => '👘',
+                                'Infrastructure' => '🏗️',
+                                'Voodoo' => '🔮',
+                                'Ritual Artifacts' => '📿',
+                                'Pets' => '🐺',
+                                default => '📦'
+                            };
+                        ?>
+                        <option value="<?php echo $categoryValue; ?>">
+                            <?php echo $icon . ' ' . htmlspecialchars($category['Name']); ?>
+                        </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>

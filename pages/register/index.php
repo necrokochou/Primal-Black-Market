@@ -89,5 +89,5 @@
     </div>
 </main>
 
-<script src="/assets/js/primal-registration.js"></script>
+<script src="/assets/js/primal-register.js"></script>
 <?php require_once __DIR__ . '/../../layouts/footer.php'; ?>

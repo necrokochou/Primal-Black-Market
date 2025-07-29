@@ -1,5 +1,8 @@
 <?php
-require_once BASE_PATH . '/bootstrap.php';
+// Remove circular dependency - bootstrap.php should be loaded before this file
+if (!defined('BASE_PATH')) {
+    throw new Exception('BASE_PATH not defined. Include bootstrap.php first.');
+}
 require_once BASE_PATH . '/vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);
