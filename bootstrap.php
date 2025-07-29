@@ -1,4 +1,7 @@
 <?php
+// Prevent any output from this file
+if (ob_get_level() == 0) ob_start();
+
 define('BASE_PATH', realpath(__DIR__));
 define('COMPONENTS_PATH', BASE_PATH . "/components");
 define('TEMPLATES_PATH', BASE_PATH . "/components/templates");
@@ -12,26 +15,8 @@ define('ERRORS_PATH', BASE_PATH . "/servers");
 
 chdir(BASE_PATH);
 
-
-// ✅ Add this block for PDO initialization
-$host = 'postgresql';
-$db   = 'primal-black-market';
-$user = 'user';
-$pass = 'password';
-$charset = 'utf8mb4';
-
-$dsn = "pgsql:host=$host;dbname=$db";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // important for debugging
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
-
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    error_log("PDO connection failed: " . $e->getMessage());
-    http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Database connection error']);
-    exit;
+// Bootstrap file complete - database connection handled by DatabaseService
+// Clean any output buffer if we're not in a handler that needs it
+if (ob_get_level() > 0 && !defined('KEEP_OUTPUT_BUFFER')) {
+    ob_end_clean();
 }

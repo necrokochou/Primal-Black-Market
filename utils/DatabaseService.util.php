@@ -1,4 +1,8 @@
 <?php
+// Ensure bootstrap.php constants are available
+if (!defined('BASE_PATH')) {
+    throw new Exception('BASE_PATH not defined. Include bootstrap.php first.');
+}
 require_once BASE_PATH . '/utils/envSetter.util.php';
 class DatabaseService
 {
@@ -169,8 +173,8 @@ class DatabaseService
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $alias = $alias ?: $username;
 
-            $sql = "INSERT INTO users (username, email, password, alias, trust_level, is_vendor, is_admin, created_at) 
-                    VALUES (:username, :email, :password, :alias, 0.0, false, false, NOW())";
+            $sql = "INSERT INTO users (Username, Email, Password, Alias, TrustLevel, Is_Vendor, Is_Admin, Created_At) 
+                    VALUES (:username, :email, :password, :alias, 0.0, false, false, CURRENT_TIMESTAMP)";
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':username', $username);

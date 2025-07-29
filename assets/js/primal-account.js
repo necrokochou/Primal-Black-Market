@@ -15,6 +15,101 @@ function initializeAccount() {
 }
 
 // ===============================
+// Product Section Refresh
+// ===============================
+function refreshProductSections() {
+  console.log('🔄 Refreshing product sections...');
+  
+  // Show loading indicators
+  const productGrids = document.querySelectorAll('.my-products-grid, .seller-products-management-grid');
+  productGrids.forEach(grid => {
+    grid.innerHTML = `
+      <div style="text-align: center; padding: 2rem; color: rgba(255, 255, 255, 0.6);">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+        <p>Loading your updated products...</p>
+      </div>
+    `;
+  });
+  
+  // Try to fetch updated product data via AJAX first
+  fetchUpdatedProducts()
+    .then(success => {
+      if (!success) {
+        // Fallback to page reload if AJAX fails
+        console.log('🔄 AJAX refresh failed, falling back to page reload...');
+        setTimeout(() => {
+          console.log('🔄 Forcing page reload to show updated products...');
+          window.location.reload(true); // Force reload from server
+        }, 1000);
+      }
+    })
+    .catch(() => {
+      // Fallback to page reload on error
+      console.log('🔄 Error during AJAX refresh, falling back to page reload...');
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 1000);
+    });
+}
+
+// Fetch updated products via AJAX
+async function fetchUpdatedProducts() {
+  try {
+    console.log('📡 Fetching updated products via AJAX...');
+    
+    // Add a small delay to ensure database transaction is complete
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const response = await fetch(window.location.href, {
+      method: 'GET',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Cache-Control': 'no-cache'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch updated data');
+    }
+    
+    const html = await response.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Update My Products section
+    const newMyProductsGrid = doc.querySelector('.my-products-grid');
+    const currentMyProductsGrid = document.querySelector('.my-products-grid');
+    if (newMyProductsGrid && currentMyProductsGrid) {
+      currentMyProductsGrid.innerHTML = newMyProductsGrid.innerHTML;
+      console.log('✅ My Products section updated');
+    }
+    
+    // Update Product Management section
+    const newManagementGrid = doc.querySelector('.seller-products-management-grid');
+    const currentManagementGrid = document.querySelector('.seller-products-management-grid');
+    if (newManagementGrid && currentManagementGrid) {
+      currentManagementGrid.innerHTML = newManagementGrid.innerHTML;
+      console.log('✅ Product Management section updated');
+    }
+    
+    // Update statistics
+    const newStats = doc.querySelector('.seller-product-stats');
+    const currentStats = document.querySelector('.seller-product-stats');
+    if (newStats && currentStats) {
+      currentStats.innerHTML = newStats.innerHTML;
+      console.log('✅ Product statistics updated');
+    }
+    
+    console.log('🎉 Product sections refreshed successfully via AJAX!');
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Error fetching updated products:', error);
+    return false;
+  }
+}
+
+// ===============================
 // Tab Navigation
 // ===============================
 function setupTabNavigation() {
@@ -163,9 +258,8 @@ document.addEventListener("click", function (e) {
     }
   }
 
-  if (e.target.id === "add-product-btn") {
-    alert("Add product functionality - coming soon!");
-  }
+  // Note: Add product button removed from My Products section
+  // Product management functionality only available in Product Management tab
 
   // Product Management Tab Functionality
   if (e.target.classList.contains("edit-seller-product")) {
@@ -187,22 +281,45 @@ document.addEventListener("click", function (e) {
     const productId = e.target.dataset.productId;
     deleteSellerProduct(productId);
   }
-
-  if (e.target.id === "add-new-product-btn") {
-    addNewProduct();
-  }
 });
 
 // Product Management Functions
 function editSellerProduct(productId) {
-  // Check if the seller product modal component exists
-  if (typeof openProductModal === 'function') {
-    // Use the existing modal if available
-    openProductModal({ id: productId });
-  } else {
-    // Fallback alert
-    alert(`Edit product functionality for product ID: ${productId} - Integration with product modal needed!`);
-  }
+  console.log(`🔧 Editing product: ${productId}`);
+  
+  // First, fetch the product data from the server
+  fetch(`/handlers/products.handler.php?action=read&id=${productId}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.product) {
+        const product = data.product;
+        console.log('Product data loaded:', product);
+        
+        // Check if the seller product modal component exists
+        if (typeof openProductModal === 'function') {
+          // Open the modal with the product data for editing
+          openProductModal({
+            id: product.listing_id,
+            title: product.title,
+            category: product.category,
+            price: product.price,
+            description: product.description,
+            quantity: product.quantity,
+            status: product.is_active ? 'active' : 'inactive',
+            image: product.item_image
+          });
+        } else {
+          // Fallback: Create a simple edit modal
+          openSimpleEditModal(product);
+        }
+      } else {
+        showNotification('❌ Failed to load product data', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error loading product:', error);
+      showNotification('❌ Error loading product data', 'error');
+    });
 }
 
 function toggleSellerProductStatus(productId) {
@@ -241,27 +358,279 @@ function duplicateSellerProduct(productId) {
 function deleteSellerProduct(productId) {
   const confirmation = confirm('Are you sure you want to permanently delete this product? This action cannot be undone.');
   if (confirmation) {
-    // Here you would typically make an API call to delete the product
-    showNotification('Product deleted successfully!', 'success');
+    console.log(`🗑️ Deleting product: ${productId}`);
     
-    // Remove the product from the UI
+    // Show loading state
     const productItem = document.querySelector(`[data-product-id="${productId}"]`);
     if (productItem) {
-      productItem.style.transition = 'all 0.3s ease';
-      productItem.style.opacity = '0';
-      productItem.style.transform = 'scale(0.8)';
-      
-      setTimeout(() => {
-        productItem.remove();
-      }, 300);
+      productItem.style.opacity = '0.5';
+      productItem.style.pointerEvents = 'none';
     }
+    
+    // Make API call to delete the product
+    fetch('/handlers/products.handler.php', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `id=${encodeURIComponent(productId)}`
+    })
+    .then(response => {
+      console.log('Delete response status:', response.status);
+      return response.json();
+    })
+    .then(data => {
+      console.log('Delete response data:', data);
+      if (data.success) {
+        showNotification('✅ Product deleted successfully!', 'success');
+        
+        // Remove the product from the UI with animation
+        if (productItem) {
+          productItem.style.transition = 'all 0.3s ease';
+          productItem.style.opacity = '0';
+          productItem.style.transform = 'scale(0.8)';
+          
+          setTimeout(() => {
+            productItem.remove();
+            
+            // Check if there are no products left and show empty state
+            checkForEmptyProductState();
+          }, 300);
+        }
+      } else {
+        showNotification(`❌ Error: ${data.message}`, 'error');
+        
+        // Restore the product item if deletion failed
+        if (productItem) {
+          productItem.style.opacity = '1';
+          productItem.style.pointerEvents = 'auto';
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error deleting product:', error);
+      showNotification('❌ Network error. Please try again.', 'error');
+      
+      // Restore the product item if deletion failed
+      if (productItem) {
+        productItem.style.opacity = '1';
+        productItem.style.pointerEvents = 'auto';
+      }
+    });
   }
 }
 
-function addNewProduct() {
-  openProductModal();
+// Helper function to check if there are no products left and show empty state
+function checkForEmptyProductState() {
+  const productGrids = document.querySelectorAll('.my-products-grid, .seller-products-management-grid');
+  
+  productGrids.forEach(grid => {
+    const productItems = grid.querySelectorAll('.product-card, .seller-product-management-item');
+    const emptyStates = grid.querySelectorAll('.empty-state');
+    
+    if (productItems.length === 0 && emptyStates.length === 0) {
+      // Check if this is the My Products grid or Product Management grid
+      const isMyProductsGrid = grid.classList.contains('my-products-grid');
+      
+      // Show empty state
+      const emptyStateHtml = `
+        <div class="empty-state primal-card">
+          <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
+            <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+            <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Products Yet</h3>
+            <p>${isMyProductsGrid ? 'You haven\'t added any products to your collection.' : 'Start building your primal marketplace by managing your products.'}</p>
+          </div>
+        </div>
+      `;
+      grid.innerHTML = emptyStateHtml;
+    }
+  });
 }
 
+// Simple edit modal fallback (in case seller modal is not available)
+function openSimpleEditModal(product) {
+  // Remove existing modal if any
+  const existingModal = document.getElementById('simple-edit-modal');
+  if (existingModal) existingModal.remove();
+  
+  const modal = document.createElement('div');
+  modal.id = 'simple-edit-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: linear-gradient(135deg, #2c1810, #1a0f08);
+      border: 2px solid #ff8c00;
+      border-radius: 15px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    ">
+      <h2 style="color: #ff8c00; margin-bottom: 1.5rem; text-align: center;">
+        <i class="fas fa-edit"></i> Edit Product
+      </h2>
+      
+      <form id="simple-edit-form">
+        <input type="hidden" id="edit-product-id" value="${product.listing_id}">
+        
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Title:</label>
+          <input type="text" id="edit-title" value="${product.title}" style="
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #ff8c00;
+            border-radius: 8px;
+            color: #fff;
+          ">
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Category:</label>
+          <input type="text" id="edit-category" value="${product.category}" style="
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #ff8c00;
+            border-radius: 8px;
+            color: #fff;
+          ">
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Price:</label>
+          <input type="number" id="edit-price" value="${product.price}" step="0.01" style="
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #ff8c00;
+            border-radius: 8px;
+            color: #fff;
+          ">
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+          <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Stock:</label>
+          <input type="number" id="edit-quantity" value="${product.quantity}" style="
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #ff8c00;
+            border-radius: 8px;
+            color: #fff;
+          ">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <label style="color: #fff; display: block; margin-bottom: 0.5rem;">Description:</label>
+          <textarea id="edit-description" rows="4" style="
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #ff8c00;
+            border-radius: 8px;
+            color: #fff;
+            resize: vertical;
+          ">${product.description}</textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+          <button type="button" onclick="document.getElementById('simple-edit-modal').remove()" style="
+            padding: 0.75rem 1.5rem;
+            background: rgba(108, 117, 125, 0.3);
+            border: 1px solid #6c757d;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+          ">Cancel</button>
+          
+          <button type="submit" style="
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #ff8c00, #ff7700);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+          ">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Handle form submission
+  document.getElementById('simple-edit-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitSimpleEdit();
+  });
+}
+
+// Handle simple edit form submission
+function submitSimpleEdit() {
+  const formData = new FormData();
+  formData.append('action', 'update');
+  formData.append('id', document.getElementById('edit-product-id').value);
+  formData.append('title', document.getElementById('edit-title').value);
+  formData.append('category', document.getElementById('edit-category').value);
+  formData.append('price', document.getElementById('edit-price').value);
+  formData.append('quantity', document.getElementById('edit-quantity').value);
+  formData.append('description', document.getElementById('edit-description').value);
+  formData.append('status', 'active');
+  
+  const submitBtn = document.querySelector('#simple-edit-form button[type="submit"]');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  submitBtn.disabled = true;
+  
+  fetch('/handlers/products.handler.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showNotification('✅ Product updated successfully!', 'success');
+      document.getElementById('simple-edit-modal').remove();
+      
+      // Refresh the page to show updated product
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } else {
+      showNotification(`❌ Error: ${data.message}`, 'error');
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    }
+  })
+  .catch(error => {
+    console.error('Error updating product:', error);
+    showNotification('❌ Network error. Please try again.', 'error');
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+  });
+}
+
+// addNewProduct function removed - using seller modal directly
+
+/*
+// OLD BASIC PRODUCT MODAL - COMMENTED OUT TO USE SELLER MODAL INSTEAD
 function openProductModal(product = {}) {
   // Prevent duplicate modals
   const existing = document.getElementById("product-modal");
@@ -418,6 +787,7 @@ function openProductModal(product = {}) {
     }
   });
 }
+*/
 
 function renderCategoryOptions(selected) {
   // You can fetch these dynamically; hard-coded for now
