@@ -32,8 +32,11 @@ class CartHandler
         }
     }
 
-    public function getCart(): array
-    {
+    public function getPdo(): PDO {
+        return $this->pdo;
+    }
+
+    public function getCart(): array {
         $stmt = $this->pdo->prepare("
             SELECT c.Cart_ID, c.Listing_ID, c.Quantity,
                 l.Title AS title, l.Price AS unit_price, l.Item_Image

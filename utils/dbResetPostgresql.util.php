@@ -43,8 +43,6 @@ $tables = [
     'purchase_history',  // Has FK to users, listings, transactions
     'cart',             // Has FK to users, listings
     'transactions',     // Has FK to users, listings
-    'messages',         // Has FK to users (sender/receiver)
-    'feedbacks',        // Has FK to users (reviewer/vendor)
     'listings',         // Has FK to users, categories
     'categories',       // No dependencies
     'users'            // No dependencies (base table)

@@ -91,6 +91,91 @@ switch ($action) {
         echo json_encode(['success' => true, 'message' => 'Cart cleared']);
         break;
 
+    case 'checkout':
+        if (!$user || !isset($user['user_id'])) {
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'User not authenticated']);
+            exit;
+        }
+
+        $userID = $user['user_id'];
+
+        try {
+            $cartItems = $cart->getCart();
+
+            if (empty($cartItems)) {
+                echo json_encode(['success' => false, 'error' => 'Cart is empty']);
+                exit;
+            }
+
+            $pdo = $cart->getPdo();
+            $pdo->beginTransaction();
+
+            // Random value pools
+            $paymentMethods = ['Cash on Delivery', 'Cryptocurrency', 'Credit Card', 'PayPal', 'Bitcoin'];
+            $deliveryStatuses = ['Pending', 'Shipped', 'Delivered', 'In Transit', 'Awaiting Pickup'];
+            $noteSamples = ['Handle with care', 'Deliver ASAP', 'Leave at door', 'Call before delivery', 'Gift item'];
+
+            foreach ($cartItems as $item) {
+                // Random values
+                $paymentMethod = $paymentMethods[array_rand($paymentMethods)];
+                $deliveryStatus = $deliveryStatuses[array_rand($deliveryStatuses)];
+                $note = $noteSamples[array_rand($noteSamples)];
+
+                // Insert into transactions
+                $transactionStmt = $pdo->prepare("
+                    INSERT INTO transactions (
+                        transaction_id, buyer_id, listing_id, quantity, total_price, transaction_status, timestamp
+                    ) VALUES (
+                        gen_random_uuid(), :buyerID, :listingID, :qty, :total, :status, NOW()
+                    ) RETURNING transaction_id
+                ");
+                $transactionStmt->execute([
+                    'buyerID'   => $userID,
+                    'listingID' => $item['listing_id'],
+                    'qty'       => $item['quantity'],
+                    'total'     => $item['unit_price'] * $item['quantity'],
+                    'status'    => $deliveryStatus
+                ]);
+                $transactionID = $transactionStmt->fetchColumn();
+
+                // Insert into purchase_history
+                $purchaseStmt = $pdo->prepare("
+                    INSERT INTO purchase_history (
+                        purchase_history_id, user_id, listing_id, transaction_id,
+                        quantity, price_each, total_price,
+                        payment_method, delivery_status, notes
+                    ) VALUES (
+                        gen_random_uuid(), :userID, :listingID, :transactionID,
+                        :quantity, :priceEach, :total,
+                        :method, :status, :notes
+                    )
+                ");
+                $purchaseStmt->execute([
+                    'userID'        => $userID,
+                    'listingID'     => $item['listing_id'],
+                    'transactionID' => $transactionID,
+                    'quantity'      => $item['quantity'],
+                    'priceEach'     => $item['unit_price'],
+                    'total'         => $item['unit_price'] * $item['quantity'],
+                    'method'        => $paymentMethod,
+                    'status'        => $deliveryStatus,
+                    'notes'         => $note
+                ]);
+            }
+
+            $cart->clearCart($userID);
+            $pdo->commit();
+
+            echo json_encode(['success' => true, 'message' => 'Checkout complete']);
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            error_log('Checkout error: ' . $e->getMessage());
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Server error during checkout']);
+        }
+        break;
+
     default:
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Invalid action']);
