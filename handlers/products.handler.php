@@ -540,20 +540,48 @@ function deleteProduct(PDO $db, string $id, string $vendorId): array
     }
 
     try {
+        // First check if product has any transaction history
+        $txnCheckStmt = $db->prepare("SELECT COUNT(*) FROM transactions WHERE listing_id = ?");
+        $txnCheckStmt->execute([$id]);
+        $transactionCount = $txnCheckStmt->fetchColumn();
+        
+        if ($transactionCount > 0) {
+            return [
+                'success' => false, 
+                'message' => 'Cannot delete this product as it has associated transaction history. For data integrity and legal compliance, products with sales records cannot be permanently deleted. Consider deactivating the product instead.'
+            ];
+        }
+
         $db->beginTransaction();
 
         // Fetch the image path before deletion
-        $imgStmt = $db->prepare("SELECT item_image FROM listings WHERE listing_id = :id");
-        $imgStmt->execute(['id' => $id]);
+        $imgStmt = $db->prepare("SELECT item_image FROM listings WHERE listing_id = ?");
+        $imgStmt->execute([$id]);
         $imagePath = $imgStmt->fetchColumn();
 
-        // Delete from cart
-        $cartStmt = $db->prepare("DELETE FROM cart WHERE listing_id = :id");
-        $cartStmt->execute(['id' => $id]);
+        // Delete from cart first (using both possible column name formats for compatibility)
+        try {
+            $cartStmt = $db->prepare("DELETE FROM cart WHERE listing_id = ?");
+            $cartStmt->execute([$id]);
+        } catch (PDOException $e) {
+            // Try with quoted column name if unquoted fails
+            try {
+                $cartStmt = $db->prepare("DELETE FROM cart WHERE \"listing_id\" = ?");
+                $cartStmt->execute([$id]);
+            } catch (PDOException $e2) {
+                error_log("Cart cleanup failed for listing {$id}: " . $e2->getMessage());
+                // Continue anyway - cart entries might not exist
+            }
+        }
 
-        // Delete from listings
-        $stmt = $db->prepare("DELETE FROM listings WHERE listing_id = :id");
-        $stmt->execute(['id' => $id]);
+        // Delete the listing itself
+        $stmt = $db->prepare("DELETE FROM listings WHERE listing_id = ?");
+        $result = $stmt->execute([$id]);
+        
+        if (!$result || $stmt->rowCount() === 0) {
+            $db->rollBack();
+            return ['success' => false, 'message' => 'Product not found or could not be deleted'];
+        }
 
         // Commit DB deletion
         $db->commit();
@@ -569,9 +597,33 @@ function deleteProduct(PDO $db, string $id, string $vendorId): array
             }
         }
 
-        return ['success' => true, 'message' => 'Product and image deleted successfully'];
+        return ['success' => true, 'message' => 'Product deleted successfully'];
+    } catch (PDOException $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        error_log("PDO error deleting product {$id}: " . $e->getMessage());
+        
+        // Handle specific foreign key constraint errors with user-friendly messages
+        if (strpos($e->getMessage(), 'foreign key constraint') !== false) {
+            if (strpos($e->getMessage(), 'transactions') !== false) {
+                return [
+                    'success' => false, 
+                    'message' => 'Cannot delete this product as it has associated transaction records. Products with sales history must be preserved for business and legal compliance.'
+                ];
+            } else {
+                return [
+                    'success' => false, 
+                    'message' => 'Cannot delete this product as it has associated data that must be preserved. Please contact an administrator for assistance.'
+                ];
+            }
+        }
+        
+        return ['success' => false, 'message' => 'Database error occurred while deleting product: ' . $e->getMessage()];
     } catch (Exception $e) {
-        $db->rollBack();
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
         error_log("Error deleting product {$id}: " . $e->getMessage());
         return ['success' => false, 'message' => 'Failed to delete product: ' . $e->getMessage()];
     }
