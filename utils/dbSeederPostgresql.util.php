@@ -27,9 +27,7 @@ try {
 // Function to clear all tables in correct order (reverse dependency order)
 function clearAllTables($pdo) {
     echo "\n🧹 Clearing all tables in correct order...\n";
-    
-    $clearOrder = ['cart', 'transactions', 'feedbacks', 'messages', 'listings', 'categories', 'users'];
-    
+    $clearOrder = ['purchase_history', 'cart', 'transactions', 'listings', 'categories', 'users'];
     foreach ($clearOrder as $table) {
         try {
             $pdo->exec("DELETE FROM {$table}");
@@ -38,7 +36,7 @@ function clearAllTables($pdo) {
             echo "⚠️  Could not clear {$table}: " . $e->getMessage() . "\n";
         }
     }
-    
+
     echo "🧹 Table clearing complete!\n";
 }
 
@@ -52,20 +50,18 @@ function seedTable($pdo, $tableName, $staticDataFile, $insertSQL, $dataProcessor
         echo "⚠️  Static data file not found: {$staticDataFile}\n";
         return 0;
     }
-    
     $dummyData = require_once $dummyDataPath;
-    
+
     // Insert dummy data
     $insertStmt = $pdo->prepare($insertSQL);
-    
+
     $insertedCount = 0;
     $skippedCount = 0;
-    
+
     foreach ($dummyData as $item) {
         try {
             $processedData = $dataProcessor($item);
             $result = $insertStmt->execute($processedData);
-            
             if ($insertStmt->rowCount() > 0) {
                 $insertedCount++;
                 echo "✅ Inserted {$tableName} item successfully.\n";
@@ -78,7 +74,6 @@ function seedTable($pdo, $tableName, $staticDataFile, $insertSQL, $dataProcessor
             $skippedCount++;
         }
     }
-    
     echo "📊 {$tableName} seeding complete! {$insertedCount} items inserted, {$skippedCount} items skipped.\n";
     return $insertedCount;
 }
@@ -96,8 +91,8 @@ $usersInserted = seedTable(
     $pdo,
     'users',
     'users.staticData.php',
-    'INSERT INTO users (Username, Password, Email, Alias, TrustLevel, Is_Vendor, Is_Admin)
-     VALUES (:username, :password, :email, :alias, :trustlevel, :is_vendor, :is_admin)
+    'INSERT INTO users (Username, Password, Email, Alias, TrustLevel, Created_At, Is_Vendor, Is_Admin, Is_Banned)
+     VALUES (:username, :password, :email, :alias, :trustlevel, :created_at, :is_vendor, :is_admin, :is_banned)
      ON CONFLICT (Username) DO NOTHING',
     function($user) {
         return [
@@ -106,8 +101,10 @@ $usersInserted = seedTable(
             ':email' => $user['Email'] ?? $user['Username'] . '@example.com',
             ':alias' => $user['Alias'],
             ':trustlevel' => $user['TrustLevel'],
-            ':is_vendor' => $user['IsVendor'] ? 'true' : 'false',
-            ':is_admin' => $user['IsAdmin'] ? 'true' : 'false'
+            ':created_at' => $user['Created_At'] ?? date('Y-m-d H:i:s'),
+            ':is_vendor' => $user['Is_Vendor'] ? 'true' : 'false',
+            ':is_admin' => $user['Is_Admin'] ? 'true' : 'false',
+            ':is_banned' => $user['Is_Banned'] ? 'true' : 'false'
         ];
     }
 );
@@ -165,67 +162,7 @@ if (empty($userIds) || empty($categoryIds)) {
     );
 }
 $totalInserted += $listingsInserted;
-
-// 4. Feedback Data (Requires Users) - Based on feedbacks.model.sql structure
-echo "\n🌱 Seeding feedback with foreign key relationships...\n";
-
-// Get random users for reviewer and vendor relationships
-$userStmt = $pdo->query("SELECT User_ID FROM users ORDER BY RANDOM() LIMIT 10");
-$userIds = $userStmt->fetchAll(PDO::FETCH_COLUMN);
-
-if (empty($userIds)) {
-    echo "⚠️  Cannot seed feedback: Missing users data\n";
-    $feedbackInserted = 0;
-} else {
-    $feedbackInserted = seedTable(
-        $pdo,
-        'feedbacks',
-        'feedbacks.staticData.php',
-        'INSERT INTO feedbacks (Reviewer_ID, Vendor_ID, Rating, Comments, Posted_At)
-         VALUES (:reviewer_id, :vendor_id, :rating, :comments, :posted_at)',
-        function($feedbacks) use ($userIds) {
-            return [
-                ':reviewer_id' => $userIds[array_rand($userIds)],
-                ':vendor_id' => $userIds[array_rand($userIds)],
-                ':rating' => $feedbacks['Rating'],
-                ':comments' => $feedbacks['Comments'],
-                ':posted_at' => $feedbacks['PostedAt']
-            ];
-        }
-    );
-}
-$totalInserted += $feedbackInserted;
-
-// 5. Messages Data (Requires Users) - Based on messages.model.sql structure
-echo "\n🌱 Seeding messages with foreign key relationships...\n";
-
-// Get random users for sender and receiver relationships
-$userStmt = $pdo->query("SELECT User_ID FROM users ORDER BY RANDOM() LIMIT 10");
-$userIds = $userStmt->fetchAll(PDO::FETCH_COLUMN);
-
-if (empty($userIds)) {
-    echo "⚠️  Cannot seed messages: Missing users data\n";
-    $messagesInserted = 0;
-} else {
-    $messagesInserted = seedTable(
-        $pdo,
-        'messages',
-        'messages.staticData.php',
-        'INSERT INTO messages (Sender_ID, Receiver_ID, Messages_Content, Sent_At)
-         VALUES (:sender_id, :receiver_id, :messages_content, :sent_at)',
-        function($message) use ($userIds) {
-            return [
-                ':sender_id' => $userIds[array_rand($userIds)],
-                ':receiver_id' => $userIds[array_rand($userIds)],
-                ':messages_content' => $message['MessagesContent'],
-                ':sent_at' => $message['SentAt']
-            ];
-        }
-    );
-}
-$totalInserted += $messagesInserted;
-
-// 6. Transactions Data (Requires Users & Listings) - Based on transactions.model.sql structure
+// 4. Transactions Data (Requires Users & Listings) - Based on transactions.model.sql structure
 echo "\n🌱 Seeding transactions with foreign key relationships...\n";
 
 // Get random users and listings for foreign key relationships
@@ -259,7 +196,7 @@ if (empty($userIds) || empty($listingIds)) {
 }
 $totalInserted += $transactionsInserted;
 
-// 7. Cart Data (Requires Users & Listings) - Based on cart.model.sql structure
+// 5. Cart Data (Requires Users & Listings) - Based on cart.model.sql structure
 echo "\n🌱 Seeding cart with foreign key relationships...\n";
 
 // Get random users and listings for foreign key relationships
@@ -291,10 +228,51 @@ if (empty($userIds) || empty($listingIds)) {
 }
 $totalInserted += $cartInserted;
 
+// 8. Purchase History Data (Requires Users, Listings & Transactions) - Based on purchase_history.model.sql structure
+echo "\n🌱 Seeding purchase_history with foreign key relationships...\n";
+
+// Get random users, listings, and transactions for foreign key relationships
+$userStmt = $pdo->query("SELECT User_ID FROM users ORDER BY RANDOM() LIMIT 10");
+$userIds = $userStmt->fetchAll(PDO::FETCH_COLUMN);
+
+$listingStmt = $pdo->query("SELECT Listing_ID FROM listings ORDER BY RANDOM() LIMIT 10");
+$listingIds = $listingStmt->fetchAll(PDO::FETCH_COLUMN);
+
+$transactionStmt = $pdo->query("SELECT Transaction_ID FROM transactions ORDER BY RANDOM() LIMIT 10");
+$transactionIds = $transactionStmt->fetchAll(PDO::FETCH_COLUMN);
+
+if (empty($userIds) || empty($listingIds) || empty($transactionIds)) {
+    echo "⚠️  Cannot seed purchase_history: Missing users, listings, or transactions data\n";
+    $purchaseHistoryInserted = 0;
+} else {
+    $purchaseHistoryInserted = seedTable(
+        $pdo,
+        'purchase_history',
+        'purchase_history.staticData.php',
+        'INSERT INTO purchase_history (User_ID, Listing_ID, Transaction_ID, Quantity, Price_Each, Total_Price, Purchase_Date, Payment_Method, Delivery_Status, Notes)
+         VALUES (:user_id, :listing_id, :transaction_id, :quantity, :price_each, :total_price, :purchase_date, :payment_method, :delivery_status, :notes)',
+        function($purchaseItem) use ($userIds, $listingIds, $transactionIds) {
+            return [
+                ':user_id' => $userIds[array_rand($userIds)],
+                ':listing_id' => $listingIds[array_rand($listingIds)],
+                ':transaction_id' => $transactionIds[array_rand($transactionIds)],
+                ':quantity' => $purchaseItem['Quantity'],
+                ':price_each' => $purchaseItem['Price_Each'],
+                ':total_price' => $purchaseItem['Total_Price'],
+                ':purchase_date' => $purchaseItem['Purchase_Date'],
+                ':payment_method' => $purchaseItem['Payment_Method'],
+                ':delivery_status' => $purchaseItem['Delivery_Status'],
+                ':notes' => $purchaseItem['Notes']
+            ];
+        }
+    );
+}
+$totalInserted += $purchaseHistoryInserted;
+
 // ---- 🔍 Verify Seeding Results ----
 echo "\n🔍 Verifying seeding results...\n";
 
-$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions', 'cart'];
+$expectedTables = ['users', 'categories', 'listings', 'transactions', 'cart', 'purchase_history'];
 $totalRecords = 0;
 
 foreach ($expectedTables as $table) {
