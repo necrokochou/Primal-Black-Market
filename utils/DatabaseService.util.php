@@ -386,23 +386,72 @@ class DatabaseService
     }
 
 
-    // Permanently delete a listing by ID
+    // Permanently delete a listing by ID (used by admin dashboard)
     public function deleteListing($listingId)
     {
-        // Step 0: Delete cart items referencing this listing
-        $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE \"Listing_ID\" = :id");
-        $stmtCart->bindValue(':id', $listingId);
-        $stmtCart->execute();
+        try {
+            // First check if listing has any transaction history
+            $txnCheckStmt = $this->pdo->prepare("SELECT COUNT(*) FROM transactions WHERE listing_id = ?");
+            $txnCheckStmt->execute([$listingId]);
+            $transactionCount = $txnCheckStmt->fetchColumn();
+            
+            if ($transactionCount > 0) {
+                throw new Exception("Cannot delete this product as it has associated transaction history. For data integrity and legal compliance, products with sales records cannot be permanently deleted.");
+            }
 
-        // Step 1: Delete transactions tied to this listing
-        $stmtTxn = $this->pdo->prepare("DELETE FROM transactions WHERE \"Listing_ID\" = :id");
-        $stmtTxn->bindValue(':id', $listingId);
-        $stmtTxn->execute();
+            // Check if listing exists before attempting deletion
+            $checkStmt = $this->pdo->prepare("SELECT listing_id FROM listings WHERE listing_id = ?");
+            $checkStmt->execute([$listingId]);
+            if (!$checkStmt->fetch()) {
+                throw new Exception("Product not found or has already been deleted.");
+            }
 
-        // Step 2: Delete the listing
-        $stmt = $this->pdo->prepare("DELETE FROM listings WHERE \"Listing_ID\" = :id");
-        $stmt->bindValue(':id', $listingId);
-        return $stmt->execute();
+            // Step 0: Delete cart items referencing this listing (try both column name formats)
+            try {
+                $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE listing_id = ?");
+                $stmtCart->execute([$listingId]);
+                error_log("Deleted " . $stmtCart->rowCount() . " cart entries for listing $listingId");
+            } catch (PDOException $e) {
+                // Try with quoted column name if unquoted fails
+                try {
+                    $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE \"listing_id\" = ?");
+                    $stmtCart->execute([$listingId]);
+                    error_log("Deleted " . $stmtCart->rowCount() . " cart entries for listing $listingId (quoted)");
+                } catch (PDOException $e2) {
+                    error_log("Cart cleanup failed for listing {$listingId}: " . $e2->getMessage());
+                    // Continue anyway - cart entries might not exist
+                }
+            }
+
+            // Step 1: Delete the listing itself
+            $stmt = $this->pdo->prepare("DELETE FROM listings WHERE listing_id = ?");
+            $result = $stmt->execute([$listingId]);
+            
+            if ($result && $stmt->rowCount() > 0) {
+                error_log("Successfully deleted listing $listingId");
+                return true;
+            } else {
+                error_log("Failed to delete listing $listingId - no rows affected");
+                return false;
+            }
+            
+        } catch (PDOException $e) {
+            error_log("PDO error deleting listing $listingId: " . $e->getMessage());
+            
+            // Handle specific foreign key constraint errors with user-friendly messages
+            if (strpos($e->getMessage(), 'foreign key constraint') !== false) {
+                if (strpos($e->getMessage(), 'transactions') !== false) {
+                    throw new Exception("Cannot delete this product as it has associated transaction records. Products with sales history must be preserved for business and legal compliance.");
+                } else {
+                    throw new Exception("Cannot delete this product as it has associated data that must be preserved. Please contact an administrator for assistance.");
+                }
+            }
+            
+            throw new Exception("Database error occurred while deleting product: " . $e->getMessage());
+        } catch (Exception $e) {
+            error_log("Error deleting listing $listingId: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     // Ban/Unban user functionality
