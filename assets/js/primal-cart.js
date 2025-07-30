@@ -488,8 +488,25 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.style.animation = 'fadeOut 0.3s ease-out';
             setTimeout(async () => {
                 document.body.removeChild(modal);
-                await renderCartEnhanced();
-                window.dispatchEvent(new Event('cartUpdated'));
+                
+                // Clear cart after successful checkout
+                try {
+                    await fetch('/handlers/cart.handler.php', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            action: 'clear'
+                        })
+                    });
+
+                    await renderCartEnhanced();
+                    window.dispatchEvent(new Event('cartUpdated'));
+                } catch (err) {
+                    console.error('Failed to clear cart after checkout:', err);
+                }
             }, 300);
         });
         

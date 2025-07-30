@@ -33,8 +33,11 @@ if (isset($_GET['success'])) {
     ];
 }
 
+require_once BASE_PATH . '/bootstrap.php';
+
 // Get user data from session
 $user = $_SESSION['user'];
+$userID = $user['user_id'];
 $username = $user['username'];
 $alias = $user['alias'] ?? $username;
 $email = $user['email'] ?? '';
@@ -43,12 +46,12 @@ $isVendor = $user['is_vendor'] ?? false;
 $isAdmin = $user['is_admin'] ?? false;
 // Get user's listings from database (if they are a vendor)
 $userListings = [];
+$purchaseHistory = [];
 if ($isVendor) {
     try {
-        require_once BASE_PATH . '/bootstrap.php';
         require_once UTILS_PATH . '/DatabaseService.util.php';
         $db = DatabaseService::getInstance()->getConnection();
-        
+
         // Get listings for this vendor
         $stmt = $db->prepare("
             SELECT listing_id, title, description, category, price, quantity, 
@@ -57,18 +60,49 @@ if ($isVendor) {
             WHERE vendor_id = :vendor_id 
             ORDER BY publish_date DESC
         ");
-        $stmt->execute(['vendor_id' => $user['user_id']]);
+        $stmt->execute(['vendor_id' => $userID]);
         $userListings = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        error_log("Found " . count($userListings) . " listings for vendor: " . $user['user_id']);
-        
-        // Debug: Log the first few listings
+
+        error_log("Found " . count($userListings) . " listings for vendor: " . $userID);
         if (!empty($userListings)) {
             error_log("Sample listing data: " . json_encode(array_slice($userListings, 0, 2)));
         }
+
+        // Get sales history for this vendor
+        $stmt = $db->prepare("
+            SELECT ph.*, l.title, l.item_image
+            FROM purchase_history ph
+            JOIN listings l ON ph.listing_id = l.listing_id
+            WHERE l.vendor_id = :vendor_id
+            ORDER BY ph.purchase_date DESC
+        ");
+        $stmt->execute(['vendor_id' => $userID]);
+        $purchaseHistory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     } catch (Exception $e) {
-        error_log("Database error getting user listings: " . $e->getMessage());
+        error_log("Database error (vendor data): " . $e->getMessage());
         $userListings = [];
+        $purchaseHistory = [];
+    }
+} else {
+    // Get purchase history for a regular user
+    try {
+        require_once UTILS_PATH . '/DatabaseService.util.php';
+        $db = DatabaseService::getInstance()->getConnection();
+
+        $stmt = $db->prepare("
+            SELECT ph.*, l.title, l.item_image
+            FROM purchase_history ph
+            JOIN listings l ON ph.listing_id = l.listing_id
+            WHERE ph.user_id = :user_id
+            ORDER BY ph.purchase_date DESC
+        ");
+        $stmt->execute(['user_id' => $userID]);
+        $purchaseHistory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch (Exception $e) {
+        error_log("Database error (user purchase history): " . $e->getMessage());
+        $purchaseHistory = [];
     }
 }
 
@@ -369,77 +403,33 @@ if ($isVendor && isset($_GET['debug'])) {
             </div>
         <?php endif; ?>
 
-        <?php if ($isVendor): ?>
-            <!-- Sales History Tab (Only for Vendors) -->
-            <div id="sales-history-content" class="tab-content">
-                <div class="section-header">
-                    <h2>
-                        <i class="fas fa-chart-line"></i> Sales History
-                    </h2>
-                    <div class="history-filters">
-                        <select id="sales-status-filter" class="filter-select">
-                            <option value="all">All Status</option>
-                            <option value="completed">Completed</option>
-                            <option value="processing">Processing</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                        <select id="sales-date-filter" class="filter-select">
-                            <option value="all">All Time</option>
-                            <option value="week">Last Week</option>
-                            <option value="month">Last Month</option>
-                            <option value="year">Last Year</option>
-                        </select>
-                        <button id="refresh-sales" class="primal-btn-secondary">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                    </div>
+        <!-- Purchase/Sales History Tab -->
+        <div id="history-content" class="tab-content">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-chart-line"></i>
+                    <?php echo $isVendor ? 'Sales History' : 'Purchase History'; ?>
+                </h2>
+                <div class="history-filters">
+                    <select id="status-filter" class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <select id="date-filter" class="filter-select">
+                        <option value="all">All Time</option>
+                        <option value="week">Last Week</option>
+                        <option value="month">Last Month</option>
+                        <option value="year">Last Year</option>
+                    </select>
                 </div>
-
-                <div class="sales-history-container primal-card">
-                    <div class="sales-summary">
-                        <h3><i class="fas fa-analytics"></i> Sales Summary</h3>
-                        <div class="sales-stats-grid">
-                            <div class="stat-item">
-                                <span class="stat-number" id="total-sales-count">0</span>
-                                <span class="stat-label">Total Sales</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-number" id="total-sales-revenue">$0.00</span>
-                                <span class="stat-label">Total Revenue</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-number" id="avg-order-value">$0.00</span>
-                                <span class="stat-label">Avg Order Value</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-number" id="recent-sales-count">0</span>
-                                <span class="stat-label">This Month</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="sales-history-list">
-                        <div class="sales-header">
-                            <h3><i class="fas fa-history"></i> Recent Sales</h3>
-                        </div>
-                        
-                        <div id="sales-loading" class="loading-spinner" style="display: none;">
-                            <i class="fas fa-spinner fa-spin"></i> Loading sales history...
-                        </div>
-                        
-                        <div id="sales-list">
-                            <!-- Dynamic sales content will be loaded here -->
-                        </div>
-                        
-                        <div id="no-sales" class="no-sales-state" style="display: none;">
-                            <i class="fas fa-chart-line"></i>
-                            <h3>No Sales Yet</h3>
-                            <p>Your sales history will appear here once customers purchase your products.</p>
-                            <a href="/pages/shop" class="primal-btn-primary">
-                                <i class="fas fa-store"></i> View My Products in Shop
-                            </a>
-                        </div>
-                    </div>
+            </div>
+            <div class="purchase-history-list primal-card">
+                <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
+                    <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No History Available</h3>
+                    <p><?php echo $isVendor ? 'Your sales history will appear here once you make your first sale.' : 'Your purchase history will appear here once you make your first purchase.'; ?></p>
                 </div>
             </div>
         <?php endif; ?>
