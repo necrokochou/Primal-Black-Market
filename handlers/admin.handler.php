@@ -1,12 +1,5 @@
 <?php
-// Start output buffering to capture any unwanted output
-ob_start();
-
-// Define flag to prevent bootstrap from cleaning output buffer
-define('KEEP_OUTPUT_BUFFER', true);
-
-// Include bootstrap first to set up all paths and constants
-require_once __DIR__ . '/../bootstrap.php';
+require_once BASE_PATH . '/../bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 
 session_start();
@@ -20,7 +13,8 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 // Only allow logged-in admin users
-if (!isset($_SESSION['user']) || !($_SESSION['user']['is_admin'] ?? false)) {
+$user = $_SESSION['user'] ?? null;
+if (!isset($user) || !($user['is_admin'] ?? false)) {
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
 }
@@ -45,7 +39,7 @@ try {
             error_log("Admin delete_user attempt - User ID: $userId, Session User: " . ($_SESSION['user']['user_id'] ?? 'null'));
 
             // Prevent self-deletion
-            if ($userId === ($_SESSION['user']['user_id'] ?? null)) {
+            if ($userId === ($_SESSION['user']['id'] ?? null)) {
                 $response['error'] = 'You cannot delete your own account while logged in.';
                 break;
             }

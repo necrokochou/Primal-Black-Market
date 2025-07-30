@@ -1,9 +1,7 @@
 <?php
 // Ensure bootstrap.php constants are available
-if (!defined('BASE_PATH')) {
-    throw new Exception('BASE_PATH not defined. Include bootstrap.php first.');
-}
-require_once BASE_PATH . '/utils/envSetter.util.php';
+require_once BASE_PATH . '/bootstrap.php';
+require_once UTILS_PATH . '/envSetter.util.php';
 class DatabaseService
 {
     private static $instance = null;

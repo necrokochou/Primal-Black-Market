@@ -27,10 +27,7 @@ try {
 // Function to clear all tables in correct order (reverse dependency order)
 function clearAllTables($pdo) {
     echo "\n🧹 Clearing all tables in correct order...\n";
-    
-    $clearOrder = ['purchase_history', 'cart', 'transactions', 'feedbacks', 'messages', 'listings', 'categories', 'users'];
-    // $clearOrder = ['transactions', 'feedbacks', 'messages', 'listings', 'categories', 'users'];
-    
+    $clearOrder = ['purchase_history', 'cart', 'transactions', 'listings', 'categories', 'users'];
     foreach ($clearOrder as $table) {
         try {
             $pdo->exec("DELETE FROM {$table}");
@@ -39,7 +36,7 @@ function clearAllTables($pdo) {
             echo "⚠️  Could not clear {$table}: " . $e->getMessage() . "\n";
         }
     }
-    
+
     echo "🧹 Table clearing complete!\n";
 }
 
@@ -53,20 +50,18 @@ function seedTable($pdo, $tableName, $staticDataFile, $insertSQL, $dataProcessor
         echo "⚠️  Static data file not found: {$staticDataFile}\n";
         return 0;
     }
-    
     $dummyData = require_once $dummyDataPath;
-    
+
     // Insert dummy data
     $insertStmt = $pdo->prepare($insertSQL);
-    
+
     $insertedCount = 0;
     $skippedCount = 0;
-    
+
     foreach ($dummyData as $item) {
         try {
             $processedData = $dataProcessor($item);
             $result = $insertStmt->execute($processedData);
-            
             if ($insertStmt->rowCount() > 0) {
                 $insertedCount++;
                 echo "✅ Inserted {$tableName} item successfully.\n";
@@ -79,7 +74,6 @@ function seedTable($pdo, $tableName, $staticDataFile, $insertSQL, $dataProcessor
             $skippedCount++;
         }
     }
-    
     echo "📊 {$tableName} seeding complete! {$insertedCount} items inserted, {$skippedCount} items skipped.\n";
     return $insertedCount;
 }
@@ -168,67 +162,7 @@ if (empty($userIds) || empty($categoryIds)) {
     );
 }
 $totalInserted += $listingsInserted;
-
-// 4. Feedback Data (Requires Users) - Based on feedbacks.model.sql structure
-echo "\n🌱 Seeding feedback with foreign key relationships...\n";
-
-// Get random users for reviewer and vendor relationships
-$userStmt = $pdo->query("SELECT User_ID FROM users ORDER BY RANDOM() LIMIT 10");
-$userIds = $userStmt->fetchAll(PDO::FETCH_COLUMN);
-
-if (empty($userIds)) {
-    echo "⚠️  Cannot seed feedback: Missing users data\n";
-    $feedbackInserted = 0;
-} else {
-    $feedbackInserted = seedTable(
-        $pdo,
-        'feedbacks',
-        'feedbacks.staticData.php',
-        'INSERT INTO feedbacks (Reviewer_ID, Vendor_ID, Rating, Comments, Posted_At)
-         VALUES (:reviewer_id, :vendor_id, :rating, :comments, :posted_at)',
-        function($feedbacks) use ($userIds) {
-            return [
-                ':reviewer_id' => $userIds[array_rand($userIds)],
-                ':vendor_id' => $userIds[array_rand($userIds)],
-                ':rating' => $feedbacks['Rating'],
-                ':comments' => $feedbacks['Comments'],
-                ':posted_at' => $feedbacks['PostedAt']
-            ];
-        }
-    );
-}
-$totalInserted += $feedbackInserted;
-
-// 5. Messages Data (Requires Users) - Based on messages.model.sql structure
-echo "\n🌱 Seeding messages with foreign key relationships...\n";
-
-// Get random users for sender and receiver relationships
-$userStmt = $pdo->query("SELECT User_ID FROM users ORDER BY RANDOM() LIMIT 10");
-$userIds = $userStmt->fetchAll(PDO::FETCH_COLUMN);
-
-if (empty($userIds)) {
-    echo "⚠️  Cannot seed messages: Missing users data\n";
-    $messagesInserted = 0;
-} else {
-    $messagesInserted = seedTable(
-        $pdo,
-        'messages',
-        'messages.staticData.php',
-        'INSERT INTO messages (Sender_ID, Receiver_ID, Messages_Content, Sent_At)
-         VALUES (:sender_id, :receiver_id, :messages_content, :sent_at)',
-        function($message) use ($userIds) {
-            return [
-                ':sender_id' => $userIds[array_rand($userIds)],
-                ':receiver_id' => $userIds[array_rand($userIds)],
-                ':messages_content' => $message['MessagesContent'],
-                ':sent_at' => $message['SentAt']
-            ];
-        }
-    );
-}
-$totalInserted += $messagesInserted;
-
-// 6. Transactions Data (Requires Users & Listings) - Based on transactions.model.sql structure
+// 4. Transactions Data (Requires Users & Listings) - Based on transactions.model.sql structure
 echo "\n🌱 Seeding transactions with foreign key relationships...\n";
 
 // Get random users and listings for foreign key relationships
@@ -262,7 +196,7 @@ if (empty($userIds) || empty($listingIds)) {
 }
 $totalInserted += $transactionsInserted;
 
-// 7. Cart Data (Requires Users & Listings) - Based on cart.model.sql structure
+// 5. Cart Data (Requires Users & Listings) - Based on cart.model.sql structure
 echo "\n🌱 Seeding cart with foreign key relationships...\n";
 
 // Get random users and listings for foreign key relationships
@@ -338,8 +272,7 @@ $totalInserted += $purchaseHistoryInserted;
 // ---- 🔍 Verify Seeding Results ----
 echo "\n🔍 Verifying seeding results...\n";
 
-$expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions', 'cart', 'purchase_history'];
-// $expectedTables = ['users', 'categories', 'listings', 'feedbacks', 'messages', 'transactions'];
+$expectedTables = ['users', 'categories', 'listings', 'transactions', 'cart', 'purchase_history'];
 $totalRecords = 0;
 
 foreach ($expectedTables as $table) {

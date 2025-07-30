@@ -1,4 +1,5 @@
 <?php
+
 /**
  * products.handler.php
  *
@@ -38,8 +39,8 @@ if (session_status() === PHP_SESSION_NONE) {
 ob_clean();
 
 // Detect if this is an AJAX request or regular form submission
-$isAjaxRequest = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && 
-                 strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+$isAjaxRequest = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+    strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
 
 // Only set JSON header for AJAX requests
 if ($isAjaxRequest) {
@@ -97,11 +98,11 @@ function sendResponse(array $response, bool $isAjaxRequest): void
     } else {
         // Regular form submission - redirect based on success/failure
         $redirectTo = $_POST['redirect_to'] ?? '/pages/account/index.php';
-        
+
         if ($response['success']) {
             // Success - redirect to account page with success message
             $message = urlencode($response['message'] ?? 'Operation completed successfully');
-            
+
             // Check if redirectTo already has query parameters
             if (strpos($redirectTo, '?') !== false) {
                 // Already has query parameters, use & to append
@@ -110,9 +111,9 @@ function sendResponse(array $response, bool $isAjaxRequest): void
                 // No query parameters, use ? to start
                 $redirectUrl = $redirectTo . '?success=' . $message;
             }
-            
+
             error_log("✅ SUCCESS: Redirecting to {$redirectUrl}");
-            
+
             if (!headers_sent()) {
                 header("Location: {$redirectUrl}");
                 exit;
@@ -125,7 +126,7 @@ function sendResponse(array $response, bool $isAjaxRequest): void
         } else {
             // Failure - redirect back with error message
             $message = urlencode($response['message'] ?? 'An error occurred');
-            
+
             // Check if redirectTo already has query parameters
             if (strpos($redirectTo, '?') !== false) {
                 // Already has query parameters, use & to append
@@ -134,9 +135,9 @@ function sendResponse(array $response, bool $isAjaxRequest): void
                 // No query parameters, use ? to start
                 $redirectUrl = $redirectTo . '?error=' . $message;
             }
-            
+
             error_log("❌ ERROR: Redirecting to {$redirectUrl}");
-            
+
             if (!headers_sent()) {
                 header("Location: {$redirectUrl}");
                 exit;
@@ -186,7 +187,7 @@ try {
                 // FALLBACK: If no action is specified but we have POST data, try to determine intent
                 $hasId = !empty($_POST['id']);
                 error_log("⚠️ No action specified. Has ID: " . ($hasId ? 'YES' : 'NO'));
-                
+
                 if ($hasId) {
                     error_log("🔄 FALLBACK: Treating as UPDATE");
                     $result = updateProduct($db, $userId);
@@ -239,7 +240,7 @@ function createProduct(PDO $db, string $vendorId): array
 {
     error_log("🆕 Creating new product for vendor: {$vendorId}");
     error_log("📊 Raw POST data: " . json_encode($_POST));
-    
+
     // Expect multipart/form-data
     $title        = trim($_POST['title'] ?? '');
     $description  = trim($_POST['description'] ?? '');
@@ -247,13 +248,13 @@ function createProduct(PDO $db, string $vendorId): array
     $price        = $_POST['price'] ?? null;
     $quantity     = $_POST['stock'] ?? $_POST['quantity'] ?? null; // your JS used "stock"
     $categoriesId = $_POST['categories_id'] ?? null; // you can pass it; else resolve from "category"
-    
+
     // Fix boolean handling for status - default to active if not provided or empty
     $statusValue = $_POST['status'] ?? 'active';
     $status = ($statusValue === 'active' || $statusValue === '1' || $statusValue === 'true' || empty($statusValue));
-    
+
     $publishDate  = date('Y-m-d'); // now
-    
+
     // Log received data for debugging
     error_log("📋 Parsed product data:");
     error_log("- Title: '{$title}' (length: " . strlen($title) . ")");
@@ -318,14 +319,14 @@ function createProduct(PDO $db, string $vendorId): array
             error_log("✅ Category resolved successfully: '{$category}' -> {$categoriesId}");
         } catch (Exception $e) {
             error_log("❌ Category resolution failed for '{$category}': " . $e->getMessage());
-            
+
             // Enhanced fallback logic with better error handling
             try {
                 $categoriesId = getDefaultCategoryId($db);
                 error_log("✅ Using fallback category ID: {$categoriesId}");
             } catch (Exception $fallbackError) {
                 error_log("❌ Fallback category also failed: " . $fallbackError->getMessage());
-                
+
                 // Final attempt: Check if any categories exist at all
                 $categoryCount = $db->query("SELECT COUNT(*) FROM categories")->fetchColumn();
                 if ($categoryCount == 0) {
@@ -338,7 +339,7 @@ function createProduct(PDO $db, string $vendorId): array
     }
 
     error_log("✅ Attempting to insert product into database...");
-    
+
     $sql = "INSERT INTO listings (vendor_id, categories_id, title, description, category, price, quantity, is_active, publish_date, item_image)
             VALUES (:vendor, :cat_id, :title, :description, :category, :price, :quantity, :active, :publish_date, :item_image)
             RETURNING listing_id";
@@ -358,7 +359,7 @@ function createProduct(PDO $db, string $vendorId): array
     ]);
 
     $id = $stmt->fetchColumn();
-    
+
     error_log("🎉 Product created successfully with ID: {$id}");
 
     return [
@@ -436,7 +437,7 @@ function listProducts(PDO $db, string $vendorId): array
         'page'      => $page,
         'limit'     => $limit,
         'total'     => $total,
-        'totalPages'=> (int)ceil($total / $limit),
+        'totalPages' => (int)ceil($total / $limit),
     ];
 }
 
@@ -474,15 +475,36 @@ function updateProduct(PDO $db, string $vendorId): array
     $fields = [];
     $params = ['id' => $id];
 
-    if ($title !== '')         { $fields[] = "title = :title";                $params['title']        = $title; }
-    if ($description !== '')   { $fields[] = "description = :description";    $params['description']  = $description; }
-    if ($category !== '')      { $fields[] = "category = :category";          $params['category']     = $category; }
-    if ($categoriesId !== null){ $fields[] = "categories_id = :categories_id";$params['categories_id']= $categoriesId; }
-    if ($price !== null)       { if (!is_numeric($price)) throw new Exception('Invalid price');
-                                 $fields[] = "price = :price";                $params['price']        = (float)$price; }
-    if ($quantity !== null)    { if (!is_numeric($quantity)) throw new Exception('Invalid quantity');
-                                 $fields[] = "quantity = :quantity";          $params['quantity']     = (int)$quantity; }
-    if ($isActive !== null)    { $fields[] = "is_active = :active";           $params['active']       = $isActive; }
+    if ($title !== '') {
+        $fields[] = "title = :title";
+        $params['title']        = $title;
+    }
+    if ($description !== '') {
+        $fields[] = "description = :description";
+        $params['description']  = $description;
+    }
+    if ($category !== '') {
+        $fields[] = "category = :category";
+        $params['category']     = $category;
+    }
+    if ($categoriesId !== null) {
+        $fields[] = "categories_id = :categories_id";
+        $params['categories_id'] = $categoriesId;
+    }
+    if ($price !== null) {
+        if (!is_numeric($price)) throw new Exception('Invalid price');
+        $fields[] = "price = :price";
+        $params['price']        = (float)$price;
+    }
+    if ($quantity !== null) {
+        if (!is_numeric($quantity)) throw new Exception('Invalid quantity');
+        $fields[] = "quantity = :quantity";
+        $params['quantity']     = (int)$quantity;
+    }
+    if ($isActive !== null) {
+        $fields[] = "is_active = :active";
+        $params['active']       = $isActive;
+    }
 
     // Handle new image upload
     $newImage = handleImageUpload($vendorId, true);
@@ -548,7 +570,6 @@ function deleteProduct(PDO $db, string $id, string $vendorId): array
         }
 
         return ['success' => true, 'message' => 'Product and image deleted successfully'];
-
     } catch (Exception $e) {
         $db->rollBack();
         error_log("Error deleting product {$id}: " . $e->getMessage());
@@ -696,7 +717,6 @@ function handleImageUpload(string $vendorId, bool $optional = false): ?string
 
     // Robust directory setup with multiple fallbacks
     $uploadsDir = BASE_PATH . '/assets/images/user-uploads';
-    
     // Ensure the base upload directory exists
     if (!is_dir($uploadsDir)) {
         error_log("Creating user-uploads directory: {$uploadsDir}");
@@ -710,14 +730,14 @@ function handleImageUpload(string $vendorId, bool $optional = false): ?string
         } else {
             // Set proper permissions
             chmod($uploadsDir, 0755);
-            
+
             // Create security .htaccess file
             $htaccessPath = $uploadsDir . '/.htaccess';
             if (!file_exists($htaccessPath)) {
                 $htaccessContent = "# Prevent execution of uploaded PHP files\n<Files *.php>\n    Deny from all\n</Files>\n<Files *.phtml>\n    Deny from all\n</Files>\n";
                 file_put_contents($htaccessPath, $htaccessContent);
             }
-            
+
             error_log("Successfully created user-uploads directory: {$uploadsDir}");
         }
     }
@@ -735,22 +755,22 @@ function handleImageUpload(string $vendorId, bool $optional = false): ?string
     // Create vendor-specific subdirectory with proper error handling
     $vendorPrefix = 'vendor-' . substr($vendorId, 0, 8);
     $vendorDir = $uploadsDir . '/' . $vendorPrefix;
-    
+
     if (!is_dir($vendorDir)) {
         error_log("Creating vendor directory: {$vendorDir}");
         if (!mkdir($vendorDir, 0755, true)) {
             error_log("Could not create vendor directory: {$vendorDir}");
             // Fallback: use main uploads directory with vendor prefix in filename
             $dest = $uploadsDir . '/' . $vendorPrefix . '-' . $name;
-            
+
             error_log("Using fallback upload path: {$dest}");
-            
+
             // Final safety check before moving file
             if (!is_uploaded_file($fileArray['tmp_name'])) {
                 error_log("Security check failed: File was not uploaded via HTTP POST");
                 throw new Exception('Security check failed: Invalid upload');
             }
-            
+
             if (!move_uploaded_file($fileArray['tmp_name'], $dest)) {
                 error_log("Failed to move uploaded file from {$fileArray['tmp_name']} to {$dest}");
                 error_log("Source file exists: " . (file_exists($fileArray['tmp_name']) ? 'yes' : 'no'));
@@ -758,13 +778,13 @@ function handleImageUpload(string $vendorId, bool $optional = false): ?string
                 error_log("Destination directory permissions: " . substr(sprintf('%o', fileperms($uploadsDir)), -4));
                 throw new Exception('Failed to move uploaded image to fallback location');
             }
-            
+
             // Return relative path for direct upload
             $relative = "/assets/images/user-uploads/" . $vendorPrefix . '-' . $name;
             if (strpos($uploadsDir, 'user-uploads') === false) {
                 $relative = "/assets/images/" . $vendorPrefix . '-' . $name;
             }
-            
+
             error_log("Image uploaded successfully (fallback): {$dest} -> {$relative}");
             return $relative;
         } else {
@@ -804,7 +824,7 @@ function handleImageUpload(string $vendorId, bool $optional = false): ?string
     } else {
         $relative = "/assets/images/" . $vendorPrefix . '/' . $name;
     }
-    
+
     error_log("Image uploaded successfully: $dest -> $relative");
     return $relative;
 }
@@ -816,30 +836,30 @@ function handleImageUpload(string $vendorId, bool $optional = false): ?string
 function getDefaultCategoryId(PDO $db): string
 {
     error_log("🔄 Getting default category ID...");
-    
+
     // Try to get "General Equipment" as the most generic category
     $preferredDefaults = ['General Equipment', 'Other', 'Miscellaneous', 'General'];
-    
+
     foreach ($preferredDefaults as $preferred) {
         $stmt = $db->prepare("SELECT categories_id FROM categories WHERE LOWER(name) = LOWER(:name) LIMIT 1");
         $stmt->execute(['name' => $preferred]);
         $id = $stmt->fetchColumn();
-        
+
         if ($id) {
             error_log("✅ Using preferred default category: '{$preferred}' -> {$id}");
             return $id;
         }
     }
-    
+
     // If no preferred default found, get the first available category
     $stmt = $db->query("SELECT categories_id, name FROM categories ORDER BY name LIMIT 1");
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$result) {
         error_log("💥 CRITICAL: No categories exist in database at all!");
         throw new Exception('No categories available. Database needs to be seeded with categories.');
     }
-    
+
     error_log("✅ Using first available category as default: '{$result['name']}' -> {$result['categories_id']}");
     return $result['categories_id'];
 }
@@ -847,26 +867,26 @@ function getDefaultCategoryId(PDO $db): string
 function resolveCategoryIdByName(PDO $db, string $categoryName): string
 {
     error_log("🔍 Resolving category: '{$categoryName}'");
-    
+
     // Look up category ID by exact name match
     $stmt = $db->prepare("SELECT categories_id FROM categories WHERE LOWER(name) = LOWER(:name) LIMIT 1");
     $stmt->execute(['name' => trim($categoryName)]);
     $id = $stmt->fetchColumn();
-    
+
     if (!$id) {
         // Enhanced debugging: Log all available categories
         error_log("❌ Category '{$categoryName}' not found. Checking available categories...");
-        
+
         $availableStmt = $db->query("SELECT name FROM categories ORDER BY name");
         $available = $availableStmt->fetchAll(PDO::FETCH_COLUMN);
-        
+
         if (empty($available)) {
             error_log("💥 CRITICAL: No categories exist in database at all!");
             throw new Exception("No categories exist in database. Database may need to be seeded.");
         } else {
             error_log("📋 Available categories (" . count($available) . "): " . implode(', ', $available));
             error_log("🔍 Requested category: '{$categoryName}'");
-            
+
             // Try to find similar category names
             $similar = [];
             foreach ($available as $availableCat) {
@@ -874,7 +894,7 @@ function resolveCategoryIdByName(PDO $db, string $categoryName): string
                     $similar[] = $availableCat;
                 }
             }
-            
+
             if (!empty($similar)) {
                 error_log("🎯 Similar categories found: " . implode(', ', $similar));
                 throw new Exception("Category '{$categoryName}' not found. Did you mean: " . implode(', ', $similar) . "?");
@@ -883,7 +903,7 @@ function resolveCategoryIdByName(PDO $db, string $categoryName): string
             }
         }
     }
-    
+
     error_log("✅ Category resolved successfully: '{$categoryName}' -> {$id}");
     return $id;
 }
