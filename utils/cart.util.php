@@ -1,13 +1,16 @@
 <?php
+require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/dbConnect.util.php';
 require_once UTILS_PATH . '/auth.util.php';
 
-class CartHandler {
+class CartHandler
+{
     private PDO $pdo;
     private \App\Utils\Auth $auth;
     private ?string $userID;
 
-    public function __construct() {
+    public function __construct()
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -29,7 +32,8 @@ class CartHandler {
         }
     }
 
-    public function getCart(): array {
+    public function getCart(): array
+    {
         $stmt = $this->pdo->prepare("
             SELECT c.Cart_ID, c.Listing_ID, c.Quantity,
                 l.Title AS title, l.Price AS unit_price, l.Item_Image
@@ -41,7 +45,8 @@ class CartHandler {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function addToCart($listingID, $quantity) {
+    public function addToCart($listingID, $quantity)
+    {
         $stmt = $this->pdo->prepare("
             SELECT Quantity FROM cart
             WHERE User_ID = :userID AND Listing_ID = :listingID
@@ -72,7 +77,8 @@ class CartHandler {
         }
     }
 
-    public function updateItem($cartID, $quantity) {
+    public function updateItem($cartID, $quantity)
+    {
         $stmt = $this->pdo->prepare("
             UPDATE cart SET Quantity = :quantity
             WHERE Cart_ID = :cartID AND User_ID = :userID
@@ -84,7 +90,8 @@ class CartHandler {
         ]);
     }
 
-    public function removeItem($cartID) {
+    public function removeItem($cartID)
+    {
         $stmt = $this->pdo->prepare("
             DELETE FROM cart WHERE Cart_ID = :cartID AND User_ID = :userID
         ");
@@ -94,12 +101,14 @@ class CartHandler {
         ]);
     }
 
-    public function clearCart($userId) {
+    public function clearCart($userId)
+    {
         $stmt = $this->pdo->prepare("DELETE FROM cart WHERE user_id = :user_id");
         $stmt->execute(['user_id' => $userId]);
     }
 
-    public function getCartCount($userID) {
+    public function getCartCount($userID)
+    {
         $stmt = $this->pdo->prepare("
             SELECT COALESCE(SUM(Quantity), 0) AS total
             FROM cart WHERE User_ID = :uid
