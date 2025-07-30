@@ -7,8 +7,9 @@ require_once UTILS_PATH . '/envSetter.util.php';
 // require_once HANDLERS_PATH . '/mongodbChecker.handler.php';
 // require_once HANDLERS_PATH . '/postgresChecker.handler.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
-require_once __DIR__ . '/layouts/header.php';
-require_once __DIR__ . '/utils/productCard.util.php';
+require_once BASE_PATH . '/bootstrap.php';
+require_once LAYOUTS_PATH . '/header.php';
+require_once UTILS_PATH . '/productCard.util.php';
 
 try {
     $db = DatabaseService::getInstance();
@@ -131,5 +132,5 @@ try {
 <!-- Primal Body Interactions -->
 <script src="/assets/js/primal-body.js"></script>
 
-<?php require_once __DIR__ . '/layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>
 

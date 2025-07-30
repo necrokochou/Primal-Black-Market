@@ -9,7 +9,8 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-require_once __DIR__ . '/../../layouts/header.php';
+require_once BASE_PATH . '/bootstrap.php';
+require_once LAYOUTS_PATH . '/header.php';
 ?>
 
 <!-- Cart Page Specific Styles -->
@@ -33,21 +34,10 @@ require_once __DIR__ . '/../../layouts/header.php';
     </div>
     <aside class="cart-summary primal-card">
       <h2 class="cart-summary-title">Order Summary</h2>
-      <div class="cart-summary-row">
-        <input type="text" id="cart-voucher" class="cart-voucher-input" placeholder="Enter discount code">
-        <button class="primal-btn-primary cart-voucher-btn">
-          <i class="fas fa-tag" style="margin-right: 0.3rem;"></i>
-          Apply
-        </button>
-      </div>
       <div class="cart-summary-list">
         <div class="cart-summary-item">
           <span><i class="fas fa-calculator" style="margin-right: 0.5rem; color: var(--primal-orange);"></i>Sub Total</span>
           <span id="cart-subtotal">$0.00</span>
-        </div>
-        <div class="cart-summary-item">
-          <span><i class="fas fa-percent" style="margin-right: 0.5rem; color: var(--primal-green);"></i>Discount (10%)</span>
-          <span id="cart-discount">-$0.00</span>
         </div>
         <div class="cart-summary-item">
           <span><i class="fas fa-truck" style="margin-right: 0.5rem; color: var(--primal-brown);"></i>Delivery Fee</span>
@@ -73,4 +63,4 @@ require_once __DIR__ . '/../../layouts/header.php';
 <!-- Cart Page JavaScript -->
 <script src="/assets/js/primal-cart.js"></script>
 
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>

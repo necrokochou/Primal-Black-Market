@@ -1,10 +1,20 @@
 /**
  * PRIMAL BLACK MARKET - USER ACCOUNT FUNCTIONALITY
- * Includes tab navigation, logout, and account settings (alias, email, password, delete)
+ * Includes tab navigation, logout, purchase history, and account settings
  */
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeAccount();
+  handleTabSwitching();
+  loadPurchaseHistory();
+  
+  // Load sales history for vendors
+  if (window.accountPageData?.isVendor) {
+    loadSalesHistory();
+  }
+  
+  setupRefreshButton();
+  setupNotificationAutoHide();
 });
 
 function initializeAccount() {
@@ -12,6 +22,333 @@ function initializeAccount() {
   setupLogout();
   setupAccountSettings();
   console.log("🔐 Primal Account initialized");
+}
+
+// ===============================
+// Tab Switching and URL Parameters
+// ===============================
+function handleTabSwitching() {
+  // Check for tab parameter in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetTab = urlParams.get('tab');
+  
+  if (targetTab) {
+    console.log('Auto-switching to tab:', targetTab);
+    
+    // Find and activate the specified tab
+    const tabButton = document.querySelector(`[data-tab="${targetTab}"]`);
+    const tabContent = document.getElementById(`${targetTab}-content`);
+    
+    if (tabButton && tabContent) {
+      // Deactivate all tabs first
+      document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      // Activate the target tab
+      tabButton.classList.add('active');
+      tabContent.classList.add('active');
+      
+      console.log('Successfully switched to tab:', targetTab);
+      
+      // Clean up URL parameter after switching
+      const url = new URL(window.location);
+      url.searchParams.delete('tab');
+      // Keep success/error parameters for the notification system
+      window.history.replaceState({}, document.title, url.pathname + (url.search || ''));
+    } else {
+      console.warn('Tab not found:', targetTab);
+    }
+  }
+}
+
+// ===============================
+// Purchase History Loading
+// ===============================
+async function loadPurchaseHistory() {
+  // Check if user is vendor - this will be set by PHP
+  const isVendor = window.accountPageData?.isVendor || false;
+  const loadingDiv = document.getElementById('purchase-loading');
+  const listDiv = document.getElementById('purchase-list');
+  const noDataDiv = document.getElementById('no-purchases');
+  
+  if (loadingDiv) loadingDiv.style.display = 'block';
+  if (listDiv) listDiv.innerHTML = '';
+  if (noDataDiv) noDataDiv.style.display = 'none';
+  
+  try {
+    const action = isVendor ? 'get_sales' : 'get_purchases';
+    const params = new URLSearchParams();
+    params.append('action', action);
+    
+    const response = await fetch('/handlers/purchase.handler.php?' + params.toString(), {
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    const data = await response.json();
+    
+    if (loadingDiv) loadingDiv.style.display = 'none';
+    
+    if (data.success) {
+      const items = isVendor ? data.sales : data.purchases;
+      
+      if (items && items.length > 0) {
+        if (noDataDiv) noDataDiv.style.display = 'none';
+        
+        // Render purchase/sales history
+        if (listDiv) {
+          listDiv.innerHTML = items.map((item, index) => {
+            const date = new Date(item.purchase_date).toLocaleDateString();
+            const imageSrc = item.product_image ? '/assets/images/' + item.product_image.replace(/^\/assets\/images\//, '') : '/assets/images/example.png';
+            const statusClass = item.delivery_status === 'Delivered' ? 'delivered' : 'processed';
+            
+            return `
+              <div class="history-item">
+                <img src="${imageSrc}" alt="${item.product_title}">
+                <div style="flex: 1;">
+                  <h4>${item.product_title}</h4>
+                  <div class="history-item-details">
+                    <span class="history-meta-item">
+                      <i class="fas fa-calendar"></i> ${date}
+                    </span>
+                    <span class="history-meta-item">
+                      <i class="fas fa-tag"></i> ${item.product_category}
+                    </span>
+                    <span class="history-meta-item">
+                      <i class="fas fa-boxes"></i> Qty: ${item.quantity}
+                    </span>
+                  </div>
+                  <div class="history-item-meta">
+                    <span class="history-price">
+                      $${parseFloat(item.total_price).toFixed(2)}
+                    </span>
+                    <span class="history-status ${statusClass}">
+                      ${item.delivery_status || 'Processed'}
+                    </span>
+                    ${isVendor ? `<span class="history-meta-item">
+                      <i class="fas fa-user"></i> ${item.buyer_name}
+                    </span>` : ''}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      } else {
+        if (noDataDiv) noDataDiv.style.display = 'block';
+      }
+    } else {
+      console.error('Failed to load purchase history:', data.error);
+      if (noDataDiv) noDataDiv.style.display = 'block';
+    }
+  } catch (error) {
+    console.error('Error loading purchase history:', error);
+    if (loadingDiv) loadingDiv.style.display = 'none';
+    if (noDataDiv) noDataDiv.style.display = 'block';
+  }
+}
+
+// Setup refresh button
+function setupRefreshButton() {
+  const refreshBtn = document.getElementById('refresh-purchases');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', function() {
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+      loadPurchaseHistory().finally(() => {
+        this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+      });
+    });
+  }
+
+  // Setup sales refresh button for vendors
+  const salesRefreshBtn = document.getElementById('refresh-sales');
+  if (salesRefreshBtn) {
+    salesRefreshBtn.addEventListener('click', function() {
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+      loadSalesHistory().finally(() => {
+        this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+      });
+    });
+  }
+}
+
+// ===============================
+// Sales History Loading (for Vendors)
+// ===============================
+async function loadSalesHistory() {
+  if (!window.accountPageData?.isVendor) return;
+
+  const loadingDiv = document.getElementById('sales-loading');
+  const salesList = document.getElementById('sales-list');
+  const noSalesDiv = document.getElementById('no-sales');
+
+  if (loadingDiv) loadingDiv.style.display = 'block';
+  if (salesList) salesList.innerHTML = '';
+  if (noSalesDiv) noSalesDiv.style.display = 'none';
+
+  try {
+    const response = await fetch('/handlers/transaction.handler.php', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'action=get_sales_history'
+    });
+
+    const data = await response.json();
+
+    if (data.success && data.sales && data.sales.length > 0) {
+      updateSalesStats(data.sales);
+      renderSalesHistory(data.sales);
+    } else if (data.success && data.sales?.length === 0) {
+      showNoSalesState();
+    } else {
+      console.error('Failed to load sales history:', data.error);
+      showNoSalesState();
+    }
+  } catch (error) {
+    console.error('Error loading sales history:', error);
+    showNoSalesState();
+  } finally {
+    if (loadingDiv) loadingDiv.style.display = 'none';
+  }
+}
+
+function updateSalesStats(sales) {
+  const totalSalesCount = document.getElementById('total-sales-count');
+  const totalSalesRevenue = document.getElementById('total-sales-revenue');
+  const avgOrderValue = document.getElementById('avg-order-value');
+  const recentSalesCount = document.getElementById('recent-sales-count');
+
+  if (totalSalesCount) totalSalesCount.textContent = sales.length;
+
+  const totalRevenue = sales.reduce((sum, sale) => sum + parseFloat(sale.total_price || 0), 0);
+  if (totalSalesRevenue) totalSalesRevenue.textContent = `$${totalRevenue.toFixed(2)}`;
+
+  const avgValue = sales.length > 0 ? totalRevenue / sales.length : 0;
+  if (avgOrderValue) avgOrderValue.textContent = `$${avgValue.toFixed(2)}`;
+
+  // Recent sales (this month)
+  const thisMonth = new Date();
+  thisMonth.setDate(1);
+  const recentSales = sales.filter(sale => new Date(sale.purchase_date) >= thisMonth);
+  if (recentSalesCount) recentSalesCount.textContent = recentSales.length;
+}
+
+function renderSalesHistory(sales) {
+  const salesList = document.getElementById('sales-list');
+  if (!salesList) return;
+
+  const salesHTML = sales.map(sale => {
+    const purchaseDate = new Date(sale.purchase_date).toLocaleDateString();
+    const statusClass = getStatusClass(sale.delivery_status);
+    
+    return `
+      <div class="history-item sales-item">
+        <div class="sale-image">
+          <img src="${sale.item_image || '/assets/images/example.png'}" 
+               alt="${sale.product_title}" loading="lazy">
+        </div>
+        <div class="history-item-details">
+          <div>
+            <h4>${sale.product_title}</h4>
+            <div class="history-item-meta">
+              <span class="history-meta-item">
+                <i class="fas fa-user"></i> Buyer: ${sale.buyer_name}
+              </span>
+              <span class="history-meta-item">
+                <i class="fas fa-calendar"></i> ${purchaseDate}
+              </span>
+              <span class="history-meta-item">
+                <i class="fas fa-credit-card"></i> ${sale.payment_method}
+              </span>
+              <span class="history-meta-item">
+                <i class="fas fa-hashtag"></i> ${sale.transaction_id.substring(0, 8)}...
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="history-item-actions">
+          <span class="history-price">
+            $${parseFloat(sale.total_price).toFixed(2)}
+          </span>
+          <span class="history-meta-item">
+            Qty: ${sale.quantity}
+          </span>
+          <span class="history-status ${statusClass}">
+            ${sale.delivery_status}
+          </span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  salesList.innerHTML = salesHTML;
+}
+
+function getStatusClass(status) {
+  switch (status?.toLowerCase()) {
+    case 'completed':
+    case 'delivered':
+      return 'delivered';
+    case 'processed':
+    case 'pending':
+      return 'processed';
+    case 'shipped':
+    case 'in transit':
+      return 'shipped';
+    case 'cancelled':
+    case 'canceled':
+      return 'cancelled';
+    case 'refunded':
+      return 'refunded';
+    default:
+      return 'processed'; // Default to processed style
+  }
+}
+
+function showNoSalesState() {
+  const salesList = document.getElementById('sales-list');
+  const noSalesDiv = document.getElementById('no-sales');
+  const loadingDiv = document.getElementById('sales-loading');
+
+  if (salesList) salesList.innerHTML = '';
+  if (loadingDiv) loadingDiv.style.display = 'none';
+  if (noSalesDiv) noSalesDiv.style.display = 'block';
+
+  // Reset stats to zero
+  ['total-sales-count', 'recent-sales-count'].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = '0';
+  });
+  
+  ['total-sales-revenue', 'avg-order-value'].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = '$0.00';
+  });
+}
+
+// ===============================
+// Notification Auto-Hide
+// ===============================
+function setupNotificationAutoHide() {
+  // Auto-hide notification after 5 seconds
+  setTimeout(() => {
+    const notification = document.getElementById('url-notification');
+    if (notification) {
+      notification.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => notification.remove(), 300);
+    }
+  }, 5000);
+  
+  // Clean up URL parameters after showing notification
+  setTimeout(() => {
+    if (window.history && window.history.replaceState) {
+      const url = new URL(window.location);
+      url.searchParams.delete('success');
+      url.searchParams.delete('error');
+      window.history.replaceState({}, document.title, url.pathname + (url.search || ''));
+    }
+  }, 100);
 }
 
 // ===============================
@@ -130,6 +467,14 @@ function setupTabNavigation() {
       const activeSection = document.getElementById(`${targetTab}-content`);
       if (activeSection) {
         activeSection.classList.add("active");
+        
+        // Load data when switching to specific tabs
+        if (targetTab === 'sales-history' && window.accountPageData?.isVendor) {
+          loadSalesHistory();
+        } else if (targetTab === 'products' && !window.accountPageData?.isVendor) {
+          // Reload purchase history for buyers when switching to products tab
+          loadPurchaseHistory();
+        }
       }
     });
   });

@@ -13,9 +13,13 @@ $username = $user['username'] ?? 'Unknown';
 $alias = $user['alias'] ?? $username;
 
 // Proceed only if access is valid
-require_once __DIR__ . '/../../bootstrap.php';
+require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
-require_once __DIR__ . '/../../layouts/header.php';
+require_once LAYOUTS_PATH . '/header.php';
+// Get admin user data
+$user = $_SESSION['user'];
+$username = $user['username'] ?? 'Unknown';
+$alias = $user['alias'] ?? $username;
 
 // Get data from database
 try {
@@ -180,9 +184,9 @@ try {
                     <input type="text" id="product-search" class="search-input" placeholder="Search products...">
                     <select id="product-category-filter" class="filter-select">
                         <option value="all">All Categories</option>
-                        <?php
-                        $categories = require_once __DIR__ . '/../../staticData/dummies/categories.staticData.php';
-                        foreach ($categories as $category):
+                        <?php 
+                        $categories = require_once DUMMIES_PATH . '/categories.staticData.php';
+                        foreach ($categories as $category): 
                             $categoryValue = strtolower(str_replace(' ', '-', $category['Name']));
                             $icon = match ($category['Name']) {
                                 'Weapons' => '⚔️',
@@ -301,4 +305,4 @@ try {
 </main>
 
 <script src="/assets/js/primal-admin.js"></script>
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>

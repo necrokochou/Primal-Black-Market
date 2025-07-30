@@ -6,7 +6,7 @@ require_once 'bootstrap.php';
 require_once UTILS_PATH . '/envSetter.util.php';
 
 // Define database schema files path
-define('DATABASE_PATH', __DIR__ . '/../database');
+define('DATABASE_PATH', BASE_PATH . '/database');
 
 echo "📦 ========================================\n";
 echo "📦 PRIMAL BLACK MARKET - MIGRATE ALL     \n";

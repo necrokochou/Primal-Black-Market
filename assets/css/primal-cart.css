@@ -469,7 +469,15 @@
     padding: 1rem 0;
     border-bottom: 1px solid rgba(127, 79, 36, 0.1);
     font-family: 'Inter', sans-serif;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--primal-beige-light);
+}
+
+.cart-summary-item span {
+    color: var(--primal-beige-light);
+}
+
+.cart-summary-item span {
+    color: var(--primal-beige-light);
 }
 
 .cart-summary-item:last-child {

@@ -16,7 +16,8 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-require_once __DIR__ . '/../../layouts/header.php';
+require_once BASE_PATH . '/bootstrap.php';
+require_once LAYOUTS_PATH . '/header.php';
 
 // Handle success/error messages from URL parameters (for non-AJAX form submissions)
 $notification = null;
@@ -105,7 +106,7 @@ if ($isVendor) {
     }
 }
 
-require_once __DIR__ . '/../../layouts/header.php';
+require_once LAYOUTS_PATH . '/header.php';
 
 // Temporary debug information
 if ($isVendor && isset($_GET['debug'])) {
@@ -124,88 +125,16 @@ if ($isVendor && isset($_GET['debug'])) {
 <!-- Account Page Specific Styles -->
 <link rel="stylesheet" href="/assets/css/primal-account.css">
 
-<style>
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes slideOut {
-    from {
-        transform: translateX(0);
-        opacity: 1;
-    }
-    to {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-}
-</style>
-
 <main class="primal-account-bg min-vh-100">
     <!-- Display notifications from URL parameters -->
     <?php if ($notification): ?>
-        <div class="notification-banner notification-<?php echo $notification['type']; ?>" id="url-notification" style="
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, 
-                <?php echo $notification['type'] === 'success' ? '#28a745, #198754' : '#dc3545, #b02a37'; ?>);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            border: 2px solid <?php echo $notification['type'] === 'success' ? 'rgba(40, 167, 69, 0.5)' : 'rgba(220, 53, 69, 0.5)'; ?>;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            z-index: 10001;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            max-width: 400px;
-            font-family: inherit;
-            animation: slideIn 0.3s ease;
-        ">
+        <div class="notification-banner notification-<?php echo $notification['type']; ?>" id="url-notification">
             <i class="fas fa-<?php echo $notification['type'] === 'success' ? 'check-circle' : 'exclamation-circle'; ?>"></i>
             <span><?php echo htmlspecialchars($notification['message']); ?></span>
-            <button onclick="this.parentElement.remove()" style="
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-                font-size: 1.2rem;
-                padding: 0;
-                margin-left: auto;
-            ">
+            <button onclick="this.parentElement.remove()">
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <script>
-            // Auto-hide notification after 5 seconds
-            setTimeout(() => {
-                const notification = document.getElementById('url-notification');
-                if (notification) {
-                    notification.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => notification.remove(), 300);
-                }
-            }, 5000);
-            
-            // Clean up URL parameters after showing notification
-            // But wait a moment to ensure tab switching has completed first
-            setTimeout(() => {
-                if (window.history && window.history.replaceState) {
-                    const url = new URL(window.location);
-                    url.searchParams.delete('success');
-                    url.searchParams.delete('error');
-                    // Don't delete 'tab' parameter here as it might still be needed
-                    window.history.replaceState({}, document.title, url.pathname + (url.search || ''));
-                }
-            }, 100);
-        </script>
     <?php endif; ?>
     
     <div class="account-container">
@@ -265,19 +194,13 @@ if ($isVendor && isset($_GET['debug'])) {
                 <button class="nav-tab" data-tab="product-management">
                     <i class="fas fa-cogs"></i> Product Management
                 </button>
+                <button class="nav-tab" data-tab="sales-history">
+                    <i class="fas fa-chart-line"></i> Sales History
+                </button>
             <?php endif; ?>
-            <button class="nav-tab" data-tab="history">
-                <i class="fas fa-history"></i>
-                <?php echo $isVendor ? 'Sales History' : 'Purchase History'; ?>
-            </button>
             <button class="nav-tab" data-tab="settings">
                 <i class="fas fa-cog"></i> Account Settings
             </button>
-            <?php if ($isAdmin): ?>
-                <button class="nav-tab" data-tab="admin-tools">
-                    <i class="fas fa-tools"></i> Admin Tools
-                </button>
-            <?php endif; ?>
         </div>
 
         <!-- Products/Purchases Tab -->
@@ -324,13 +247,28 @@ if ($isVendor && isset($_GET['debug'])) {
                     <?php endif; ?>
                 </div>
             <?php else: ?>
-                <!-- Member Purchases -->
+                <!-- Member Purchases - Dynamic Loading -->
                 <div class="purchases-section primal-card">
-                    <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
-                        <i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Purchases Yet</h3>
+                    <div class="purchase-header">
+                        <h3><i class="fas fa-history"></i> Purchase History</h3>
+                        <button id="refresh-purchases" class="primal-btn-secondary">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    
+                    <div id="purchase-loading" class="loading-spinner" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Loading purchases...
+                    </div>
+                    
+                    <div id="purchase-list">
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
+                    
+                    <div id="no-purchases" class="no-purchases-state" style="display: none;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>No Purchases Yet</h3>
                         <p>Explore the primal marketplace and discover unique items.</p>
-                        <a href="/pages/shop" class="primal-btn-primary" style="margin-top: 1rem;">
+                        <a href="/pages/shop" class="primal-btn-primary">
                             <i class="fas fa-store"></i> Browse Products
                         </a>
                     </div>
@@ -350,7 +288,7 @@ if ($isVendor && isset($_GET['debug'])) {
                         <select id="seller-product-category-filter" class="filter-select">
                             <option value="all">All Categories</option>
                             <?php 
-                            $categories = require_once __DIR__ . '/../../staticData/dummies/categories.staticData.php';
+                            $categories = require_once DUMMIES_PATH . '/categories.staticData.php';
                             foreach ($categories as $category): 
                                 $categoryValue = strtolower(str_replace(' ', '-', $category['Name']));
                                 $icon = match($category['Name']) {
@@ -460,69 +398,80 @@ if ($isVendor && isset($_GET['debug'])) {
             </div>
         <?php endif; ?>
 
-        <!-- Purchase/Sales History Tab -->
-        <div id="history-content" class="tab-content">
-            <div class="section-header">
-                <h2>
-                    <i class="fas fa-chart-line"></i>
-                    <?php echo $isVendor ? 'Sales History' : 'Purchase History'; ?>
-                </h2>
-                <div class="history-filters">
-                    <select id="status-filter" class="filter-select">
-                        <option value="all">All Status</option>
-                        <option value="completed">Completed</option>
-                        <option value="pending">Pending</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                    <select id="date-filter" class="filter-select">
-                        <option value="all">All Time</option>
-                        <option value="week">Last Week</option>
-                        <option value="month">Last Month</option>
-                        <option value="year">Last Year</option>
-                    </select>
+        <?php if ($isVendor): ?>
+            <!-- Sales History Tab (Only for Vendors) -->
+            <div id="sales-history-content" class="tab-content">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-chart-line"></i> Sales History
+                    </h2>
+                    <div class="history-filters">
+                        <select id="sales-status-filter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="processed">Processed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <select id="sales-date-filter" class="filter-select">
+                            <option value="all">All Time</option>
+                            <option value="week">Last Week</option>
+                            <option value="month">Last Month</option>
+                            <option value="year">Last Year</option>
+                        </select>
+                        <button id="refresh-sales" class="primal-btn-secondary">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sales-history-container primal-card">
+                    <div class="sales-summary">
+                        <h3><i class="fas fa-analytics"></i> Sales Summary</h3>
+                        <div class="sales-stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-sales-count">0</span>
+                                <span class="stat-label">Total Sales</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-sales-revenue">$0.00</span>
+                                <span class="stat-label">Total Revenue</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="avg-order-value">$0.00</span>
+                                <span class="stat-label">Avg Order Value</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="recent-sales-count">0</span>
+                                <span class="stat-label">This Month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sales-history-list">
+                        <div class="sales-header">
+                            <h3><i class="fas fa-history"></i> Recent Sales</h3>
+                        </div>
+                        
+                        <div id="sales-loading" class="loading-spinner" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> Loading sales history...
+                        </div>
+                        
+                        <div id="sales-list">
+                            <!-- Dynamic sales content will be loaded here -->
+                        </div>
+                        
+                        <div id="no-sales" class="no-sales-state" style="display: none;">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>No Sales Yet</h3>
+                            <p>Your sales history will appear here once customers purchase your products.</p>
+                            <a href="/pages/shop" class="primal-btn-primary">
+                                <i class="fas fa-store"></i> View My Products in Shop
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="purchase-history-list primal-card">
-                <?php if (!empty($purchaseHistory)): ?>
-                    <div class="cart-table">
-                        <div class="cart-table-header">
-                            <div class="cart-th-product">Product</div>
-                            <div>Price</div>
-                            <div>Quantity</div>
-                            <div>Total</div>
-                        </div>
-
-                        <div id="history-items">
-                            <?php foreach ($purchaseHistory as $item): ?>
-                                <div class="cart-row">
-                                    <div class="cart-row-product">
-                                        <img class="cart-row-img" src="<?= htmlspecialchars($item['item_image']) ?>" alt="<?= htmlspecialchars($item['title']) ?>">
-                                        <div class="cart-row-info">
-                                            <div class="cart-row-title"><?= htmlspecialchars($item['title']) ?></div>
-                                            <div class="cart-row-color">
-                                                <span>Purchased on:</span>
-                                                <?= date('M d, Y', strtotime($item['purchase_date'])) ?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="cart-row-total">₱<?= number_format($item['price_each'], 2) ?></div>
-                                    <div class="cart-row-qty">
-                                        <span class="cart-qty"><?= $item['quantity'] ?></span>
-                                    </div>
-                                    <div class="cart-row-total">₱<?= number_format($item['total_price'], 2) ?></div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
-                        <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No History Available</h3>
-                        <p><?= $isVendor ? 'Your sales history will appear here once you make your first sale.' : 'Your purchase history will appear here once you make your first purchase.'; ?></p>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
+        <?php endif; ?>
 
         <!-- Settings Tab -->
         <div id="settings-content" class="tab-content">
@@ -606,55 +555,6 @@ if ($isVendor && isset($_GET['debug'])) {
                 <?php endif; ?>
             </div>
         </div>
-
-        <?php if ($isAdmin): ?>
-            <!-- Admin Tools Tab -->
-            <div id="admin-tools-content" class="tab-content">
-                <div class="section-header">
-                    <h2><i class="fas fa-shield-alt"></i> Administrative Tools</h2>
-                </div>
-
-                <div class="settings-grid">
-                    <div class="settings-section primal-card">
-                        <h3><i class="fas fa-tachometer-alt"></i> Quick Actions</h3>
-                        <div style="display: flex; flex-direction: column; gap: 1rem;">
-                            <a href="/pages/admin/index.php" class="primal-btn-primary" style="text-decoration: none; text-align: center;">
-                                <i class="fas fa-desktop"></i> Full Admin Dashboard
-                            </a>
-                            <button class="primal-btn-secondary" style="width: 100%;">
-                                <i class="fas fa-users"></i> View All Users
-                            </button>
-                            <button class="primal-btn-secondary" style="width: 100%;">
-                                <i class="fas fa-box"></i> Manage Products
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="settings-section primal-card">
-                        <h3><i class="fas fa-chart-bar"></i> System Overview</h3>
-                        <div style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
-                            <p><strong>Account Type:</strong> Administrator</p>
-                            <p><strong>Privileges:</strong> Full System Access</p>
-                            <p><strong>Last Login:</strong> <?php echo date('M d, Y g:i A'); ?></p>
-                            <p><strong>Trust Level:</strong> Maximum (<?php echo number_format($trustLevel, 1); ?>)</p>
-                        </div>
-                    </div>
-
-                    <div class="settings-section primal-card">
-                        <h3><i class="fas fa-cogs"></i> System Settings</h3>
-                        <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">
-                            Access advanced system configuration and maintenance tools.
-                        </p>
-                        <button class="primal-btn-secondary" style="width: 100%; margin-bottom: 0.75rem;">
-                            <i class="fas fa-database"></i> Database Management
-                        </button>
-                        <button class="primal-btn-secondary" style="width: 100%;">
-                            <i class="fas fa-file-alt"></i> System Logs
-                        </button>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
     </div>
 </main>
 
@@ -663,46 +563,17 @@ if ($isVendor && isset($_GET['debug'])) {
 <?php
 // Include seller product modal for vendors
 if ($isVendor) {
-    include __DIR__ . '/../../components/sellerProductModal.component.php';
+    include COMPONENTS_PATH . '/sellerProductModal.component.php';
 }
 ?>
 
+<!-- Pass PHP data to JavaScript -->
 <script>
-// Handle automatic tab switching from URL parameters
-document.addEventListener('DOMContentLoaded', function() {
-    // Check for tab parameter in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetTab = urlParams.get('tab');
-    
-    if (targetTab) {
-        console.log('Auto-switching to tab:', targetTab);
-        
-        // Find and activate the specified tab
-        const tabButton = document.querySelector(`[data-tab="${targetTab}"]`);
-        const tabContent = document.getElementById(`${targetTab}-content`);
-        
-        if (tabButton && tabContent) {
-            // Deactivate all tabs first
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // Activate the target tab
-            tabButton.classList.add('active');
-            tabContent.classList.add('active');
-            
-            console.log('Successfully switched to tab:', targetTab);
-            
-            // Clean up URL parameter after switching
-            const url = new URL(window.location);
-            url.searchParams.delete('tab');
-            // Keep success/error parameters for the notification system
-            window.history.replaceState({}, document.title, url.pathname + (url.search || ''));
-        } else {
-            console.warn('Tab not found:', targetTab);
-        }
-    }
-});
+window.accountPageData = {
+    isVendor: <?php echo $isVendor ? 'true' : 'false'; ?>,
+    isAdmin: <?php echo $isAdmin ? 'true' : 'false'; ?>
+};
 </script>
 
 <script src="/assets/js/primal-account.js"></script>
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>

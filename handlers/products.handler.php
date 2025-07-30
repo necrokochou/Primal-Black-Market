@@ -716,15 +716,14 @@ function handleImageUpload(string $vendorId, bool $optional = false): ?string
     $name = bin2hex(random_bytes(16)) . '.' . $ext;
 
     // Robust directory setup with multiple fallbacks
-    $uploadsDir = dirname(__DIR__) . '/assets/images/user-uploads';
-
+    $uploadsDir = BASE_PATH . '/assets/images/user-uploads';
     // Ensure the base upload directory exists
     if (!is_dir($uploadsDir)) {
         error_log("Creating user-uploads directory: {$uploadsDir}");
         if (!mkdir($uploadsDir, 0755, true)) {
             error_log("Failed to create user-uploads directory, trying alternative");
             // Fallback to main images directory
-            $uploadsDir = dirname(__DIR__) . '/assets/images';
+            $uploadsDir = BASE_PATH . '/assets/images';
             if (!is_dir($uploadsDir)) {
                 throw new Exception('No suitable upload directory available');
             }

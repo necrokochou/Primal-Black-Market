@@ -1,4 +1,6 @@
 <?php
+require_once BASE_PATH . '/bootstrap.php';
+
 // Load categories from database
 try {
     require_once BASE_PATH . '/utils/DatabaseService.util.php';
@@ -7,7 +9,7 @@ try {
 } catch (Exception $e) {
     error_log("Error loading categories: " . $e->getMessage());
     // Fallback to static data if database fails
-    $categories = require_once __DIR__ . '/../staticData/dummies/categories.staticData.php';
+    $categories = require_once DUMMIES_PATH . '/categories.staticData.php';
 }
 ?>
 
@@ -212,64 +214,7 @@ try {
     </div>
 </div>
 
-<!-- Buyer Quick Actions Panel -->
-<div id="buyer-actions" class="buyer-quick-actions" style="display: none;">
-    <div class="quick-action-card primal-card">
-        <h3><i class="fas fa-shopping-cart"></i> Quick Actions</h3>
-        <div class="action-buttons">
-            <a href="/pages/shop" class="action-btn">
-                <i class="fas fa-store"></i>
-                <span>Browse All Products</span>
-            </a>
-            <a href="/pages/shop?category=featured" class="action-btn">
-                <i class="fas fa-star"></i>
-                <span>Featured Items</span>
-            </a>
-            <a href="/pages/shop?sort=newest" class="action-btn">
-                <i class="fas fa-clock"></i>
-                <span>New Arrivals</span>
-            </a>
-            <a href="/pages/cart" class="action-btn">
-                <i class="fas fa-shopping-bag"></i>
-                <span>View Cart</span>
-                <span class="cart-count" id="cart-count">0</span>
-            </a>
-        </div>
-        
-        <div class="category-quick-links">
-            <h4>Popular Categories</h4>
-            <div class="category-links">
-                <a href="/pages/shop?category=weapons" class="category-link">
-                    <i class="fas fa-sword"></i> Weapons
-                </a>
-                <a href="/pages/shop?category=clothing" class="category-link">
-                    <i class="fas fa-tshirt"></i> Clothing
-                </a>
-                <a href="/pages/shop?category=food" class="category-link">
-                    <i class="fas fa-apple-alt"></i> Food
-                </a>
-                <a href="/pages/shop?category=pets" class="category-link">
-                    <i class="fas fa-paw"></i> Pets
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="recommendations-card primal-card">
-        <h3><i class="fas fa-thumbs-up"></i> Recommended for You</h3>
-        <div class="recommendation-list" id="recommendations">
-            <div class="recommendation-item">
-                <div class="rec-image">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="rec-info">
-                    <h4>Discover Products</h4>
-                    <p>Start shopping to get personalized recommendations</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <!-- Include Modal JavaScript -->
 <script src="/assets/js/primal-seller-modal.js"></script>
