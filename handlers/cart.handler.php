@@ -70,23 +70,23 @@ switch ($action) {
         break;
 
     case 'count':
-        if (!$user || !isset($user['id'])) {
+        if (!$user || !isset($user['user_id'])) {
             echo json_encode(['success' => false, 'error' => 'User not authenticated']);
             exit;
         }
 
-        $count = $cart->getCartCount($user['id']);
+        $count = $cart->getCartCount($user['user_id']);
         echo json_encode(['success' => true, 'count' => $count]);
         break;
 
     case 'clear':
-        if (!$user || !isset($user['id'])) {
+        if (!$user || !isset($user['user_id'])) {
             http_response_code(401);
             echo json_encode(['success' => false, 'error' => 'User not authenticated']);
             exit;
         }
 
-        $cart->clearCart($user['id']);
+        $cart->clearCart($user['user_id']);
         echo json_encode(['success' => true, 'message' => 'Cart cleared']);
         break;
 
