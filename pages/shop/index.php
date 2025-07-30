@@ -11,7 +11,7 @@ if (!isset($_SESSION['user'])) {
 
 require_once BASE_PATH . '/bootstrap.php';
 require_once LAYOUTS_PATH . '/header.php';
-require_once UTILS_PATH . '/productCard.util.php';
+require_once COMPONENTS_PATH . '/productCard.component.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 
 // // Get user data from session

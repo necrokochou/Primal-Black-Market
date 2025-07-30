@@ -138,7 +138,7 @@ class DatabaseService
     // Get user by username or email
     public function getUser($usernameOrEmail)
     {
-        $sql = "SELECT * FROM users WHERE username = :identifier OR email = :identifier";
+        $sql = "SELECT * FROM users WHERE \"Username\" = :identifier OR \"Email\" = :identifier";
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':identifier', $usernameOrEmail);
         $stmt->execute();
@@ -173,7 +173,7 @@ class DatabaseService
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $alias = $alias ?: $username;
 
-            $sql = "INSERT INTO users (Username, Email, Password, Alias, TrustLevel, Is_Vendor, Is_Admin, Created_At) 
+            $sql = "INSERT INTO users (\"Username\", \"Email\", \"Password\", \"Alias\", \"TrustLevel\", \"Is_Vendor\", \"Is_Admin\", \"Created_At\") 
                     VALUES (:username, :email, :password, :alias, 0.0, false, false, CURRENT_TIMESTAMP)";
 
             $stmt = $this->pdo->prepare($sql);
@@ -295,7 +295,9 @@ class DatabaseService
     //use this when created_at is added to users.model.sql
     public function getAllUsers()
     {
-        $sql = "SELECT user_id, username, email, alias, trustlevel, is_vendor, is_admin, created_at 
+        $sql = "SELECT user_id, username, email, alias, 
+                trustlevel, is_vendor, is_admin, 
+                is_banned, created_at 
             FROM users 
             ORDER BY created_at DESC";
 
@@ -329,31 +331,63 @@ class DatabaseService
     // Permanently delete a user by ID
     public function deleteUser($userId)
     {
-        // Step 0: Delete cart entries (FK: cart.user_id)
-        $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE user_id = :id");
-        $stmtCart->bindValue(':id', $userId);
-        $stmtCart->execute();
+        try {
+            // Begin transaction for data integrity
+            $this->pdo->beginTransaction();
+            
+            error_log("Starting deletion process for user: $userId");
+            
+            // Step 0: Delete cart entries (FK: cart.User_ID)
+            $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE \"User_ID\" = :id");
+            $stmtCart->bindValue(':id', $userId);
+            $stmtCart->execute();
+            error_log("Deleted " . $stmtCart->rowCount() . " cart entries for user $userId");
 
-        // Step 0.1: Delete transactions where user is the buyer (FK: transactions.buyer_id)
-        $stmtTxn = $this->pdo->prepare("DELETE FROM transactions WHERE buyer_id = :id");
-        $stmtTxn->bindValue(':id', $userId);
-        $stmtTxn->execute();
+            // Step 0.1: Delete transactions where user is the buyer (FK: transactions.Buyer_ID)
+            $stmtTxn = $this->pdo->prepare("DELETE FROM transactions WHERE \"Buyer_ID\" = :id");
+            $stmtTxn->bindValue(':id', $userId);
+            $stmtTxn->execute();
+            error_log("Deleted " . $stmtTxn->rowCount() . " transactions for user $userId");
 
-        // Step 1: Get all listings by the user
-        $stmt = $this->pdo->prepare("SELECT listing_id FROM listings WHERE vendor_id = :id");
-        $stmt->bindValue(':id', $userId);
-        $stmt->execute();
-        $listings = $stmt->fetchAll();
+            // Step 1: Get all listings by the user
+            $stmt = $this->pdo->prepare("SELECT \"Listing_ID\" as listing_id FROM listings WHERE \"Vendor_ID\" = :id");
+            $stmt->bindValue(':id', $userId);
+            $stmt->execute();
+            $listings = $stmt->fetchAll();
+            error_log("Found " . count($listings) . " listings for user $userId");
 
-        // Step 2: Delete each listing (also removes cart + transaction entries for each listing)
-        foreach ($listings as $listing) {
-            $this->deleteListing($listing['listing_id']);
+            // Step 2: Delete each listing (also removes cart + transaction entries for each listing)
+            foreach ($listings as $listing) {
+                error_log("Deleting listing: " . $listing['listing_id']);
+                $this->deleteListing($listing['listing_id']);
+            }
+
+            // Step 3: Delete the user itself
+            $stmtUser = $this->pdo->prepare("DELETE FROM users WHERE user_id = :id");
+            $stmtUser->bindValue(':id', $userId);
+            $result = $stmtUser->execute();
+            
+            if ($result && $stmtUser->rowCount() > 0) {
+                $this->pdo->commit();
+                error_log("Successfully deleted user $userId");
+                return true;
+            } else {
+                $this->pdo->rollback();
+                error_log("Failed to delete user $userId - user not found or no rows affected");
+                return false;
+            }
+            
+        } catch (PDOException $e) {
+            $this->pdo->rollback();
+            error_log("PDO error deleting user $userId: " . $e->getMessage());
+            error_log("PDO error code: " . $e->getCode());
+            error_log("PDO error info: " . print_r($e->errorInfo, true));
+            throw new Exception("Cannot delete this user — their account is still linked to other records (e.g., transactions or cart).");
+        } catch (Exception $e) {
+            $this->pdo->rollback();
+            error_log("General error deleting user $userId: " . $e->getMessage());
+            throw $e;
         }
-
-        // Step 3: Delete the user itself
-        $stmtUser = $this->pdo->prepare("DELETE FROM users WHERE user_id = :id");
-        $stmtUser->bindValue(':id', $userId);
-        return $stmtUser->execute();
     }
 
 
@@ -361,18 +395,52 @@ class DatabaseService
     public function deleteListing($listingId)
     {
         // Step 0: Delete cart items referencing this listing
-        $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE listing_id = :id");
+        $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE \"Listing_ID\" = :id");
         $stmtCart->bindValue(':id', $listingId);
         $stmtCart->execute();
 
         // Step 1: Delete transactions tied to this listing
-        $stmtTxn = $this->pdo->prepare("DELETE FROM transactions WHERE listing_id = :id");
+        $stmtTxn = $this->pdo->prepare("DELETE FROM transactions WHERE \"Listing_ID\" = :id");
         $stmtTxn->bindValue(':id', $listingId);
         $stmtTxn->execute();
 
         // Step 2: Delete the listing
-        $stmt = $this->pdo->prepare("DELETE FROM listings WHERE listing_id = :id");
+        $stmt = $this->pdo->prepare("DELETE FROM listings WHERE \"Listing_ID\" = :id");
         $stmt->bindValue(':id', $listingId);
         return $stmt->execute();
+    }
+
+    // Ban/Unban user functionality
+    public function banUser($userId, $banned = true)
+    {
+        try {
+            $sql = "UPDATE users SET is_banned = :banned WHERE user_id = :user_id";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':banned', $banned, PDO::PARAM_BOOL);
+            $stmt->bindValue(':user_id', $userId);
+            $result = $stmt->execute();
+            
+            if ($result && $stmt->rowCount() > 0) {
+                error_log("Successfully " . ($banned ? 'banned' : 'unbanned') . " user $userId");
+                return true;
+            } else {
+                error_log("Failed to " . ($banned ? 'ban' : 'unban') . " user $userId - user not found or no changes made");
+                return false;
+            }
+        } catch (Exception $e) {
+            error_log("Error " . ($banned ? 'banning' : 'unbanning') . " user $userId: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    // Get user ban status
+    public function isUserBanned($userId)
+    {
+        $sql = "SELECT is_banned FROM users WHERE user_id = :user_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':user_id', $userId);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? (bool)$result['is_banned'] : false;
     }
 }

@@ -318,6 +318,11 @@
     color: white;
 }
 
+.status-badge.banned {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+}
+
 /* Action Buttons */
 .action-buttons {
     display: flex;

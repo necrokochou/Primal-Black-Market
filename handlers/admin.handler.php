@@ -1,10 +1,23 @@
 <?php
-require_once BASE_PATH . '/../bootstrap.php';
+// Start output buffering to capture any unwanted output
+ob_start();
+
+// Define flag to prevent bootstrap from cleaning output buffer
+define('KEEP_OUTPUT_BUFFER', true);
+
+// Include bootstrap first to set up all paths and constants
+require_once __DIR__ . '/../bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 
 session_start();
 
+// Clear any output that might have been generated
+ob_clean();
+
+// Set JSON header and disable error output to browser to prevent HTML in JSON response
 header('Content-Type: application/json');
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
 
 // Only allow logged-in admin users
 if (!isset($_SESSION['user']) || !($_SESSION['user']['is_admin'] ?? false)) {
@@ -12,7 +25,13 @@ if (!isset($_SESSION['user']) || !($_SESSION['user']['is_admin'] ?? false)) {
     exit;
 }
 
-$db = DatabaseService::getInstance();
+// Wrap everything in try-catch to ensure JSON response even on fatal errors
+try {
+    $db = DatabaseService::getInstance();
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'error' => 'Database connection failed: ' . $e->getMessage()]);
+    exit;
+}
 
 $action = $_POST['action'] ?? '';
 $response = ['success' => false];
@@ -21,17 +40,32 @@ try {
     switch ($action) {
         case 'delete_user':
             $userId = $_POST['user_id'] ?? null;
+            
+            // Debug logging
+            error_log("Admin delete_user attempt - User ID: $userId, Session User: " . ($_SESSION['user']['user_id'] ?? 'null'));
 
             // Prevent self-deletion
-            if ($userId === ($_SESSION['user']['id'] ?? null)) {
+            if ($userId === ($_SESSION['user']['user_id'] ?? null)) {
                 $response['error'] = 'You cannot delete your own account while logged in.';
                 break;
             }
 
-            if ($userId && $db->deleteUser($userId)) {
-                $response['success'] = true;
-            } else {
-                $response['error'] = 'User deletion failed';
+            if (!$userId) {
+                $response['error'] = 'User ID is required';
+                break;
+            }
+
+            try {
+                if ($db->deleteUser($userId)) {
+                    $response['success'] = true;
+                    error_log("User $userId successfully deleted");
+                } else {
+                    $response['error'] = 'User deletion failed';
+                    error_log("User $userId deletion failed - database returned false");
+                }
+            } catch (Exception $e) {
+                $response['error'] = $e->getMessage();
+                error_log("User $userId deletion exception: " . $e->getMessage());
             }
             break;
 
@@ -44,15 +78,36 @@ try {
             }
             break;
 
+        case 'ban_user':
+            $userId = $_POST['user_id'] ?? null;
+            $banStatus = filter_var($_POST['ban_status'] ?? true, FILTER_VALIDATE_BOOLEAN);
+
+            // Prevent self-banning
+            if ($userId === ($_SESSION['user']['user_id'] ?? null)) {
+                $response['error'] = 'You cannot ban your own account.';
+                break;
+            }
+
+            if ($userId && $db->banUser($userId, $banStatus)) {
+                $response['success'] = true;
+                $response['banned'] = $banStatus;
+            } else {
+                $response['error'] = 'User ban operation failed';
+            }
+            break;
+
         default:
             $response['error'] = 'Invalid action';
     }
 } catch (Exception $e) {
-    if (str_contains($e->getMessage(), 'foreign key') || str_contains($e->getMessage(), '23503')) {
+    error_log("Admin handler exception: " . $e->getMessage());
+    if (strpos($e->getMessage(), 'foreign key') !== false || strpos($e->getMessage(), '23503') !== false) {
         $response['error'] = 'Cannot delete this user — their account is still linked to other records (e.g., transactions or cart).';
     } else {
         $response['error'] = 'Exception: ' . $e->getMessage();
     }
 }
 
+// End output buffering and ensure clean JSON output
+ob_end_clean();
 echo json_encode($response);

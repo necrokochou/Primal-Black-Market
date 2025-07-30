@@ -1,4 +1,3 @@
-
 <?php
 // Product card component
 function renderProductCard($title, $id, $price, $imgSrc, $isNew = false) {
@@ -18,3 +17,4 @@ function renderProductCard($title, $id, $price, $imgSrc, $isNew = false) {
     </div>
     <?php
 }
+?>

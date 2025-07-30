@@ -9,7 +9,7 @@ require_once UTILS_PATH . '/envSetter.util.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 require_once BASE_PATH . '/bootstrap.php';
 require_once LAYOUTS_PATH . '/header.php';
-require_once UTILS_PATH . '/productCard.util.php';
+require_once COMPONENTS_PATH . '/productCard.component.php';
 
 try {
     $db = DatabaseService::getInstance();

@@ -151,7 +151,7 @@ try {
                                     </div>
                                </td>
                                 <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
-                                <td><span class="status-badge active">Active</span></td>
+                                <td><span class="status-badge <?php echo $user['is_banned'] ? 'banned' : 'active'; ?>"><?php echo $user['is_banned'] ? 'Banned' : 'Active'; ?></span></td>
                                 <td class="user-created-at"><?php echo $user['created_at']; ?></td>
                                 <td><?php echo number_format($user['trustlevel'], 1); ?></td>
                                 <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
@@ -160,8 +160,8 @@ try {
                                         <button class="action-btn view-user" data-user-id="<?php echo $user['user_id']; ?>" title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="action-btn ban-user" data-user-id="<?php echo $user['user_id']; ?>" title="Ban User">
-                                            <i class="fas fa-ban"></i>
+                                        <button class="action-btn <?php echo $user['is_banned'] ? 'unban-user' : 'ban-user'; ?>" data-user-id="<?php echo $user['user_id']; ?>" title="<?php echo $user['is_banned'] ? 'Unban User' : 'Ban User'; ?>">
+                                            <i class="fas fa-<?php echo $user['is_banned'] ? 'user-check' : 'ban'; ?>"></i>
                                         </button>
                                         <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>" title="Delete User">
                                             <i class="fas fa-trash"></i>
