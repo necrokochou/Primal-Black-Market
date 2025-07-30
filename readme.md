@@ -215,7 +215,6 @@ Primal-Black-Market
 ├── Dockerfile
 └── create-upload-directory.sh
 ```
-> Use descriptive names for files and folders. Avoid generic names like `name.js` or `name.css`. Follow the Primal Black Market conventions for all new files and folders.
 
 ## Resources
 
