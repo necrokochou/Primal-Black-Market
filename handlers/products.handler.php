@@ -451,14 +451,20 @@ function updateProduct(PDO $db, string $vendorId): array
         return ['success' => false, 'message' => 'Forbidden'];
     }
 
+    // 🔍 Fetch current image path before updating
+    $stmt = $db->prepare("SELECT item_image FROM listings WHERE listing_id = :id");
+    $stmt->execute(['id' => $id]);
+    $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+    $oldImage = $existing['item_image'] ?? null;
+
     $title        = trim($_POST['title'] ?? '');
     $description  = trim($_POST['description'] ?? '');
     $category     = trim($_POST['category'] ?? '');
     $price        = $_POST['price'] ?? null;
     $quantity     = $_POST['stock'] ?? $_POST['quantity'] ?? null;
     $categoriesId = $_POST['categories_id'] ?? null;
-    
-    // Fix boolean handling for status - only update if explicitly provided
+
+    // Fix boolean handling for status
     $isActive = null;
     if (isset($_POST['status'])) {
         $statusValue = $_POST['status'];
@@ -478,11 +484,19 @@ function updateProduct(PDO $db, string $vendorId): array
                                  $fields[] = "quantity = :quantity";          $params['quantity']     = (int)$quantity; }
     if ($isActive !== null)    { $fields[] = "is_active = :active";           $params['active']       = $isActive; }
 
-    // Handle (optional) new image
+    // Handle new image upload
     $newImage = handleImageUpload($vendorId, true);
     if ($newImage) {
         $fields[] = "item_image = :item_image";
         $params['item_image'] = $newImage;
+
+        $uploadBase = realpath($_SERVER['DOCUMENT_ROOT'] . '/assets/images/user-uploads');
+        $fullPath = realpath($_SERVER['DOCUMENT_ROOT'] . $oldImage);
+
+        // 🗑️ Delete old image if exists and is not empty
+        if ($oldImage && file_exists($_SERVER['DOCUMENT_ROOT'] . $oldImage)) {
+            unlink($_SERVER['DOCUMENT_ROOT'] . $oldImage);
+        }
     }
 
     if (empty($fields)) {
