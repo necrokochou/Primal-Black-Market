@@ -29,16 +29,16 @@ try {
     $listingCount = $db->getListingCount(false); // Total listings
     $activeListingCount = $db->getListingCount(true); // Active listings only
     $users = $db->getAllUsers();
-    $listings = $db->getListings(null, null, 0, true);
-    echo '<pre>';
-    echo "✅ Users loaded: " . count($users) . "\n";
-    echo "✅ Listings loaded: " . count($listings) . "\n";
-    echo "Host: " . ($_ENV['PG_HOST'] ?? 'not set') . "\n";
-    echo "Port: " . ($_ENV['PG_PORT'] ?? 'not set') . "\n";
-    echo "DB: " . ($_ENV['PG_DB'] ?? 'not set') . "\n";
-    echo "User: " . ($_ENV['PG_USER'] ?? 'not set') . "\n";
-    echo '</pre>';
-    echo '</pre>'; // Include inactive listings for admin
+    // $listings = $db->getListings(null, null, 0, true);
+    // echo '<pre>';
+    // echo "✅ Users loaded: " . count($users) . "\n";
+    // echo "✅ Listings loaded: " . count($listings) . "\n";
+    // echo "Host: " . ($_ENV['PG_HOST'] ?? 'not set') . "\n";
+    // echo "Port: " . ($_ENV['PG_PORT'] ?? 'not set') . "\n";
+    // echo "DB: " . ($_ENV['PG_DB'] ?? 'not set') . "\n";
+    // echo "User: " . ($_ENV['PG_USER'] ?? 'not set') . "\n";
+    // echo '</pre>';
+    // echo '</pre>'; // Include inactive listings for admin
 } catch (Exception $e) {
     error_log("Database error in admin dashboard: " . $e->getMessage());
     // Set default values if database fails
@@ -48,11 +48,11 @@ try {
     $users = [];
     $listings = [];
 
-    echo '<pre>';
-    echo "❌ Error: " . $e->getMessage() . "\n";
-    echo "✅ Users fallback: " . count($users) . "\n";
-    echo "✅ Listings fallback: " . count($listings) . "\n";
-    echo '</pre>';
+    // echo '<pre>';
+    // echo "❌ Error: " . $e->getMessage() . "\n";
+    // echo "✅ Users fallback: " . count($users) . "\n";
+    // echo "✅ Listings fallback: " . count($listings) . "\n";
+    // echo '</pre>';
 }
 ?>
 
@@ -149,7 +149,7 @@ try {
                                             <div class="user-alias">Alias: <?php echo htmlspecialchars($user['alias']); ?></div>
                                         </div>
                                     </div>
-                               </td>
+                                </td>
                                 <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
                                 <td><span class="status-badge active">Active</span></td>
                                 <td class="user-created-at"><?php echo $user['created_at']; ?></td>
@@ -183,11 +183,11 @@ try {
                     <input type="text" id="product-search" class="search-input" placeholder="Search products...">
                     <select id="product-category-filter" class="filter-select">
                         <option value="all">All Categories</option>
-                        <?php 
+                        <?php
                         $categories = require_once __DIR__ . '/../../staticData/dummies/categories.staticData.php';
-                        foreach ($categories as $category): 
+                        foreach ($categories as $category):
                             $categoryValue = strtolower(str_replace(' ', '-', $category['Name']));
-                            $icon = match($category['Name']) {
+                            $icon = match ($category['Name']) {
                                 'Weapons' => '⚔️',
                                 'Hunting Equipment' => '🏹',
                                 'Prehistoric Drugs' => '🧪',
@@ -203,9 +203,9 @@ try {
                                 default => '📦'
                             };
                         ?>
-                        <option value="<?php echo $categoryValue; ?>">
-                            <?php echo $icon . ' ' . htmlspecialchars($category['Name']); ?>
-                        </option>
+                            <option value="<?php echo $categoryValue; ?>">
+                                <?php echo $icon . ' ' . htmlspecialchars($category['Name']); ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
