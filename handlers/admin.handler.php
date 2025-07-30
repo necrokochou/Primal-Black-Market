@@ -1,6 +1,24 @@
 <?php
-require_once BASE_PATH . '/../bootstrap.php';
-require_once UTILS_PATH . '/DatabaseService.util.php';
+// CRITICAL: Prevent ANY output before JSON response
+ob_start();
+
+// Custom error handler to prevent HTML error output
+set_error_handler(function($severity, $message, $file, $line) {
+    error_log("PHP Error: $message in $file on line $line");
+    // Don't let PHP output HTML errors
+    return true;
+});
+
+// Include bootstrap file with correct path
+try {
+    require_once __DIR__ . '/../bootstrap.php';
+    require_once UTILS_PATH . '/DatabaseService.util.php';
+} catch (Exception $e) {
+    ob_end_clean();
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => 'Bootstrap error: ' . $e->getMessage()]);
+    exit;
+}
 
 session_start();
 
@@ -10,11 +28,13 @@ ob_clean();
 // Set JSON header and disable error output to browser to prevent HTML in JSON response
 header('Content-Type: application/json');
 ini_set('display_errors', 0);
+ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
 // Only allow logged-in admin users
 $user = $_SESSION['user'] ?? null;
 if (!isset($user) || !($user['is_admin'] ?? false)) {
+    ob_end_clean();
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
 }
@@ -23,6 +43,7 @@ if (!isset($user) || !($user['is_admin'] ?? false)) {
 try {
     $db = DatabaseService::getInstance();
 } catch (Exception $e) {
+    ob_end_clean();
     echo json_encode(['success' => false, 'error' => 'Database connection failed: ' . $e->getMessage()]);
     exit;
 }
@@ -39,7 +60,7 @@ try {
             error_log("Admin delete_user attempt - User ID: $userId, Session User: " . ($_SESSION['user']['user_id'] ?? 'null'));
 
             // Prevent self-deletion
-            if ($userId === ($_SESSION['user']['id'] ?? null)) {
+            if ($userId === ($_SESSION['user']['user_id'] ?? null)) {
                 $response['error'] = 'You cannot delete your own account while logged in.';
                 break;
             }
@@ -103,5 +124,10 @@ try {
 }
 
 // End output buffering and ensure clean JSON output
-ob_end_clean();
+if (ob_get_level() > 0) {
+    ob_end_clean();
+}
+
+// Final check to ensure we only send JSON
+header('Content-Type: application/json');
 echo json_encode($response);

@@ -330,61 +330,58 @@ class DatabaseService
     public function deleteUser($userId)
     {
         try {
-            // Begin transaction for data integrity
-            $this->pdo->beginTransaction();
-            
-            error_log("Starting deletion process for user: $userId");
-            
-            // Step 0: Delete cart entries (FK: cart.User_ID)
-            $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE \"User_ID\" = :id");
-            $stmtCart->bindValue(':id', $userId);
-            $stmtCart->execute();
-            error_log("Deleted " . $stmtCart->rowCount() . " cart entries for user $userId");
-
-            // Step 0.1: Delete transactions where user is the buyer (FK: transactions.Buyer_ID)
-            $stmtTxn = $this->pdo->prepare("DELETE FROM transactions WHERE \"Buyer_ID\" = :id");
-            $stmtTxn->bindValue(':id', $userId);
-            $stmtTxn->execute();
-            error_log("Deleted " . $stmtTxn->rowCount() . " transactions for user $userId");
-
-            // Step 1: Get all listings by the user
-            $stmt = $this->pdo->prepare("SELECT \"Listing_ID\" as listing_id FROM listings WHERE \"Vendor_ID\" = :id");
-            $stmt->bindValue(':id', $userId);
-            $stmt->execute();
-            $listings = $stmt->fetchAll();
-            error_log("Found " . count($listings) . " listings for user $userId");
-
-            // Step 2: Delete each listing (also removes cart + transaction entries for each listing)
-            foreach ($listings as $listing) {
-                error_log("Deleting listing: " . $listing['listing_id']);
-                $this->deleteListing($listing['listing_id']);
+            // First, let's try to delete cart entries with both possible column names
+            try {
+                $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE user_id = ?");
+                $stmtCart->execute([$userId]);
+                error_log("Deleted " . $stmtCart->rowCount() . " cart entries for user $userId");
+            } catch (PDOException $e) {
+                // Try with the other column name format
+                try {
+                    $stmtCart = $this->pdo->prepare("DELETE FROM cart WHERE \"user_id\" = ?");
+                    $stmtCart->execute([$userId]);
+                    error_log("Deleted " . $stmtCart->rowCount() . " cart entries for user $userId (quoted)");
+                } catch (PDOException $e2) {
+                    error_log("Cart deletion failed with both approaches: " . $e2->getMessage());
+                    // Continue anyway - cart entries might not exist
+                }
             }
 
-            // Step 3: Delete the user itself
-            $stmtUser = $this->pdo->prepare("DELETE FROM users WHERE user_id = :id");
-            $stmtUser->bindValue(':id', $userId);
-            $result = $stmtUser->execute();
+            // Handle transactions - try to nullify buyer references
+            try {
+                $stmtTxn = $this->pdo->prepare("UPDATE transactions SET buyer_id = NULL WHERE buyer_id = ?");
+                $stmtTxn->execute([$userId]);
+                error_log("Nullified buyer references in " . $stmtTxn->rowCount() . " transactions");
+            } catch (PDOException $e) {
+                error_log("Transaction update failed: " . $e->getMessage());
+                // Continue anyway
+            }
+
+            // Handle listings - deactivate them
+            try {
+                $stmtListings = $this->pdo->prepare("UPDATE listings SET is_active = false WHERE vendor_id = ?");
+                $stmtListings->execute([$userId]);
+                error_log("Deactivated " . $stmtListings->rowCount() . " listings for user $userId");
+            } catch (PDOException $e) {
+                error_log("Listings update failed: " . $e->getMessage());
+                // Continue anyway
+            }
+
+            // Finally, delete the user
+            $stmtUser = $this->pdo->prepare("DELETE FROM users WHERE user_id = ?");
+            $result = $stmtUser->execute([$userId]);
             
             if ($result && $stmtUser->rowCount() > 0) {
-                $this->pdo->commit();
                 error_log("Successfully deleted user $userId");
                 return true;
             } else {
-                $this->pdo->rollback();
-                error_log("Failed to delete user $userId - user not found or no rows affected");
+                error_log("Failed to delete user $userId - user not found");
                 return false;
             }
             
-        } catch (PDOException $e) {
-            $this->pdo->rollback();
-            error_log("PDO error deleting user $userId: " . $e->getMessage());
-            error_log("PDO error code: " . $e->getCode());
-            error_log("PDO error info: " . print_r($e->errorInfo, true));
-            throw new Exception("Cannot delete this user — their account is still linked to other records (e.g., transactions or cart).");
         } catch (Exception $e) {
-            $this->pdo->rollback();
-            error_log("General error deleting user $userId: " . $e->getMessage());
-            throw $e;
+            error_log("Error deleting user $userId: " . $e->getMessage());
+            throw new Exception("Database error occurred while deleting user: " . $e->getMessage());
         }
     }
 

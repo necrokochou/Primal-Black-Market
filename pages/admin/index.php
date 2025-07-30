@@ -28,16 +28,7 @@ try {
     $listingCount = $db->getListingCount(false); // Total listings
     $activeListingCount = $db->getListingCount(true); // Active listings only
     $users = $db->getAllUsers();
-    // $listings = $db->getListings(null, null, 0, true);
-    // echo '<pre>';
-    // echo "✅ Users loaded: " . count($users) . "\n";
-    // echo "✅ Listings loaded: " . count($listings) . "\n";
-    // echo "Host: " . ($_ENV['PG_HOST'] ?? 'not set') . "\n";
-    // echo "Port: " . ($_ENV['PG_PORT'] ?? 'not set') . "\n";
-    // echo "DB: " . ($_ENV['PG_DB'] ?? 'not set') . "\n";
-    // echo "User: " . ($_ENV['PG_USER'] ?? 'not set') . "\n";
-    // echo '</pre>';
-    // echo '</pre>'; // Include inactive listings for admin
+    $listings = $db->getListings(null, null, 0, true); // Include inactive listings for admin
 } catch (Exception $e) {
     error_log("Database error in admin dashboard: " . $e->getMessage());
     // Set default values if database fails
@@ -46,12 +37,6 @@ try {
     $activeListingCount = 0;
     $users = [];
     $listings = [];
-
-    // echo '<pre>';
-    // echo "❌ Error: " . $e->getMessage() . "\n";
-    // echo "✅ Users fallback: " . count($users) . "\n";
-    // echo "✅ Listings fallback: " . count($listings) . "\n";
-    // echo '</pre>';
 }
 ?>
 
@@ -149,42 +134,19 @@ try {
                                                 <div class="user-alias">Alias: <?php echo htmlspecialchars($u['alias']); ?></div>
                                             </div>
                                         </div>
-<<<<<<< HEAD
-                                    </div>
-                               </td>
-                                <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
-                                <td><span class="status-badge <?php echo $user['is_banned'] ? 'banned' : 'active'; ?>"><?php echo $user['is_banned'] ? 'Banned' : 'Active'; ?></span></td>
-                                <td class="user-created-at"><?php echo $user['created_at']; ?></td>
-                                <td><?php echo number_format($user['trustlevel'], 1); ?></td>
-                                <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-user" data-user-id="<?php echo $user['user_id']; ?>" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn <?php echo $user['is_banned'] ? 'unban-user' : 'ban-user'; ?>" data-user-id="<?php echo $user['user_id']; ?>" title="<?php echo $user['is_banned'] ? 'Unban User' : 'Ban User'; ?>">
-                                            <i class="fas fa-<?php echo $user['is_banned'] ? 'user-check' : 'ban'; ?>"></i>
-                                        </button>
-                                        <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>" title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-=======
                                     </td>
                                     <td><span class="role-badge <?php echo $u['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $u['is_admin'] ? 'Admin' : 'User'; ?></span></td>
-                                    <td><span class="status-badge active">Active</span></td>
-                                    <td class="user-created-at"><?php echo $u['created_at']; ?></td>
-                                    <td><?php echo number_format($u['trustlevel'], 1); ?></td>
-                                    <td><?php echo $u['is_vendor'] ? 'Yes' : 'No'; ?></td>
+                                    <td><span class="status-badge <?php echo isset($u['is_banned']) && $u['is_banned'] ? 'banned' : 'active'; ?>"><?php echo isset($u['is_banned']) && $u['is_banned'] ? 'Banned' : 'Active'; ?></span></td>
+                                    <td class="user-created-at"><?php echo htmlspecialchars($u['created_at'] ?? 'N/A'); ?></td>
+                                    <td><?php echo isset($u['trustlevel']) ? number_format($u['trustlevel'], 1) : '0.0'; ?></td>
+                                    <td><?php echo isset($u['is_vendor']) && $u['is_vendor'] ? 'Yes' : 'No'; ?></td>
                                     <td>
                                         <div class="action-buttons">
                                             <button class="action-btn view-user" data-user-id="<?php echo $u['user_id']; ?>" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button class="action-btn ban-user" data-user-id="<?php echo $u['user_id']; ?>" title="Ban User">
-                                                <i class="fas fa-ban"></i>
+                                            <button class="action-btn <?php echo isset($u['is_banned']) && $u['is_banned'] ? 'unban-user' : 'ban-user'; ?>" data-user-id="<?php echo $u['user_id']; ?>" title="<?php echo isset($u['is_banned']) && $u['is_banned'] ? 'Unban User' : 'Ban User'; ?>">
+                                                <i class="fas fa-<?php echo isset($u['is_banned']) && $u['is_banned'] ? 'user-check' : 'ban'; ?>"></i>
                                             </button>
                                             <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($u['user_id']); ?>" title="Delete User">
                                                 <i class="fas fa-trash"></i>
@@ -193,7 +155,6 @@ try {
                                     </td>
                                 </tr>
                             <?php endif; ?>
->>>>>>> 0f8f1a7f6656461850534c21e30893208f442900
                         <?php endforeach; ?>
                     </tbody>
                 </table>

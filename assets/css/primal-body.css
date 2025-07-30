@@ -383,12 +383,13 @@
     font-family: 'Cinzel', serif;
     font-size: 2rem;
     font-weight: 700;
-    color: transparent;
+    color: var(--primal-orange); /* Fallback color */
     background: linear-gradient(135deg, 
         var(--primal-orange) 0%, 
         #ff6b35 100%);
     -webkit-background-clip: text;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
     margin-bottom: 1rem;
     letter-spacing: 1px;
     text-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
