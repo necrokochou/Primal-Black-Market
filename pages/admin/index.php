@@ -2,14 +2,13 @@
 // Start session and validate admin access BEFORE any output
 session_start();
 
-
-if (!isset($_SESSION['user']) || !($_SESSION['user']['is_admin'] ?? false)) {
+$user = $_SESSION['user'] ?? null;
+if (!isset($user) || !($user['is_admin'] ?? false)) {
     header('Location: /pages/login/index.php');
     exit;
 }
 
 // Get admin user data
-$user = $_SESSION['user'];
 $username = $user['username'] ?? 'Unknown';
 $alias = $user['alias'] ?? $username;
 
@@ -17,10 +16,6 @@ $alias = $user['alias'] ?? $username;
 require_once __DIR__ . '/../../bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 require_once __DIR__ . '/../../layouts/header.php';
-// Get admin user data
-$user = $_SESSION['user'];
-$username = $user['username'] ?? 'Unknown';
-$alias = $user['alias'] ?? $username;
 
 // Get data from database
 try {
@@ -138,37 +133,39 @@ try {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($users as $index => $user): ?>
-                            <tr data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>">
-                                <td>
-                                    <div class="user-info">
-                                        <i class="fas fa-user-circle user-avatar"></i>
-                                        <div>
-                                            <div class="user-name"><?php echo htmlspecialchars($user['username']); ?></div>
-                                            <div class="user-email"><?php echo htmlspecialchars($user['email']); ?></div>
-                                            <div class="user-alias">Alias: <?php echo htmlspecialchars($user['alias']); ?></div>
+                        <?php foreach ($users as $index => $u): ?>
+                            <?php if ($u['user_id'] !== $user['user_id']): ?>
+                                <tr data-user-id="<?php echo htmlspecialchars($u['user_id']); ?>">
+                                    <td>
+                                        <div class="user-info">
+                                            <i class="fas fa-user-circle user-avatar"></i>
+                                            <div>
+                                                <div class="user-name"><?php echo htmlspecialchars($u['username']); ?></div>
+                                                <div class="user-email"><?php echo htmlspecialchars($u['email']); ?></div>
+                                                <div class="user-alias">Alias: <?php echo htmlspecialchars($u['alias']); ?></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
-                                <td><span class="status-badge active">Active</span></td>
-                                <td class="user-created-at"><?php echo $user['created_at']; ?></td>
-                                <td><?php echo number_format($user['trustlevel'], 1); ?></td>
-                                <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-user" data-user-id="<?php echo $user['user_id']; ?>" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn ban-user" data-user-id="<?php echo $user['user_id']; ?>" title="Ban User">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                        <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>" title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td><span class="role-badge <?php echo $u['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $u['is_admin'] ? 'Admin' : 'User'; ?></span></td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td class="user-created-at"><?php echo $u['created_at']; ?></td>
+                                    <td><?php echo number_format($u['trustlevel'], 1); ?></td>
+                                    <td><?php echo $u['is_vendor'] ? 'Yes' : 'No'; ?></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view-user" data-user-id="<?php echo $u['user_id']; ?>" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn ban-user" data-user-id="<?php echo $u['user_id']; ?>" title="Ban User">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                            <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($u['user_id']); ?>" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
