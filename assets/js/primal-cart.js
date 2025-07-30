@@ -441,9 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
-                        body: new URLSearchParams({
-                            action: 'clear'
-                        })
+                        body: new URLSearchParams({ action: 'checkout' })
                     });
 
                     await renderCartEnhanced();
