@@ -152,6 +152,9 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (!data.success) throw new Error(data.error);
                 console.log('Cart updated:', data);
+
+                // ✅ Only dispatch if successful
+                window.dispatchEvent(new Event('cartUpdated'));
             })
             .catch(err => {
                 console.error('Network/cart error:', err);

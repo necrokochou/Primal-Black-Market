@@ -284,43 +284,43 @@ document.addEventListener("click", function (e) {
 });
 
 // Product Management Functions
-function editSellerProduct(productId) {
-  console.log(`🔧 Editing product: ${productId}`);
+// function editSellerProduct(productId) {
+//   console.log(`🔧 Editing product: ${productId}`);
   
-  // First, fetch the product data from the server
-  fetch(`/handlers/products.handler.php?action=read&id=${productId}`)
-    .then(response => response.json())
-    .then(data => {
-      if (data.success && data.product) {
-        const product = data.product;
-        console.log('Product data loaded:', product);
+//   // First, fetch the product data from the server
+//   fetch(`/handlers/products.handler.php?action=read&id=${productId}`)
+//     .then(response => response.json())
+//     .then(data => {
+//       if (data.success && data.product) {
+//         const product = data.product;
+//         console.log('Product data loaded:', product);
         
-        // Check if the seller product modal component exists
-        if (typeof openProductModal === 'function') {
-          // Open the modal with the product data for editing
-          openProductModal({
-            id: product.listing_id,
-            title: product.title,
-            category: product.category,
-            price: product.price,
-            description: product.description,
-            quantity: product.quantity,
-            status: product.is_active ? 'active' : 'inactive',
-            image: product.item_image
-          });
-        } else {
-          // Fallback: Create a simple edit modal
-          openSimpleEditModal(product);
-        }
-      } else {
-        showNotification('❌ Failed to load product data', 'error');
-      }
-    })
-    .catch(error => {
-      console.error('Error loading product:', error);
-      showNotification('❌ Error loading product data', 'error');
-    });
-}
+//         // Check if the seller product modal component exists
+//         if (typeof openProductModal === 'function') {
+//           // Open the modal with the product data for editing
+//           openProductModal({
+//             id: product.listing_id,
+//             title: product.title,
+//             category: product.category,
+//             price: product.price,
+//             description: product.description,
+//             quantity: product.quantity,
+//             status: product.is_active ? 'active' : 'inactive',
+//             image: product.item_image
+//           });
+//         } else {
+//           // Fallback: Create a simple edit modal
+//           openSimpleEditModal(product);
+//         }
+//       } else {
+//         showNotification('❌ Failed to load product data', 'error');
+//       }
+//     })
+//     .catch(error => {
+//       console.error('Error loading product:', error);
+//       showNotification('❌ Error loading product data', 'error');
+//     });
+// }
 
 function toggleSellerProductStatus(productId) {
   const confirmation = confirm('Are you sure you want to toggle the status of this product?');
@@ -372,6 +372,7 @@ function deleteSellerProduct(productId) {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest'
       },
       body: `id=${encodeURIComponent(productId)}`
     })
