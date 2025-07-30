@@ -676,3 +676,424 @@
 .about-cta {
     animation: fadeInUp 0.8s ease-out 1.4s both;
 }
+
+/* ================================
+   TEAM MEMBERS SECTION
+   ================================ */
+
+.team-section {
+    padding: 5rem 0;
+    position: relative;
+}
+
+.team-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(255, 140, 0, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(127, 79, 36, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.team-section .about-section-title {
+    text-align: center;
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--primal-beige-light), var(--primal-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.team-section .about-section-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primal-orange), var(--primal-brown));
+    box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
+}
+
+.team-section-subtitle {
+    text-align: center;
+    font-size: 1.3rem;
+    color: rgba(245, 245, 220, 0.9);
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 4rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+    font-weight: 300;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 3rem;
+    margin-top: 4rem;
+    position: relative;
+}
+
+.team-member {
+    background: linear-gradient(135deg, 
+        rgba(26, 26, 26, 0.98) 0%, 
+        rgba(35, 35, 35, 0.98) 50%,
+        rgba(26, 26, 26, 0.98) 100%);
+    border-radius: 25px;
+    padding: 2.5rem 2rem;
+    border: 1px solid rgba(127, 79, 36, 0.2);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    position: relative;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    transform-style: preserve-3d;
+}
+
+.team-member::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 140, 0, 0.03) 0%, 
+        transparent 30%, 
+        rgba(127, 79, 36, 0.03) 70%,
+        transparent 100%);
+    pointer-events: none;
+    border-radius: 25px;
+}
+
+.team-member::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+        from 0deg at 50% 50%,
+        transparent,
+        rgba(255, 140, 0, 0.1),
+        transparent,
+        rgba(127, 79, 36, 0.1),
+        transparent
+    );
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    animation: rotate 10s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.team-member:hover {
+    transform: translateY(-15px) rotateX(2deg);
+    box-shadow: 
+        0 35px 70px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(255, 140, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 140, 0, 0.4);
+}
+
+.team-member:hover::after {
+    opacity: 1;
+}
+
+.team-member-image {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 2rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid transparent;
+    background: linear-gradient(135deg, var(--primal-orange), var(--primal-brown));
+    padding: 4px;
+    transition: all 0.5s ease;
+}
+
+.team-member:hover .team-member-image {
+    transform: scale(1.1) rotateY(5deg);
+    box-shadow: 0 15px 30px rgba(255, 140, 0, 0.3);
+}
+
+.team-member-image::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: conic-gradient(
+        from 0deg,
+        var(--primal-orange),
+        var(--primal-brown),
+        var(--primal-green),
+        var(--primal-orange)
+    );
+    border-radius: 50%;
+    z-index: -1;
+    animation: spin 3s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.team-member:hover .team-member-image::before {
+    opacity: 1;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.team-member-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: all 0.5s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.team-member:hover .team-member-image img {
+    transform: scale(1.05);
+    filter: brightness(1.1) contrast(1.1);
+}
+
+.team-member-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+        rgba(255, 140, 0, 0.95) 0%, 
+        rgba(127, 79, 36, 0.95) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    backdrop-filter: blur(10px);
+}
+
+.team-member:hover .team-member-overlay {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.team-member-social {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.team-social-link {
+    color: white;
+    font-size: 1.4rem;
+    padding: 0.8rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.team-social-link:hover {
+    background: white;
+    color: var(--primal-orange);
+    transform: scale(1.2) rotate(360deg);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+}
+
+.team-member-info {
+    text-align: center;
+    position: relative;
+    z-index: 3;
+}
+
+.team-member-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primal-beige-light);
+    margin-bottom: 0.8rem;
+    line-height: 1.3;
+    background: linear-gradient(135deg, var(--primal-beige-light), rgba(245, 245, 220, 0.8));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.3s ease;
+}
+
+.team-member:hover .team-member-name {
+    transform: translateY(-2px);
+    text-shadow: 0 2px 8px rgba(245, 245, 220, 0.3);
+}
+
+.team-member-role {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primal-orange);
+    margin-bottom: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.team-member-role::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(135deg, var(--primal-orange), var(--primal-brown));
+    transition: width 0.3s ease;
+}
+
+.team-member:hover .team-member-role::after {
+    width: 60px;
+}
+
+.team-member-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: rgba(245, 245, 220, 0.85);
+    line-height: 1.7;
+    margin: 0;
+    font-weight: 300;
+    transition: all 0.3s ease;
+}
+
+.team-member:hover .team-member-description {
+    color: rgba(245, 245, 220, 0.95);
+    transform: translateY(-1px);
+}
+
+/* Enhanced Team Member Animations */
+.team-member:nth-child(1) { 
+    animation: slideInUp 0.8s ease-out 0.2s both;
+}
+.team-member:nth-child(2) { 
+    animation: slideInUp 0.8s ease-out 0.4s both;
+}
+.team-member:nth-child(3) { 
+    animation: slideInUp 0.8s ease-out 0.6s both;
+}
+.team-member:nth-child(4) { 
+    animation: slideInUp 0.8s ease-out 0.8s both;
+}
+.team-member:nth-child(5) { 
+    animation: slideInUp 0.8s ease-out 1.0s both;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(60px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Responsive Design for Team Section */
+@media (max-width: 768px) {
+    .team-section {
+        padding: 3rem 0;
+    }
+    
+    .team-section .about-section-title {
+        font-size: 2.2rem;
+    }
+    
+    .team-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2.5rem;
+    }
+    
+    .team-member {
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+    }
+    
+    .team-member-image {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .team-member-name {
+        font-size: 1.3rem;
+    }
+    
+    .team-member-role {
+        font-size: 0.9rem;
+    }
+    
+    .team-section-subtitle {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+        margin-bottom: 3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .team-member {
+        padding: 1.8rem 1.2rem;
+        border-radius: 18px;
+    }
+    
+    .team-member-image {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .team-member-name {
+        font-size: 1.2rem;
+    }
+    
+    .team-member-role {
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+    }
+    
+    .team-member-description {
+        font-size: 0.95rem;
+    }
+    
+    .team-social-link {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+    }
+}

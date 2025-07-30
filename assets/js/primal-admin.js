@@ -34,7 +34,7 @@ function protectAdminFromSelfActions() {
           const userId = row.dataset.userId;
 
           if (userId === currentUserId) {
-            const banBtn = row.querySelector(".ban-user");
+            const banBtn = row.querySelector(".ban-user, .unban-user");
             const deleteBtn = row.querySelector(".delete-user");
 
             if (banBtn) banBtn.remove();
@@ -93,7 +93,11 @@ function setupUserActions() {
     }
 
     if (e.target.classList.contains("ban-user")) {
-      banUser(userId, userRow);
+      banUser(userId, userRow, true);
+    }
+
+    if (e.target.classList.contains("unban-user")) {
+      banUser(userId, userRow, false);
     }
 
     if (e.target.classList.contains("delete-user")) {
@@ -183,25 +187,65 @@ function showUserModal(userId, userRow) {
     `User Details:\n\nName: ${userName}\nEmail: ${userEmail}\nAlias: ${userAlias}\nJoined: ${userDate}`
   );
 }
-function banUser(userId, userRow) {
+function banUser(userId, userRow, shouldBan = true) {
   const userName = userRow.querySelector(".user-name").textContent;
-  const confirmation = confirm(`Are you sure you want to ban ${userName}?`);
+  const action = shouldBan ? "ban" : "unban";
+  const confirmation = confirm(`Are you sure you want to ${action} ${userName}?`);
 
   if (confirmation) {
     // Visual feedback
     userRow.style.opacity = "0.5";
-    userRow.style.background = "rgba(220, 53, 69, 0.1)";
+    userRow.style.background = shouldBan ? "rgba(220, 53, 69, 0.1)" : "rgba(40, 167, 69, 0.1)";
 
-    // Update status badge
-    const statusBadge = userRow.querySelector(".status-badge");
-    if (statusBadge) {
-      statusBadge.textContent = "Banned";
-      statusBadge.className = "status-badge banned";
-      statusBadge.style.background =
-        "linear-gradient(135deg, #dc3545, #c82333)";
-    }
+    fetch("/handlers/admin.handler.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `action=ban_user&user_id=${encodeURIComponent(userId)}&ban_status=${shouldBan}`,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          // Update status badge
+          const statusBadge = userRow.querySelector(".status-badge");
+          if (statusBadge) {
+            statusBadge.textContent = shouldBan ? "Banned" : "Active";
+            statusBadge.className = shouldBan ? "status-badge banned" : "status-badge active";
+            statusBadge.style.background = shouldBan 
+              ? "linear-gradient(135deg, #dc3545, #c82333)" 
+              : "linear-gradient(135deg, #28a745, #20c997)";
+          }
 
-    showNotification(`${userName} has been banned`, "success");
+          // Update the button itself
+          const actionBtn = userRow.querySelector(".ban-user, .unban-user");
+          if (actionBtn) {
+            actionBtn.className = shouldBan ? "action-btn unban-user" : "action-btn ban-user";
+            actionBtn.title = shouldBan ? "Unban User" : "Ban User";
+            const icon = actionBtn.querySelector("i");
+            if (icon) {
+              icon.className = shouldBan ? "fas fa-user-check" : "fas fa-ban";
+            }
+          }
+
+          // Reset visual feedback
+          userRow.style.opacity = "";
+          userRow.style.background = "";
+
+          showNotification(`${userName} has been ${shouldBan ? 'banned' : 'unbanned'}`, "success");
+        } else {
+          showNotification(`Failed to ${action} ${userName}: ${data.error}`, "error");
+          // Reset visual feedback on error
+          userRow.style.opacity = "";
+          userRow.style.background = "";
+        }
+      })
+      .catch(() => {
+        showNotification(`Failed to ${action} ${userName}: server error`, "error");
+        // Reset visual feedback on error
+        userRow.style.opacity = "";
+        userRow.style.background = "";
+      });
   }
 }
 
@@ -212,6 +256,9 @@ function deleteUser(userId, userRow) {
   );
 
   if (confirmation) {
+    // Debug info
+    console.log("Attempting to delete user:", userId, userName);
+    
     // Visual feedback before backend call
     userRow.style.transition = "all 0.5s ease";
     userRow.style.opacity = "0.5";
@@ -224,8 +271,15 @@ function deleteUser(userId, userRow) {
       },
       body: `action=delete_user&user_id=${encodeURIComponent(userId)}`,
     })
-      .then((res) => res.json())
+      .then((res) => {
+        console.log("Delete response status:", res.status);
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+      })
       .then((data) => {
+        console.log("Delete response data:", data);
         if (data.success) {
           setTimeout(() => {
             userRow.remove();
@@ -233,15 +287,16 @@ function deleteUser(userId, userRow) {
           }, 300);
         } else {
           showNotification(
-            `Failed to delete ${userName}: ${data.error}`,
+            `Failed to delete ${userName}: ${data.error || 'Unknown error'}`,
             "error"
           );
           userRow.style.opacity = "";
           userRow.style.transform = "";
         }
       })
-      .catch(() => {
-        showNotification(`Failed to delete ${userName}: server error`, "error");
+      .catch((error) => {
+        console.error("Delete user error:", error);
+        showNotification(`Failed to delete ${userName}: ${error.message || 'server error'}`, "error");
         userRow.style.opacity = "";
         userRow.style.transform = "";
       });

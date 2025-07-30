@@ -96,6 +96,105 @@ require_once LAYOUTS_PATH . '/header.php';
             </div>
         </div>
         
+        <!-- Team Members Section -->
+        <section class="about-section team-section">
+            <h2 class="about-section-title">Meet Our Team</h2>
+            <p class="team-section-subtitle">
+                The passionate individuals behind Primal Black Market, dedicated to bringing you the extraordinary.
+            </p>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="team-member-image">
+                        <img src="/assets/images/team/joseph.jpg" alt="Joseph Aiden Reilly Flores" loading="lazy">
+                        <div class="team-member-overlay">
+                            <div class="team-member-social">
+                                <a href="https://github.com/necrokochou" class="team-social-link"><i class="fab fa-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-member-info">
+                        <h3 class="team-member-name">Joseph Aiden Reilly Flores</h3>
+                        <p class="team-member-role">QA & Backend Developer</p>
+                        <p class="team-member-description">
+                            Ensures our platform runs flawlessly with rigorous testing and robust backend architecture.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="team-member-image">
+                        <img src="/assets/images/team/christian.jpg" alt="Christian Allen Galang" loading="lazy">
+                        <div class="team-member-overlay">
+                            <div class="team-member-social">
+                                <a href="https://github.com/LLen-G" class="team-social-link"><i class="fab fa-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-member-info">
+                        <h3 class="team-member-name">Christian Allen Galang</h3>
+                        <p class="team-member-role">Backend Developer</p>
+                        <p class="team-member-description">
+                            Crafts the powerful server-side systems that power our primal marketplace experience.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="team-member-image">
+                        <img src="/assets/images/team/louie.jpg" alt="Louie John Pamilar" loading="lazy">
+                        <div class="team-member-overlay">
+                            <div class="team-member-social">
+                                <a href="https://github.com/PhantomMorphus" class="team-social-link"><i class="fab fa-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-member-info">
+                        <h3 class="team-member-name">Louie John Pamilar</h3>
+                        <p class="team-member-role">Database Specialist</p>
+                        <p class="team-member-description">
+                            Masters the data infrastructure that keeps our marketplace secure and efficient.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="team-member-image">
+                        <img src="/assets/images/team/carl.jpg" alt="Carl Markruel Cendana" loading="lazy">
+                        <div class="team-member-overlay">
+                            <div class="team-member-social">
+                                <a href="https://github.com/Aiden017" class="team-social-link"><i class="fab fa-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-member-info">
+                        <h3 class="team-member-name">Carl Markruel Cendana</h3>
+                        <p class="team-member-role">Full-Stack Developer</p>
+                        <p class="team-member-description">
+                            Versatile developer handling everything from frontend magic to backend wizardry.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="team-member-image">
+                        <img src="/assets/images/team/christiane.jpg" alt="Christiane Janiel Banaag" loading="lazy">
+                        <div class="team-member-overlay">
+                            <div class="team-member-social">
+                                <a href="https://github.com/Ceji-B" class="team-social-link"><i class="fab fa-github"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="team-member-info">
+                        <h3 class="team-member-name">Christiane Janiel Banaag</h3>
+                        <p class="team-member-role">Frontend Developer</p>
+                        <p class="team-member-description">
+                            Creates stunning user interfaces that make our primal marketplace a visual masterpiece.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
         <!-- Values Section -->
         <section class="about-section">
             <h2 class="about-section-title">Our Core Values</h2>

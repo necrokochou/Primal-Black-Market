@@ -16,31 +16,43 @@ class Auth
 
     public function tryLogin(string $username, string $password): ?array
     {
-        $field = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        try {
+            $field = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        $statement = $this->account->prepare("SELECT * FROM users WHERE {$field} = :username");
-        $statement->bindParam(':username', $username);
-        $statement->execute();
-        $user = $statement->fetch(PDO::FETCH_ASSOC);
+            $statement = $this->account->prepare("SELECT * FROM users WHERE {$field} = :username");
+            $statement->bindParam(':username', $username);
+            $statement->execute();
+            $user = $statement->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user || !isset($user['password'])) {
+            if (!$user || !isset($user['password'])) {
+                return null;
+            }
+
+            // Check if user is banned
+            if (isset($user['is_banned']) && $user['is_banned']) {
+                return null;
+            }
+
+            if (password_verify($password, $user['password'])) {
+                // Return normalized field names for consistency
+                $result = [
+                    'user_id' => $user['user_id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                    'alias' => $user['alias'],
+                    'trustlevel' => $user['trustlevel'] ?? 0,
+                    'is_admin' => $user['is_admin'] ?? false,
+                    'is_vendor' => $user['is_vendor'] ?? false
+                ];
+                
+                return $result;
+            }
+
+            return null;
+        } catch (Exception $e) {
+            error_log("Login error: " . $e->getMessage());
             return null;
         }
-
-        if (password_verify($password, $user['password'])) {
-            // Return normalized field names for consistency
-            return [
-                'user_id' => $user['user_id'],
-                'username' => $user['username'],
-                'email' => $user['email'],
-                'alias' => $user['alias'],
-                'trustlevel' => $user['trustlevel'],
-                'is_admin' => $user['is_admin'],
-                'is_vendor' => $user['is_vendor']
-            ];
-        }
-
-        return null;
     }
 
     public function getLoggedInUserID(): ?string

@@ -14,6 +14,18 @@ if (session_status() === PHP_SESSION_NONE) {
 // Prevent accidental echo output (HTML/errors/warnings)
 ob_start();
 
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display errors to browser
+ini_set('log_errors', 1);     // Log errors
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Prevent accidental echo output (HTML/errors/warnings)
+ob_start();
+
 // Define BASE_PATH if not already defined
 if (!defined('BASE_PATH')) {
     define('BASE_PATH', realpath(__DIR__ . '/..'));
@@ -82,9 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     outputJson(['success' => false, 'error' => 'Method not allowed'], 405);
 }
 
-
 try {
     $action = $_POST['action'] ?? '';
+    error_log("Auth action: $action");
 
     if ($action === 'login') {
         $username = $_POST['username'] ?? '';
