@@ -92,8 +92,8 @@ function sendResponse(array $response, bool $isAjaxRequest): void
         // AJAX request - send JSON response
         if (!headers_sent()) {
             header('Content-Type: application/json');
+            echo json_encode($response);
         }
-        echo json_encode($response);
     } else {
         // Regular form submission - redirect based on success/failure
         $redirectTo = $_POST['redirect_to'] ?? '/pages/account/index.php';
@@ -217,14 +217,15 @@ try {
     if (ob_get_level()) {
         ob_clean();
     }
-    
+
     error_log('Products handler error: ' . $e->getMessage());
     error_log('Stack trace: ' . $e->getTraceAsString());
-    
+
     http_response_code(400);
-    
-    $errorResponse = ['success' => false, 'message' => $e->getMessage()];
-    sendResponse($errorResponse, $isAjaxRequest);
+
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    exit;
 }
 
 // Ensure output buffering is ended cleanly
@@ -277,13 +278,36 @@ function createProduct(PDO $db, string $vendorId): array
     }
 
     // Temporarily disable image upload to test core functionality
+    // $imagePath = null;
+    // try {
+    //     $imagePath = handleImageUpload($vendorId, true); // Make image optional
+    // } catch (Exception $e) {
+    //     // Log the image upload error but don't fail the product creation
+    //     error_log("Image upload failed (continuing without image): " . $e->getMessage());
+    //     $imagePath = null;
+    // }
+
     $imagePath = null;
-    try {
-        $imagePath = handleImageUpload($vendorId, true); // Make image optional
-    } catch (Exception $e) {
-        // Log the image upload error but don't fail the product creation
-        error_log("Image upload failed (continuing without image): " . $e->getMessage());
-        $imagePath = null;
+
+    if (isset($_FILES['images']) && $_FILES['images']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = '/assets/images/user-uploads/';
+        $uploadPath = $_SERVER['DOCUMENT_ROOT'] . $uploadDir;
+
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0775, true); // ensure directory exists
+        }
+
+        $filename = uniqid('img_', true) . '.' . pathinfo($_FILES['images']['name'], PATHINFO_EXTENSION);
+        $targetFile = $uploadPath . $filename;
+
+        $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+        $allowedTypes = ['jpg', 'jpeg', 'png', 'webp'];
+
+        if (in_array($fileType, $allowedTypes)) {
+            if (move_uploaded_file($_FILES['images']['tmp_name'], $targetFile)) {
+                $imagePath = $uploadDir . $filename; // store relative path for DB
+            }
+        }
     }
 
     // if you don't have categories_id in UI, you may want to resolve it here.
@@ -344,7 +368,7 @@ function createProduct(PDO $db, string $vendorId): array
     ];
 }
 
-function readProduct(PDO $db, string $id, string $vendorId): array
+function readProduct(PDO $db, string $id, ?string $vendorId = null): array
 {
     $stmt = $db->prepare("SELECT * FROM listings WHERE listing_id = :id AND vendor_id = :vid LIMIT 1");
     $stmt->execute(['id' => $id, 'vid' => $vendorId]);
@@ -480,35 +504,38 @@ function deleteProduct(PDO $db, string $id, string $vendorId): array
     }
 
     try {
-        // Start transaction
         $db->beginTransaction();
-        
-        // First, remove any cart references to this product
+
+        // Fetch the image path before deletion
+        $imgStmt = $db->prepare("SELECT item_image FROM listings WHERE listing_id = :id");
+        $imgStmt->execute(['id' => $id]);
+        $imagePath = $imgStmt->fetchColumn();
+
+        // Delete from cart
         $cartStmt = $db->prepare("DELETE FROM cart WHERE listing_id = :id");
         $cartStmt->execute(['id' => $id]);
-        
-        // Log how many cart items were removed
-        $removedCartItems = $cartStmt->rowCount();
-        if ($removedCartItems > 0) {
-            error_log("Removed {$removedCartItems} cart items for product {$id}");
-        }
-        
-        // Then delete the product
+
+        // Delete from listings
         $stmt = $db->prepare("DELETE FROM listings WHERE listing_id = :id");
         $stmt->execute(['id' => $id]);
-        
-        // Commit transaction
+
+        // Commit DB deletion
         $db->commit();
-        
-        $message = 'Product deleted successfully';
-        if ($removedCartItems > 0) {
-            $message .= " (also removed from {$removedCartItems} user cart(s))";
+
+        // Try to delete image from file system if it exists
+        if ($imagePath) {
+            $fullPath = $_SERVER['DOCUMENT_ROOT'] . $imagePath;
+            if (file_exists($fullPath)) {
+                unlink($fullPath); // Delete file
+                error_log("🗑️ Deleted image file: {$fullPath}");
+            } else {
+                error_log("⚠️ Image file not found at: {$fullPath}");
+            }
         }
-        
-        return ['success' => true, 'message' => $message];
-        
+
+        return ['success' => true, 'message' => 'Product and image deleted successfully'];
+
     } catch (Exception $e) {
-        // Rollback transaction on error
         $db->rollBack();
         error_log("Error deleting product {$id}: " . $e->getMessage());
         return ['success' => false, 'message' => 'Failed to delete product: ' . $e->getMessage()];
