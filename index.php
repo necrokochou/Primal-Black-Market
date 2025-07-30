@@ -1,21 +1,26 @@
-
-
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/envSetter.util.php';
-require_once HANDLERS_PATH . '/mongodbChecker.handler.php';
-require_once HANDLERS_PATH . '/postgresChecker.handler.php';
+// require_once HANDLERS_PATH . '/mongodbChecker.handler.php';
+// require_once HANDLERS_PATH . '/postgresChecker.handler.php';
+require_once UTILS_PATH . '/DatabaseService.util.php';
 require_once __DIR__ . '/layouts/header.php';
-require_once __DIR__ . '/components/productCard.component.php';
+require_once __DIR__ . '/utils/productCard.util.php';
 
-$categories = require __DIR__ . '/staticData/dummies/categories.staticData.php';
-$listings = require __DIR__ . '/staticData/dummies/listings.staticData.php';
-$groupedListings = [];
-foreach ($listings as $listing) {
-    if (!isset($groupedListings[$listing['Category']])) {
-        $groupedListings[$listing['Category']] = [];
-    }
-    $groupedListings[$listing['Category']][] = $listing;
+try {
+    $db = DatabaseService::getInstance();
+    $categories = $db->getCategories();
+    $featuredListings = $db->getFeaturedListings(8);
+    $groupedListings = $db->getListingsByCategory(6);
+} catch (Exception $e) {
+    error_log("Database error: " . $e->getMessage());
+    // Set empty arrays if database fails
+    $categories = [];
+    $featuredListings = [];
+    $groupedListings = [];
 }
 ?>
 
@@ -47,15 +52,25 @@ foreach ($listings as $listing) {
         <h2>Featured Products</h2>
         <div class="featured-products-row">
             <?php
-            $allProducts = $listings;
-            shuffle($allProducts);
-            $carouselProducts = array_slice($allProducts, 0, 3);
+            // Use featured listings from database or fallback to static data
+            $displayProducts = $featuredListings ?? $listings ?? [];
+            shuffle($displayProducts);
+            $carouselProducts = array_slice($displayProducts, 0, 3);
             foreach ($carouselProducts as $product) {
-                $isNew = (strtotime($product['PublishDate']) > strtotime('-14 days'));
-                $imagePath = $product['Item_Image'] ? '/' . $product['Item_Image'] : '/assets/images/example.png';
+                // Handle both database format and static format
+                $id = $product['listing_id'];
+                $title = $product['title'] ?? $product['name'] ?? $product['Title'] ?? 'Unknown Product';
+                $price = $product['price'] ?? $product['Price'] ?? 0;
+                $image = $product['item_image'] ?? $product['image_path'] ?? $product['Item_Image'] ?? $product['Image'] ?? null;
+                $publishDate = $product['publish_date'] ?? $product['created_at'] ?? $product['PublishDate'] ?? date('Y-m-d');
+                
+                $isNew = (strtotime($publishDate) > strtotime('-14 days'));
+                $imagePath = $image ? $image : '/assets/images/example.png';
+                
                 renderProductCard(
-                    $product['Title'],
-                    number_format($product['Price'], 2),
+                    $title,
+                    $id,
+                    number_format($price, 2),
                     $imagePath,
                     $isNew
                 );
@@ -81,15 +96,25 @@ foreach ($listings as $listing) {
         <h2>Weekly Top Selling</h2>
         <div class="products-grid">
            <?php
-            $allProducts = $listings;
-            shuffle($allProducts);
-            $carouselProducts = array_slice($allProducts, 0, 4);
+            // Use featured listings from database or fallback to static data
+            $displayProducts = $featuredListings ?? $listings ?? [];
+            shuffle($displayProducts);
+            $carouselProducts = array_slice($displayProducts, 0, 4);
             foreach ($carouselProducts as $product) {
-                $isNew = (strtotime($product['PublishDate']) > strtotime('-14 days'));
-                $imagePath = $product['Item_Image'] ? '/' . $product['Item_Image'] : '/assets/images/example.png';
+                // Handle both database format and static format
+                $id = $product['listing_id'];
+                $title = $product['title'] ?? $product['name'] ?? $product['Title'] ?? 'Unknown Product';
+                $price = $product['price'] ?? $product['Price'] ?? 0;
+                $image = $product['item_image'] ?? $product['image_path'] ?? $product['Item_Image'] ?? $product['Image'] ?? null;
+                $publishDate = $product['publish_date'] ?? $product['created_at'] ?? $product['PublishDate'] ?? date('Y-m-d');
+                
+                $isNew = (strtotime($publishDate) > strtotime('-14 days'));
+                $imagePath = $image ? $image : '/assets/images/example.png';
+                
                 renderProductCard(
-                    $product['Title'],
-                    number_format($product['Price'], 2),
+                    $title,
+                    $id,
+                    number_format($price, 2),
                     $imagePath,
                     $isNew
                 );

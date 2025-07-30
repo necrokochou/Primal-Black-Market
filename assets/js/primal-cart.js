@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // ENHANCED CART RENDERING
     // ================================
     
-    function renderCartEnhanced() {
-        const cart = getCart();
+    async function renderCartEnhanced() {
+        const cart = await getCart();
         
         if (!cartItemsDiv) return;
         
@@ -46,24 +46,27 @@ document.addEventListener('DOMContentLoaded', function() {
         let subtotal = 0;
         
         cartItemsDiv.innerHTML = cart.map((item, idx) => {
-            const itemTotal = item.price * item.qty;
+            const unitPrice = item.unit_price ?? 0;
+            const qty = item.quantity ?? 0;
+            const itemTotal = unitPrice * qty;
+            const imagePath = item.item_image ? '/' + item.item_image.replace(/^\/?/, '') : '/assets/images/example.png';
             subtotal += itemTotal;
             
             return `
-                <div class="cart-row" data-item-index="${idx}">
+                <div class="cart-row" data-item-index="${idx}" data-item-id="${item.cart_id}">
                     <div class="cart-row-product">
-                        <img src="${item.image || '/assets/images/example.png'}" alt="${item.title}" class="cart-row-img">
+                        <img src="${imagePath || '/assets/images/example.png'}" alt="${item.title}" class="cart-row-img">
                         <div class="cart-row-info">
                             <div class="cart-row-title">${item.title}</div>
                             <div class="cart-row-color">Set : Colour: <span>${item.color || 'Default'}</span></div>
                             <div class="cart-row-price" style="font-size: 0.9rem; color: var(--primal-orange); margin-top: 0.5rem;">
-                                $${item.price.toFixed(2)} each
+                                $${unitPrice.toFixed(2)} each
                             </div>
                         </div>
                     </div>
                     <div class="cart-row-qty">
                         <button class="qty-btn qty-decrease" data-index="${idx}">-</button>
-                        <span class="cart-qty">${item.qty}</span>
+                        <span class="cart-qty">${qty}</span>
                         <button class="qty-btn qty-increase" data-index="${idx}">+</button>
                     </div>
                     <div class="cart-row-total">$${itemTotal.toFixed(2)}</div>
@@ -76,11 +79,22 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }).join('');
         
-        // Update summary
-        const discount = subtotal > 0 ? subtotal * 0.10 : 0;
+        // Discount from voucher
+        const voucherDiscountRate = appliedVoucher?.discount ?? 0;
+
+        // Quantity-based discount
+        let quantityDiscountRate = 0;
+        if (cart.length >= 5) quantityDiscountRate = 0.05;
+        else if (cart.length >= 3) quantityDiscountRate = 0.03;
+        else if (cart.length >= 2) quantityDiscountRate = 0.01;
+
+        // Total discount rate is the higher of the two
+        const discountRate = Math.max(voucherDiscountRate, quantityDiscountRate);
+
+        const discount = subtotal * discountRate;
         const delivery = subtotal > 0 ? 50 : 0;
         const total = subtotal - discount + delivery;
-        
+
         updateCartSummary(subtotal, discount, delivery, total);
         
         // Add event listeners to new elements
@@ -149,9 +163,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Remove buttons
         document.querySelectorAll('.remove-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 const index = parseInt(this.dataset.index);
-                removeItemWithAnimation(index);
+                const cartRow = document.querySelector(`.cart-row[data-item-index="${index}"]`);
+                const cartId = cartRow?.getAttribute('data-item-id');
+
+                if (cartId) {
+                    removeItemWithAnimation(cartId);
+                } else {
+                    console.error('cart_id not found for index', index);
+                }
             });
         });
         
@@ -167,75 +188,93 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    function updateQuantityWithAnimation(index, delta) {
-        const cart = getCart();
+    async function updateQuantityWithAnimation(index, delta) {
+        const cart = await getCart();
         const item = cart[index];
-        
         if (!item) return;
-        
-        const newQty = item.qty + delta;
-        
+
+        const newQty = item.quantity + delta;
         if (newQty <= 0) {
-            removeItemWithAnimation(index);
+            removeItemWithAnimation(item.cart_id);
             return;
         }
-        
-        // Update quantity with visual feedback
-        item.qty = newQty;
-        localStorage.setItem('pbm_cart', JSON.stringify(cart));
-        
-        // Find the quantity display and animate it
-        const qtyDisplay = document.querySelector(`[data-item-index="${index}"] .cart-qty`);
-        if (qtyDisplay) {
-            qtyDisplay.style.transform = 'scale(1.2)';
-            qtyDisplay.style.color = 'var(--primal-orange)';
-            
-            setTimeout(() => {
-                qtyDisplay.textContent = newQty;
-                qtyDisplay.style.transform = 'scale(1)';
-                qtyDisplay.style.color = 'var(--primal-beige-light)';
-            }, 150);
+
+        try {
+            const response = await fetch('/handlers/cart.handler.php', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    action: 'update',
+                    cart_id: item.cart_id,
+                    quantity: newQty
+                })
+            });
+
+            const data = await response.json();
+            if (!data.success) {
+                console.error('Update failed:', data.error);
+                return;
+            }
+
+            // Animate quantity display
+            const qtyDisplay = document.querySelector(`[data-item-index="${index}"] .cart-qty`);
+            if (qtyDisplay) {
+                qtyDisplay.style.transform = 'scale(1.2)';
+                qtyDisplay.style.color = 'var(--primal-orange)';
+                setTimeout(() => {
+                    qtyDisplay.textContent = newQty;
+                    qtyDisplay.style.transform = 'scale(1)';
+                    qtyDisplay.style.color = 'var(--primal-beige-light)';
+                }, 150);
+            }
+
+            await renderCartEnhanced();
+            window.dispatchEvent(new Event('cartUpdated'));
+            showUpdateNotification(`Quantity updated to ${newQty}`);
+        } catch (err) {
+            console.error('Failed to update quantity:', err);
         }
-        
-        // Update totals
-        renderCartEnhanced();
-        
-        // Trigger cart update event
-        window.dispatchEvent(new Event('cartUpdated'));
-        
-        // Show update notification
-        showUpdateNotification(`Quantity updated to ${newQty}`);
     }
     
-    function removeItemWithAnimation(index) {
-        const cart = getCart();
-        const item = cart[index];
-        
-        if (!item) return;
-        
-        // Get the cart row element
-        const cartRow = document.querySelector(`[data-item-index="${index}"]`);
-        
-        if (cartRow) {
-            // Animate removal
-            cartRow.style.transform = 'translateX(-100%)';
-            cartRow.style.opacity = '0';
-            
-            setTimeout(() => {
-                // Remove from cart
-                cart.splice(index, 1);
-                localStorage.setItem('pbm_cart', JSON.stringify(cart));
-                
-                // Re-render cart
-                renderCartEnhanced();
-                
-                // Trigger cart update event
+    async function removeItemWithAnimation(cartId) {
+        const cartRow = document.querySelector(`[data-item-id="${cartId}"]`);
+        if (!cartRow) return;
+
+        // Animate row before removal
+        cartRow.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        cartRow.style.transform = 'translateX(-100%)';
+        cartRow.style.opacity = '0';
+
+        setTimeout(async () => {
+            try {
+                const response = await fetch('/handlers/cart.handler.php', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        action: 'remove',
+                        cart_id: cartId  // ✅ match backend
+                    })
+                });
+
+                const data = await response.json();
+                if (!data.success) {
+                    console.error('Remove failed:', data.error);
+                    return;
+                }
+
+                await renderCartEnhanced();  // ✅ re-render cart items
                 window.dispatchEvent(new Event('cartUpdated'));
-                
-                // Show removal notification
-                showUpdateNotification(`${item.title} removed from cart`, 'warning');
-            }, 300);
-        }
+                showUpdateNotification(`Item removed from cart`, 'warning');
+            } catch (err) {
+                console.error('Failed to remove item:', err);
+            }
+        }, 300);
     }
     
     // ================================
@@ -316,8 +355,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function initializeCheckout() {
         if (checkoutBtn) {
-            checkoutBtn.addEventListener('click', function() {
-                const cart = getCart();
+            checkoutBtn.addEventListener('click', async function() {
+                const cart = await getCart();
                 
                 if (!cart.length) {
                     showUpdateNotification('Your cart is empty', 'error');
@@ -340,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function showCheckoutModal() {
+    async function showCheckoutModal() {
         const modal = document.createElement('div');
         modal.style.cssText = `
             position: fixed;
@@ -389,15 +428,27 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Close modal functionality
         const closeBtn = modal.querySelector('#closeModal');
-        closeBtn.addEventListener('click', function() {
+        closeBtn.addEventListener('click', async function() {
             modal.style.animation = 'fadeOut 0.3s ease-out';
-            setTimeout(() => {
+            setTimeout(async () => {
                 document.body.removeChild(modal);
                 
                 // Clear cart after successful checkout
-                localStorage.removeItem('pbm_cart');
-                renderCartEnhanced();
-                window.dispatchEvent(new Event('cartUpdated'));
+                try {
+                    await fetch('/handlers/cart.handler.php', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({ action: 'checkout' })
+                    });
+
+                    await renderCartEnhanced();
+                    window.dispatchEvent(new Event('cartUpdated'));
+                } catch (err) {
+                    console.error('Failed to clear cart after checkout:', err);
+                }
             }, 300);
         });
         
@@ -413,8 +464,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // UTILITY FUNCTIONS
     // ================================
     
-    function getCart() {
-        return JSON.parse(localStorage.getItem('pbm_cart') || '[]');
+    async function getCart() {
+        const response = await fetch('/handlers/cart.handler.php?action=get', {
+            credentials: 'include'
+        });
+
+        const data = await response.json();
+        if (!data.success) {
+            console.error('Failed to get cart:', data.error);
+            return [];
+        }
+
+        return data.items || [];
     }
     
     function animateValue(element, value) {

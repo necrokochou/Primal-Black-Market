@@ -17,6 +17,8 @@ services:
     depends_on:
       - mongodb
       - postgresql
+    volumes:
+      - .:/var/www/html
 
   mongodb:
     image: mongo:latest

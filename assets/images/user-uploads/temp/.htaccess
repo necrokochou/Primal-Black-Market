@@ -1,0 +1,21 @@
+# Prevent direct execution of uploaded files
+<Files *.php>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files *.phtml>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files *.php5>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Allow only image files
+<FilesMatch "\.(jpg|jpeg|png|gif|webp)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>

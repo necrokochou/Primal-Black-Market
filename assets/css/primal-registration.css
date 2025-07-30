@@ -1,0 +1,397 @@
+/* Primal Registration Enhancements */
+
+/* Account Type Selection Section */
+.account-type-section {
+    margin: 2rem 0;
+    padding: 0;
+}
+
+.account-type-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    color: #ff8c00;
+    text-align: center;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.account-type-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    margin: 0 0 2rem 0;
+    font-size: 0.95rem;
+}
+
+/* Account Type Cards Grid */
+.account-type-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Individual Account Type Card */
+.account-type-card {
+    position: relative;
+    background: linear-gradient(135deg, 
+        rgba(127, 79, 36, 0.1) 0%, 
+        rgba(255, 140, 0, 0.05) 50%, 
+        rgba(101, 109, 74, 0.1) 100%
+    );
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 140, 0, 0.2);
+    border-radius: 15px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.account-type-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 140, 0, 0.4);
+    box-shadow: 0 8px 25px rgba(255, 140, 0, 0.2);
+}
+
+/* Hide radio button */
+.account-type-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Selected state */
+.account-type-card input[type="radio"]:checked + .card-content {
+    background: rgba(255, 140, 0, 0.1);
+}
+
+.account-type-card input[type="radio"]:checked ~ .card-badge {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.account-type-card:has(input[type="radio"]:checked) {
+    border-color: #ff8c00;
+    background: linear-gradient(135deg, 
+        rgba(127, 79, 36, 0.15) 0%, 
+        rgba(255, 140, 0, 0.1) 50%, 
+        rgba(101, 109, 74, 0.15) 100%
+    );
+    box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+}
+
+/* Card Content */
+.card-content {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    padding: 0.5rem;
+}
+
+.card-icon {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.card-icon i {
+    font-size: 2.5rem;
+    color: #ff8c00;
+    transition: all 0.3s ease;
+}
+
+.buyer-card:hover .card-icon i {
+    color: #4a90e2;
+}
+
+.seller-card:hover .card-icon i {
+    color: #50c878;
+}
+
+.card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: #ff8c00;
+    text-align: center;
+    margin: 0 0 0.8rem 0;
+    font-weight: 600;
+}
+
+.card-description {
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0 0 1rem 0;
+}
+
+/* Card Features List */
+.card-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.card-features li {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-features i {
+    color: #50c878;
+    font-size: 0.7rem;
+    width: 12px;
+}
+
+/* Card Badges */
+.card-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: linear-gradient(135deg, #ff8c00, #e67e00);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    font-family: 'Cinzel', serif;
+    box-shadow: 0 2px 10px rgba(255, 140, 0, 0.4);
+}
+
+.seller-badge {
+    background: linear-gradient(135deg, #50c878, #45b866);
+}
+
+/* Buyer Card Specific Styling */
+.buyer-card {
+    border-color: rgba(74, 144, 226, 0.3);
+}
+
+.buyer-card:has(input[type="radio"]:checked) {
+    border-color: #4a90e2;
+    box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+}
+
+.buyer-card .card-title {
+    color: #4a90e2;
+}
+
+/* Seller Card Specific Styling */
+.seller-card {
+    border-color: rgba(80, 200, 120, 0.3);
+}
+
+.seller-card:has(input[type="radio"]:checked) {
+    border-color: #50c878;
+    box-shadow: 0 0 20px rgba(80, 200, 120, 0.3);
+}
+
+.seller-card .card-title {
+    color: #50c878;
+}
+
+/* Enhanced Form Button */
+.primal-btn-primary {
+    background: linear-gradient(135deg, #ff8c00, #e67e00);
+    border: none;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    font-size: 1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1rem;
+}
+
+.primal-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4);
+    background: linear-gradient(135deg, #e67e00, #cc7000);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .account-type-cards {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .account-type-card {
+        padding: 1.2rem;
+    }
+    
+    .card-icon i {
+        font-size: 2rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .card-description {
+        font-size: 0.85rem;
+    }
+    
+    .card-features li {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .account-type-section {
+        margin: 1.5rem 0;
+    }
+    
+    .account-type-title {
+        font-size: 1.3rem;
+    }
+    
+    .account-type-card {
+        padding: 1rem;
+    }
+    
+    .card-icon i {
+        font-size: 1.8rem;
+    }
+}
+
+/* Animation for card selection */
+@keyframes cardSelect {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.account-type-card:has(input[type="radio"]:checked) {
+    animation: cardSelect 0.3s ease;
+}
+
+/* Focus states for accessibility */
+.account-type-card:focus-within {
+    outline: 2px solid #ff8c00;
+    outline-offset: 2px;
+}
+
+/* Enhanced terms and marketing checkboxes */
+.form-options {
+    margin: 1.5rem 0 1rem 0;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    margin: 1rem 0;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+    position: relative;
+    padding: 0.3rem 0;
+    user-select: none;
+}
+
+.checkbox-group:hover .checkmark {
+    border-color: rgba(255, 140, 0, 0.8);
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.3);
+}
+
+.checkbox-group:focus-within .checkmark {
+    outline: 2px solid #ff8c00;
+    outline-offset: 2px;
+}
+
+.checkbox-group:active .checkmark {
+    transform: scale(0.95);
+}
+
+.checkbox-group input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    left: 0;
+    top: 2px;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 140, 0, 0.5);
+    border-radius: 4px;
+    position: relative;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"]:checked + .checkmark {
+    background: linear-gradient(135deg, #ff8c00, #e67e00);
+    border-color: #ff8c00;
+    box-shadow: 0 0 15px rgba(255, 140, 0, 0.4);
+}
+
+.checkbox-group input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.label-text {
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.terms-link {
+    color: #ff8c00;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    cursor: pointer;
+}
+
+.terms-link:hover {
+    color: #e67e00;
+    text-decoration: underline;
+}
+
+/* Additional debugging styles */
+.checkbox-group:hover {
+    background: rgba(255, 140, 0, 0.05);
+    border-radius: 8px;
+    padding: 0.5rem 0.3rem;
+    margin: 0.5rem -0.3rem;
+}

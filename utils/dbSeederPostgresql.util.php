@@ -27,7 +27,7 @@ try {
 // Function to clear all tables in correct order (reverse dependency order)
 function clearAllTables($pdo) {
     echo "\n🧹 Clearing all tables in correct order...\n";
-    $clearOrder = ['cart', 'transactions','listings', 'categories', 'users'];
+    $clearOrder = ['purchase_history', 'cart', 'transactions', 'listings', 'categories', 'users'];
     foreach ($clearOrder as $table) {
         try {
             $pdo->exec("DELETE FROM {$table}");
@@ -91,8 +91,8 @@ $usersInserted = seedTable(
     $pdo,
     'users',
     'users.staticData.php',
-    'INSERT INTO users (Username, Password, Email, Alias, TrustLevel, Is_Vendor, Is_Admin)
-     VALUES (:username, :password, :email, :alias, :trustlevel, :is_vendor, :is_admin)
+    'INSERT INTO users (Username, Password, Email, Alias, TrustLevel, Created_At, Is_Vendor, Is_Admin, Is_Banned)
+     VALUES (:username, :password, :email, :alias, :trustlevel, :created_at, :is_vendor, :is_admin, :is_banned)
      ON CONFLICT (Username) DO NOTHING',
     function($user) {
         return [
@@ -101,8 +101,10 @@ $usersInserted = seedTable(
             ':email' => $user['Email'] ?? $user['Username'] . '@example.com',
             ':alias' => $user['Alias'],
             ':trustlevel' => $user['TrustLevel'],
-            ':is_vendor' => $user['IsVendor'] ? 'true' : 'false',
-            ':is_admin' => $user['IsAdmin'] ? 'true' : 'false'
+            ':created_at' => $user['Created_At'] ?? date('Y-m-d H:i:s'),
+            ':is_vendor' => $user['Is_Vendor'] ? 'true' : 'false',
+            ':is_admin' => $user['Is_Admin'] ? 'true' : 'false',
+            ':is_banned' => $user['Is_Banned'] ? 'true' : 'false'
         ];
     }
 );
@@ -226,10 +228,51 @@ if (empty($userIds) || empty($listingIds)) {
 }
 $totalInserted += $cartInserted;
 
+// 8. Purchase History Data (Requires Users, Listings & Transactions) - Based on purchase_history.model.sql structure
+echo "\n🌱 Seeding purchase_history with foreign key relationships...\n";
+
+// Get random users, listings, and transactions for foreign key relationships
+$userStmt = $pdo->query("SELECT User_ID FROM users ORDER BY RANDOM() LIMIT 10");
+$userIds = $userStmt->fetchAll(PDO::FETCH_COLUMN);
+
+$listingStmt = $pdo->query("SELECT Listing_ID FROM listings ORDER BY RANDOM() LIMIT 10");
+$listingIds = $listingStmt->fetchAll(PDO::FETCH_COLUMN);
+
+$transactionStmt = $pdo->query("SELECT Transaction_ID FROM transactions ORDER BY RANDOM() LIMIT 10");
+$transactionIds = $transactionStmt->fetchAll(PDO::FETCH_COLUMN);
+
+if (empty($userIds) || empty($listingIds) || empty($transactionIds)) {
+    echo "⚠️  Cannot seed purchase_history: Missing users, listings, or transactions data\n";
+    $purchaseHistoryInserted = 0;
+} else {
+    $purchaseHistoryInserted = seedTable(
+        $pdo,
+        'purchase_history',
+        'purchase_history.staticData.php',
+        'INSERT INTO purchase_history (User_ID, Listing_ID, Transaction_ID, Quantity, Price_Each, Total_Price, Purchase_Date, Payment_Method, Delivery_Status, Notes)
+         VALUES (:user_id, :listing_id, :transaction_id, :quantity, :price_each, :total_price, :purchase_date, :payment_method, :delivery_status, :notes)',
+        function($purchaseItem) use ($userIds, $listingIds, $transactionIds) {
+            return [
+                ':user_id' => $userIds[array_rand($userIds)],
+                ':listing_id' => $listingIds[array_rand($listingIds)],
+                ':transaction_id' => $transactionIds[array_rand($transactionIds)],
+                ':quantity' => $purchaseItem['Quantity'],
+                ':price_each' => $purchaseItem['Price_Each'],
+                ':total_price' => $purchaseItem['Total_Price'],
+                ':purchase_date' => $purchaseItem['Purchase_Date'],
+                ':payment_method' => $purchaseItem['Payment_Method'],
+                ':delivery_status' => $purchaseItem['Delivery_Status'],
+                ':notes' => $purchaseItem['Notes']
+            ];
+        }
+    );
+}
+$totalInserted += $purchaseHistoryInserted;
+
 // ---- 🔍 Verify Seeding Results ----
 echo "\n🔍 Verifying seeding results...\n";
 
-$expectedTables = ['users', 'categories', 'listings','transactions', 'cart'];
+$expectedTables = ['users', 'categories', 'listings', 'transactions', 'cart', 'purchase_history'];
 $totalRecords = 0;
 
 foreach ($expectedTables as $table) {
