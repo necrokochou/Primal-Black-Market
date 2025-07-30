@@ -100,7 +100,7 @@ async function loadPurchaseHistory() {
           listDiv.innerHTML = items.map((item, index) => {
             const date = new Date(item.purchase_date).toLocaleDateString();
             const imageSrc = item.product_image ? '/assets/images/' + item.product_image.replace(/^\/assets\/images\//, '') : '/assets/images/example.png';
-            const statusClass = item.delivery_status === 'Delivered' ? 'delivered' : 'processing';
+            const statusClass = item.delivery_status === 'Delivered' ? 'delivered' : 'processed';
             
             return `
               <div class="history-item">
@@ -123,7 +123,7 @@ async function loadPurchaseHistory() {
                       $${parseFloat(item.total_price).toFixed(2)}
                     </span>
                     <span class="history-status ${statusClass}">
-                      ${item.delivery_status || 'Processing'}
+                      ${item.delivery_status || 'Processed'}
                     </span>
                     ${isVendor ? `<span class="history-meta-item">
                       <i class="fas fa-user"></i> ${item.buyer_name}
@@ -290,9 +290,9 @@ function getStatusClass(status) {
     case 'completed':
     case 'delivered':
       return 'delivered';
-    case 'processing':
+    case 'processed':
     case 'pending':
-      return 'processing';
+      return 'processed';
     case 'shipped':
     case 'in transit':
       return 'shipped';
@@ -302,7 +302,7 @@ function getStatusClass(status) {
     case 'refunded':
       return 'refunded';
     default:
-      return 'processing'; // Default to processing style
+      return 'processed'; // Default to processed style
   }
 }
 

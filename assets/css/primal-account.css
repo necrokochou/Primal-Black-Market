@@ -183,7 +183,7 @@
     background: var(--primal-green);
 }
 
-.history-status.processing {
+.history-status.processed {
     background: var(--primal-orange);
 }
 

@@ -123,7 +123,7 @@ switch ($action) {
                 // Create purchase history record
                 $stmt = $pdo->prepare("
                     INSERT INTO purchase_history (user_id, listing_id, transaction_id, quantity, price_each, total_price, payment_method, delivery_status, notes)
-                    VALUES (:userID, :listingID, :transactionID, :quantity, :priceEach, :totalPrice, :paymentMethod, 'Processing', :notes)
+                    VALUES (:userID, :listingID, :transactionID, :quantity, :priceEach, :totalPrice, :paymentMethod, 'Processed', :notes)
                 ");
                 $stmt->execute([
                     'userID' => $userID,

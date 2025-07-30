@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const cartItemsDiv = document.getElementById('cart-items');
     const updateCartBtn = document.getElementById('update-cart-btn');
     const checkoutBtn = document.getElementById('checkout-btn');
-    const voucherInput = document.getElementById('cart-voucher');
-    const voucherBtn = document.querySelector('.cart-voucher-btn');
     
     // ================================
     // ENHANCED CART RENDERING
@@ -39,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </a>
                 </div>
             `;
-            updateCartSummary(0, 0, 0, 0);
+            updateCartSummary(0, 0, 0);
             return;
         }
         
@@ -79,23 +77,11 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }).join('');
         
-        // Discount from voucher
-        const voucherDiscountRate = appliedVoucher?.discount ?? 0;
-
-        // Quantity-based discount
-        let quantityDiscountRate = 0;
-        if (cart.length >= 5) quantityDiscountRate = 0.05;
-        else if (cart.length >= 3) quantityDiscountRate = 0.03;
-        else if (cart.length >= 2) quantityDiscountRate = 0.01;
-
-        // Total discount rate is the higher of the two
-        const discountRate = Math.max(voucherDiscountRate, quantityDiscountRate);
-
-        const discount = subtotal * discountRate;
+        // Calculate totals without discount
         const delivery = subtotal > 0 ? 50 : 0;
-        const total = subtotal - discount + delivery;
+        const total = subtotal + delivery;
 
-        updateCartSummary(subtotal, discount, delivery, total);
+        updateCartSummary(subtotal, delivery, total);
         
         // Add event listeners to new elements
         addCartEventListeners();
@@ -114,20 +100,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // CART SUMMARY UPDATES
     // ================================
     
-    function updateCartSummary(subtotal, discount, delivery, total) {
+    function updateCartSummary(subtotal, delivery, total) {
         const subtotalEl = document.getElementById('cart-subtotal');
-        const discountEl = document.getElementById('cart-discount');
         const deliveryEl = document.getElementById('cart-delivery');
         const totalEl = document.getElementById('cart-total');
         
         if (subtotalEl) {
             subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
             animateValue(subtotalEl, subtotal);
-        }
-        
-        if (discountEl) {
-            discountEl.textContent = `-$${discount.toFixed(2)}`;
-            animateValue(discountEl, discount);
         }
         
         if (deliveryEl) {
@@ -278,78 +258,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ================================
-    // VOUCHER FUNCTIONALITY
-    // ================================
-    
-    let appliedVoucher = null;
-    
-    function initializeVoucherSystem() {
-        if (voucherBtn) {
-            voucherBtn.addEventListener('click', function() {
-                const voucherCode = voucherInput.value.trim().toLowerCase();
-                
-                if (!voucherCode) {
-                    showUpdateNotification('Please enter a voucher code', 'error');
-                    return;
-                }
-                
-                applyVoucher(voucherCode);
-            });
-        }
-        
-        if (voucherInput) {
-            voucherInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    voucherBtn.click();
-                }
-            });
-        }
-    }
-    
-    function applyVoucher(code) {
-        const validVouchers = {
-            'primal10': { discount: 0.10, description: '10% off' },
-            'wild20': { discount: 0.20, description: '20% off' },
-            'savage15': { discount: 0.15, description: '15% off' },
-            'beast25': { discount: 0.25, description: '25% off' }
-        };
-        
-        if (validVouchers[code]) {
-            appliedVoucher = validVouchers[code];
-            
-            // Visual feedback
-            voucherInput.style.borderColor = 'var(--primal-green)';
-            voucherBtn.textContent = 'Applied!';
-            voucherBtn.style.background = 'linear-gradient(135deg, var(--primal-green), #28a745)';
-            
-            // Update cart summary
-            renderCartEnhanced();
-            
-            showUpdateNotification(`Voucher applied: ${appliedVoucher.description}`, 'success');
-            
-            // Reset button after delay
-            setTimeout(() => {
-                voucherBtn.textContent = 'Apply';
-                voucherBtn.style.background = 'linear-gradient(135deg, var(--primal-green), #4a5a3a)';
-            }, 3000);
-        } else {
-            // Invalid voucher
-            voucherInput.style.borderColor = '#dc3545';
-            voucherBtn.textContent = 'Invalid';
-            voucherBtn.style.background = 'linear-gradient(135deg, #dc3545, #b02a37)';
-            
-            showUpdateNotification('Invalid voucher code', 'error');
-            
-            // Reset after delay
-            setTimeout(() => {
-                voucherInput.style.borderColor = 'rgba(127, 79, 36, 0.3)';
-                voucherBtn.textContent = 'Apply';
-                voucherBtn.style.background = 'linear-gradient(135deg, var(--primal-green), #4a5a3a)';
-            }, 3000);
-        }
-    }
-    
-    // ================================
     // CHECKOUT FUNCTIONALITY
     // ================================
     
@@ -447,7 +355,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         Items: ${totalItems}<br>
                         Total Amount: $${totalAmount.toFixed(2)}<br>
                         Payment: Credit Card<br>
-                        Status: Processing
+                        Status: Processed
                     </div>
                 </div>
                 <p style="font-family: 'Inter', sans-serif; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 2rem;">
@@ -640,7 +548,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // ================================
     
     // Initialize all features
-    initializeVoucherSystem();
     initializeCheckout();
     initializeUpdateButton();
     

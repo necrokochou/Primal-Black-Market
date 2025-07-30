@@ -201,11 +201,6 @@ if ($isVendor && isset($_GET['debug'])) {
             <button class="nav-tab" data-tab="settings">
                 <i class="fas fa-cog"></i> Account Settings
             </button>
-            <?php if ($isAdmin): ?>
-                <button class="nav-tab" data-tab="admin-tools">
-                    <i class="fas fa-tools"></i> Admin Tools
-                </button>
-            <?php endif; ?>
         </div>
 
         <!-- Products/Purchases Tab -->
@@ -403,33 +398,77 @@ if ($isVendor && isset($_GET['debug'])) {
             </div>
         <?php endif; ?>
 
-        <!-- Purchase/Sales History Tab -->
-        <div id="history-content" class="tab-content">
-            <div class="section-header">
-                <h2>
-                    <i class="fas fa-chart-line"></i>
-                    <?php echo $isVendor ? 'Sales History' : 'Purchase History'; ?>
-                </h2>
-                <div class="history-filters">
-                    <select id="status-filter" class="filter-select">
-                        <option value="all">All Status</option>
-                        <option value="completed">Completed</option>
-                        <option value="pending">Pending</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                    <select id="date-filter" class="filter-select">
-                        <option value="all">All Time</option>
-                        <option value="week">Last Week</option>
-                        <option value="month">Last Month</option>
-                        <option value="year">Last Year</option>
-                    </select>
+        <?php if ($isVendor): ?>
+            <!-- Sales History Tab (Only for Vendors) -->
+            <div id="sales-history-content" class="tab-content">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-chart-line"></i> Sales History
+                    </h2>
+                    <div class="history-filters">
+                        <select id="sales-status-filter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="processed">Processed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <select id="sales-date-filter" class="filter-select">
+                            <option value="all">All Time</option>
+                            <option value="week">Last Week</option>
+                            <option value="month">Last Month</option>
+                            <option value="year">Last Year</option>
+                        </select>
+                        <button id="refresh-sales" class="primal-btn-secondary">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="purchase-history-list primal-card">
-                <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
-                    <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No History Available</h3>
-                    <p><?php echo $isVendor ? 'Your sales history will appear here once you make your first sale.' : 'Your purchase history will appear here once you make your first purchase.'; ?></p>
+
+                <div class="sales-history-container primal-card">
+                    <div class="sales-summary">
+                        <h3><i class="fas fa-analytics"></i> Sales Summary</h3>
+                        <div class="sales-stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-sales-count">0</span>
+                                <span class="stat-label">Total Sales</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-sales-revenue">$0.00</span>
+                                <span class="stat-label">Total Revenue</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="avg-order-value">$0.00</span>
+                                <span class="stat-label">Avg Order Value</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="recent-sales-count">0</span>
+                                <span class="stat-label">This Month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sales-history-list">
+                        <div class="sales-header">
+                            <h3><i class="fas fa-history"></i> Recent Sales</h3>
+                        </div>
+                        
+                        <div id="sales-loading" class="loading-spinner" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> Loading sales history...
+                        </div>
+                        
+                        <div id="sales-list">
+                            <!-- Dynamic sales content will be loaded here -->
+                        </div>
+                        
+                        <div id="no-sales" class="no-sales-state" style="display: none;">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>No Sales Yet</h3>
+                            <p>Your sales history will appear here once customers purchase your products.</p>
+                            <a href="/pages/shop" class="primal-btn-primary">
+                                <i class="fas fa-store"></i> View My Products in Shop
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         <?php endif; ?>
@@ -516,55 +555,6 @@ if ($isVendor && isset($_GET['debug'])) {
                 <?php endif; ?>
             </div>
         </div>
-
-        <?php if ($isAdmin): ?>
-            <!-- Admin Tools Tab -->
-            <div id="admin-tools-content" class="tab-content">
-                <div class="section-header">
-                    <h2><i class="fas fa-shield-alt"></i> Administrative Tools</h2>
-                </div>
-
-                <div class="settings-grid">
-                    <div class="settings-section primal-card">
-                        <h3><i class="fas fa-tachometer-alt"></i> Quick Actions</h3>
-                        <div style="display: flex; flex-direction: column; gap: 1rem;">
-                            <a href="/pages/admin/index.php" class="primal-btn-primary" style="text-decoration: none; text-align: center;">
-                                <i class="fas fa-desktop"></i> Full Admin Dashboard
-                            </a>
-                            <button class="primal-btn-secondary" style="width: 100%;">
-                                <i class="fas fa-users"></i> View All Users
-                            </button>
-                            <button class="primal-btn-secondary" style="width: 100%;">
-                                <i class="fas fa-box"></i> Manage Products
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="settings-section primal-card">
-                        <h3><i class="fas fa-chart-bar"></i> System Overview</h3>
-                        <div style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
-                            <p><strong>Account Type:</strong> Administrator</p>
-                            <p><strong>Privileges:</strong> Full System Access</p>
-                            <p><strong>Last Login:</strong> <?php echo date('M d, Y g:i A'); ?></p>
-                            <p><strong>Trust Level:</strong> Maximum (<?php echo number_format($trustLevel, 1); ?>)</p>
-                        </div>
-                    </div>
-
-                    <div class="settings-section primal-card">
-                        <h3><i class="fas fa-cogs"></i> System Settings</h3>
-                        <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">
-                            Access advanced system configuration and maintenance tools.
-                        </p>
-                        <button class="primal-btn-secondary" style="width: 100%; margin-bottom: 0.75rem;">
-                            <i class="fas fa-database"></i> Database Management
-                        </button>
-                        <button class="primal-btn-secondary" style="width: 100%;">
-                            <i class="fas fa-file-alt"></i> System Logs
-                        </button>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
     </div>
 </main>
 
