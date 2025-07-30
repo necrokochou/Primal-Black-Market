@@ -57,7 +57,7 @@ A Final Project showcasing Black Market website with the Prehistoric/Primal them
 - Cendana, Carl Markruel
 - Flores, Joseph Aiden
 - Galang, Christian Allen
-- Pamilar,Louie
+- Pamilar,Louie John
 
 ### Key Components
 
