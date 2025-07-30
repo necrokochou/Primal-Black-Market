@@ -29,6 +29,10 @@ class CartHandler {
         }
     }
 
+    public function getPdo(): PDO {
+        return $this->pdo;
+    }
+
     public function getCart(): array {
         $stmt = $this->pdo->prepare("
             SELECT c.Cart_ID, c.Listing_ID, c.Quantity,
