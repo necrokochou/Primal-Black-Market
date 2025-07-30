@@ -1,6 +1,16 @@
+<?php
+// Check if user is logged in
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+if (!isset($_SESSION['user'])) {
+    header('Location: /pages/login/index.php');
+    exit;
+}
 
-<?php require_once __DIR__ . '/../../layouts/header.php'; ?>
+require_once __DIR__ . '/../../layouts/header.php';
+?>
 
 <!-- Cart Page Specific Styles -->
 <link rel="stylesheet" href="/assets/css/primal-cart.css">

@@ -10,7 +10,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
-        'Item_Image' => 'assets/images/Weps/raptorClawKnife.png'
+        'Item_Image' => '/assets/images/Weps/raptorClawKnife.png'
     ],
     [
         'Title' => 'Triceratops Horn Spear',
@@ -20,7 +20,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/Weps/TriceratopsHornSpear.png',
+        'Item_Image' => '/assets/images/Weps/TriceratopsHornSpear.png',
     ],
     [
         'Title' => 'Obsidian Arrow Set',
@@ -30,7 +30,7 @@ return [
         'Quantity' => 3,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/Weps/obsidianArrowSets.png',
+        'Item_Image' => '/assets/images/Weps/obsidianArrowSets.png',
     ],
     [
         'Title' => 'Saber-Tooth Bone Club',
@@ -40,7 +40,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/Weps/sabertoothBoneClub.png',
+        'Item_Image' => '/assets/images/Weps/sabertoothBoneClub.png',
     ],
 
     // ───── Hunting Equipment ─────
@@ -52,7 +52,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/hunting-materials/MamoothJawSnareBlueprint.png' 
+        'Item_Image' => '/assets/images/hunting-materials/MamoothJawSnareBlueprint.png' 
     ],
     [
         'Title' => 'Pterosaur Wing Net Plan',
@@ -62,7 +62,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/hunting-materials/PterosaurWingNetPlan.png'
+        'Item_Image' => '/assets/images/hunting-materials/PterosaurWingNetPlan.png'
     ],
     [
         'Title' => 'Spiked Vine Trap Design',
@@ -72,7 +72,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
-        'Item_Image' => 'assets/images/hunting-materials/Spiketrap.png'
+        'Item_Image' => '/assets/images/hunting-materials/Spiketrap.png'
     ],
     [
         'Title' => 'Swamp Pitfall Construction Guide',
@@ -82,7 +82,7 @@ return [
         'Quantity' => 3,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/hunting-materials/SwampPitfallConstructionGuide.png',
+        'Item_Image' => '/assets/images/hunting-materials/SwampPitfallConstructionGuide.png',
     ],
 
     // ───── Prehistoric Drugs ─────
@@ -94,7 +94,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => 'assets/images/prehistoric-drugs/DilophosaurVenomExtract.png',
+        'Item_Image' => '/assets/images/prehistoric-drugs/DilophosaurVenomExtract.png',
     ],
     [
         'Title' => 'Jungle Moss Poultice',
@@ -104,7 +104,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
-        'Item_Image' => 'assets/images/prehistoric-drugs/Jungle-Moss-Poultice.jpg',
+        'Item_Image' => '/assets/images/prehistoric-drugs/Jungle-Moss-Poultice.jpg',
     ],
     [
         'Title' => 'Hallucinogenic Spore Pouch',
@@ -114,7 +114,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/prehistoric-drugs/HallucinogenicSporePouch.png',
+        'Item_Image' => '/assets/images/prehistoric-drugs/HallucinogenicSporePouch.png',
     ],
     [
         'Title' => 'Tyrant Root Elixir',
@@ -124,7 +124,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/prehistoric-drugs/TyrantRootElixir.png',
+        'Item_Image' => '/assets/images/prehistoric-drugs/TyrantRootElixir.png',
     ],
 
     // ───── Food ─────
@@ -136,7 +136,7 @@ return [
         'Quantity' => 10,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/food/DriedMegalocerosMeat.png',
+        'Item_Image' => '/assets/images/food/DriedMegalocerosMeat.png',
     ],
     [   
         'Title' => 'Salted Saber-Tooth Jerky',
@@ -146,7 +146,7 @@ return [
         'Quantity' => 6,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/food/SaltedSaberToothJerky.png',
+        'Item_Image' => '/assets/images/food/SaltedSaberToothJerky.png',
     ],
     [
         'Title' => 'Sun-Baked Fish Slabs',
@@ -156,7 +156,7 @@ return [
         'Quantity' => 8,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/food/SunBakedFishSlabs.png',
+        'Item_Image' => '/assets/images/food/SunBakedFishSlabs.png',
     ],
     [
         'Title' => 'Fermented Berries',
@@ -166,7 +166,7 @@ return [
         'Quantity' => 9,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => 'assets/images/food/fermented-berries.jpg',
+        'Item_Image' => '/assets/images/food/fermented-berries.jpg',
     ],
 
     // ───── Spices and etc. ─────
@@ -178,7 +178,7 @@ return [
         'Quantity' => 10,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/spices-etc/crushed-bone-salt.jpg',
+        'Item_Image' => '/assets/images/spices-etc/crushed-bone-salt.jpg',
     ],
     [
         'Title' => 'Mammoth Tallow Jar',
@@ -188,7 +188,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/spices-etc/mammoth-tallow-jar.jpg',
+        'Item_Image' => '/assets/images/spices-etc/mammoth-tallow-jar.jpg',
     ],
     [
         'Title' => 'Herbal Ash Rub',
@@ -198,7 +198,7 @@ return [
         'Quantity' => 7,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/spices-etc/Herbal-Ash-Rub.jpg',
+        'Item_Image' => '/assets/images/spices-etc/Herbal-Ash-Rub.jpg',
     ],
     [
         'Title' => 'Smoked Pterosaur Grease',
@@ -208,7 +208,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => 'assets/images/spices-etc/Smoked-Pterosaur-Grease.jpg',
+        'Item_Image' => '/assets/images/spices-etc/Smoked-Pterosaur-Grease.jpg',
     ],
     // ───── Clothing ─────
     [
@@ -219,7 +219,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
-        'Item_Image' => 'assets/images/clothing/Saber-Tooth-Hide-Cloak.jpg',
+        'Item_Image' => '/assets/images/clothing/Saber-Tooth-Hide-Cloak.jpg',
     ],
     [
         'Title' => 'Feathered Raptor Shawl',
@@ -229,7 +229,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/clothing/Feathered-Raptor-Shawl.jpg',
+        'Item_Image' => '/assets/images/clothing/Feathered-Raptor-Shawl.jpg',
     ],
     [
         'Title' => 'Tanned Pterosaur Leathers',
@@ -239,7 +239,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/clothing/Tanned-Pterosaur-Leathers.jpg',
+        'Item_Image' => '/assets/images/clothing/Tanned-Pterosaur-Leathers.jpg',
     ],
     [
         'Title' => 'Mammoth Fur Boots',
@@ -249,7 +249,7 @@ return [
         'Quantity' => 3,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/clothing/Mammoth-Fur-Boots.jpg',
+        'Item_Image' => '/assets/images/clothing/Mammoth-Fur-Boots.jpg',
     ],
 
     // ───── Forging Materials ─────
@@ -261,7 +261,7 @@ return [
         'Quantity' => 5,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/forging-materials/forge-volcanic-obsidian-slab.jpg',
+        'Item_Image' => '/assets/images/forging-materials/forge-volcanic-obsidian-slab.jpg',
     ],
     [
         'Title' => 'Fossilized Bone Core',
@@ -271,7 +271,7 @@ return [
         'Quantity' => 6,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/forging-materials/forge-fossilized-bone-core.jpg',
+        'Item_Image' => '/assets/images/forging-materials/forge-fossilized-bone-core.jpg',
     ],
     [
         'Title' => 'Ancient Amber Nugget',
@@ -281,7 +281,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/forging-materials/forge-primal-amber-nugget.jpg',
+        'Item_Image' => '/assets/images/forging-materials/forge-primal-amber-nugget.jpg',
     ],
     [
         'Title' => 'Meteor Shard',
@@ -291,7 +291,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => 'assets/images/forging-materials/forge-meteor-shard.jpg',
+        'Item_Image' => '/assets/images/forging-materials/forge-meteor-shard.jpg',
     ],
 
     // ───── Infrastructure ─────
@@ -303,7 +303,7 @@ return [
         'Quantity' => 4,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
-        'Item_Image' => 'assets/images/infrastructure/Spiked-Mammoth-Rib-Fence.jpg',
+        'Item_Image' => '/assets/images/infrastructure/Spiked-Mammoth-Rib-Fence.jpg',
     ],
     [
         'Title' => 'Brontosaur Hide Wall',
@@ -313,7 +313,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/infrastructure/Brontosaur-Hide-Wall.jpg',
+        'Item_Image' => '/assets/images/infrastructure/Brontosaur-Hide-Wall.jpg',
     ],
     [
         'Title' => 'Sun-Dried Clay Bricks',
@@ -323,7 +323,7 @@ return [
         'Quantity' => 30,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/infrastructure/Sun-Dried-Clay-Bricks.jpg',
+        'Item_Image' => '/assets/images/infrastructure/Sun-Dried-Clay-Bricks.jpg',
     ],
     [
         'Title' => 'Bed Rock Gate',
@@ -333,7 +333,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/infrastructure/Bedrock-Gate.jpg',
+        'Item_Image' => '/assets/images/infrastructure/Bedrock-Gate.jpg',
     ],
 
     // ───── Voodoo ─────
@@ -345,7 +345,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/voodoo/Tyrannosaur-Tooth-Charm.jpg',
+        'Item_Image' => '/assets/images/voodoo/Tyrannosaur-Tooth-Charm.jpg',
     ],
     [
         'Title' => 'Fossil Eye Pendant',
@@ -355,7 +355,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/voodoo/Fossil-Eye-Pendant.jpg',
+        'Item_Image' => '/assets/images/voodoo/Fossil-Eye-Pendant.jpg',
     ],
     [
         'Title' => 'Swamp Voodo Doll',
@@ -365,7 +365,7 @@ return [
         'Quantity' => 3,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/voodoo/Swamp-Voodo-Doll.jpg',
+        'Item_Image' => '/assets/images/voodoo/Swamp-Voodo-Doll.jpg',
     ],
     [
         'Title' => 'Charred Spirit Idol',
@@ -375,7 +375,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => 'assets/images/voodoo/Charred-Spirit-Idol.jpg',
+        'Item_Image' => '/assets/images/voodoo/Charred-Spirit-Idol.jpg',
     ],
 
     // ───── Ritual Artifacts ─────
@@ -387,7 +387,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-10',
-        'Item_Image' => 'assets/images/ritual-artifacts/Blood-Stained-Ritual-Drum.jpg',
+        'Item_Image' => '/assets/images/ritual-artifacts/Blood-Stained-Ritual-Drum.jpg',
     ],
     [
         'Title' => 'Ancient Bone Mask',
@@ -397,7 +397,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/ritual-artifacts/Ancient-Bone-Mask.jpg',
+        'Item_Image' => '/assets/images/ritual-artifacts/Ancient-Bone-Mask.jpg',
     ],
     [
         'Title' => 'Mammoth Skull Totem',
@@ -407,7 +407,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/ritual-artifacts/Mammoth-Skull-Totem.jpg',
+        'Item_Image' => '/assets/images/ritual-artifacts/Mammoth-Skull-Totem.jpg',
     ],
     [
         'Title' => 'Bedrock Sacrifice Altar',
@@ -417,7 +417,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/ritual-artifacts/bedrock-sacrifice-altar.jpg',
+        'Item_Image' => '/assets/images/ritual-artifacts/bedrock-sacrifice-altar.jpg',
     ],
 
     // ───── Pets ─────
@@ -429,7 +429,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-12',
-        'Item_Image' => 'assets/images/pets/sabertooth-cub.jpg',
+        'Item_Image' => '/assets/images/pets/sabertooth-cub.jpg',
     ],
     [
         'Title' => 'Miniature Mammoth Calf',
@@ -439,7 +439,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-13',
-        'Item_Image' => 'assets/images/pets/mammoth-calf.jpeg',
+        'Item_Image' => '/assets/images/pets/mammoth-calf.jpeg',
     ],
     [
         'Title' => 'Tamed Raptor Hatchling',
@@ -449,7 +449,7 @@ return [
         'Quantity' => 1,
         'IsActive' => true,
         'PublishDate' => '2025-07-14',
-        'Item_Image' => 'assets/images/pets/raptor-hatchling.jpg',
+        'Item_Image' => '/assets/images/pets/raptor-hatchling.jpg',
     ],
     [
         'Title' => 'Swamp Glider Lizard',
@@ -459,7 +459,7 @@ return [
         'Quantity' => 2,
         'IsActive' => true,
         'PublishDate' => '2025-07-11',
-        'Item_Image' => 'assets/images/pets/Swamp-Glider-Lizard.jpg',
+        'Item_Image' => '/assets/images/pets/Swamp-Glider-Lizard.jpg',
     ],
 
 ];

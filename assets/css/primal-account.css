@@ -771,3 +771,327 @@
     }
 }
 
+/* ================================
+   SELLER PRODUCT MANAGEMENT STYLES
+   ================================ */
+
+/* Product Management Grid */
+.seller-products-management-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.seller-product-management-item {
+    background: linear-gradient(135deg, 
+        rgba(127, 79, 36, 0.1) 0%, 
+        rgba(255, 140, 0, 0.05) 50%, 
+        rgba(101, 109, 74, 0.1) 100%);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 140, 0, 0.2);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.seller-product-management-item:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 140, 0, 0.4);
+    box-shadow: 0 15px 40px rgba(255, 140, 0, 0.2);
+}
+
+.seller-product-management-item .product-image {
+    position: relative;
+    margin-bottom: 1.5rem;
+    border-radius: 15px;
+    overflow: hidden;
+    height: 200px;
+}
+
+.seller-product-management-item .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.seller-product-management-item:hover .product-image img {
+    transform: scale(1.05);
+}
+
+.seller-product-management-item .product-status-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--primal-green);
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.seller-product-management-item .product-status-indicator.inactive {
+    background: var(--primal-red);
+}
+
+.seller-product-management-item .product-details h3 {
+    color: var(--primal-orange);
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    margin: 0 0 1rem 0;
+    font-weight: 600;
+}
+
+.seller-product-management-item .product-details p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.seller-product-management-item .product-details .product-price {
+    color: var(--primal-orange);
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.seller-product-management-item .product-details .product-views,
+.seller-product-management-item .product-details .product-sales {
+    color: var(--primal-green);
+    font-weight: 600;
+}
+
+/* Product Management Actions */
+.product-management-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+}
+
+.product-management-actions .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+}
+
+.product-management-actions .edit-seller-product {
+    background: linear-gradient(135deg, var(--primal-orange), #e67e00);
+    color: white;
+}
+
+.product-management-actions .edit-seller-product:hover {
+    background: linear-gradient(135deg, #e67e00, #cc7000);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4);
+}
+
+.product-management-actions .toggle-seller-product-status {
+    background: linear-gradient(135deg, var(--primal-green), #4a5233);
+    color: white;
+}
+
+.product-management-actions .toggle-seller-product-status:hover {
+    background: linear-gradient(135deg, #4a5233, #3a4028);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(101, 109, 74, 0.4);
+}
+
+.product-management-actions .duplicate-seller-product {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+    color: white;
+}
+
+.product-management-actions .duplicate-seller-product:hover {
+    background: linear-gradient(135deg, #5a6268, #495057);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+}
+
+.product-management-actions .delete-seller-product {
+    background: linear-gradient(135deg, var(--primal-red), #c82333);
+    color: white;
+}
+
+.product-management-actions .delete-seller-product:hover {
+    background: linear-gradient(135deg, #c82333, #a71e2a);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+}
+
+/* Product Management Statistics */
+.seller-product-stats {
+    margin-top: 2rem;
+    padding: 2rem;
+}
+
+.seller-product-stats h3 {
+    color: var(--primal-orange);
+    font-family: 'Cinzel', serif;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.stats-grid .stat-item {
+    text-align: center;
+    background: rgba(255, 140, 0, 0.1);
+    border: 1px solid rgba(255, 140, 0, 0.2);
+    border-radius: 15px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.stats-grid .stat-item:hover {
+    background: rgba(255, 140, 0, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 140, 0, 0.2);
+}
+
+.stats-grid .stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primal-orange);
+    font-family: 'Cinzel', serif;
+    margin-bottom: 0.5rem;
+}
+
+.stats-grid .stat-label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Section Filters Enhanced for Product Management */
+.section-filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.section-filters .search-input {
+    flex: 1;
+    min-width: 250px;
+    padding: 0.8rem 1.2rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 140, 0, 0.2);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.section-filters .search-input:focus {
+    outline: none;
+    border-color: var(--primal-orange);
+    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+}
+
+.section-filters .filter-select {
+    padding: 0.8rem 1.2rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 140, 0, 0.2);
+    border-radius: 10px;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.section-filters .filter-select:focus {
+    outline: none;
+    border-color: var(--primal-orange);
+    box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+}
+
+.section-filters .filter-select option {
+    background: var(--primal-dark);
+    color: white;
+}
+
+#add-new-product-btn {
+    background: linear-gradient(135deg, var(--primal-orange), #e67e00);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+#add-new-product-btn:hover {
+    background: linear-gradient(135deg, #e67e00, #cc7000);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4);
+}
+
+/* Responsive Design for Product Management */
+@media (max-width: 768px) {
+    .seller-products-management-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .product-management-actions {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .section-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .section-filters .search-input {
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .seller-product-management-item {
+        padding: 1rem;
+    }
+    
+    .seller-product-management-item .product-image {
+        height: 150px;
+    }
+}
+

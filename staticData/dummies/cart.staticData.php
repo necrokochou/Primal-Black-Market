@@ -1,8 +1,8 @@
 <?php
 return [
     [
-        'User_ID' => null, // Will be replaced with random user ID
-        'Listing_ID' => null, // Will be replaced with random listing ID
+        'User_ID' => null,
+        'Listing_ID' => null,
         'Quantity' => 1,
         'AddedAt' => '2024-01-15 10:30:00'
     ],
