@@ -2,14 +2,13 @@
 // Start session and validate admin access BEFORE any output
 session_start();
 
-
-if (!isset($_SESSION['user']) || !($_SESSION['user']['is_admin'] ?? false)) {
+$user = $_SESSION['user'] ?? null;
+if (!isset($user) || !($user['is_admin'] ?? false)) {
     header('Location: /pages/login/index.php');
     exit;
 }
 
 // Get admin user data
-$user = $_SESSION['user'];
 $username = $user['username'] ?? 'Unknown';
 $alias = $user['alias'] ?? $username;
 
@@ -29,16 +28,16 @@ try {
     $listingCount = $db->getListingCount(false); // Total listings
     $activeListingCount = $db->getListingCount(true); // Active listings only
     $users = $db->getAllUsers();
-    $listings = $db->getListings(null, null, 0, true);
-    echo '<pre>';
-    echo "✅ Users loaded: " . count($users) . "\n";
-    echo "✅ Listings loaded: " . count($listings) . "\n";
-    echo "Host: " . ($_ENV['PG_HOST'] ?? 'not set') . "\n";
-    echo "Port: " . ($_ENV['PG_PORT'] ?? 'not set') . "\n";
-    echo "DB: " . ($_ENV['PG_DB'] ?? 'not set') . "\n";
-    echo "User: " . ($_ENV['PG_USER'] ?? 'not set') . "\n";
-    echo '</pre>';
-    echo '</pre>'; // Include inactive listings for admin
+    // $listings = $db->getListings(null, null, 0, true);
+    // echo '<pre>';
+    // echo "✅ Users loaded: " . count($users) . "\n";
+    // echo "✅ Listings loaded: " . count($listings) . "\n";
+    // echo "Host: " . ($_ENV['PG_HOST'] ?? 'not set') . "\n";
+    // echo "Port: " . ($_ENV['PG_PORT'] ?? 'not set') . "\n";
+    // echo "DB: " . ($_ENV['PG_DB'] ?? 'not set') . "\n";
+    // echo "User: " . ($_ENV['PG_USER'] ?? 'not set') . "\n";
+    // echo '</pre>';
+    // echo '</pre>'; // Include inactive listings for admin
 } catch (Exception $e) {
     error_log("Database error in admin dashboard: " . $e->getMessage());
     // Set default values if database fails
@@ -48,11 +47,11 @@ try {
     $users = [];
     $listings = [];
 
-    echo '<pre>';
-    echo "❌ Error: " . $e->getMessage() . "\n";
-    echo "✅ Users fallback: " . count($users) . "\n";
-    echo "✅ Listings fallback: " . count($listings) . "\n";
-    echo '</pre>';
+    // echo '<pre>';
+    // echo "❌ Error: " . $e->getMessage() . "\n";
+    // echo "✅ Users fallback: " . count($users) . "\n";
+    // echo "✅ Listings fallback: " . count($listings) . "\n";
+    // echo '</pre>';
 }
 ?>
 
@@ -138,37 +137,39 @@ try {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($users as $index => $user): ?>
-                            <tr data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>">
-                                <td>
-                                    <div class="user-info">
-                                        <i class="fas fa-user-circle user-avatar"></i>
-                                        <div>
-                                            <div class="user-name"><?php echo htmlspecialchars($user['username']); ?></div>
-                                            <div class="user-email"><?php echo htmlspecialchars($user['email']); ?></div>
-                                            <div class="user-alias">Alias: <?php echo htmlspecialchars($user['alias']); ?></div>
+                        <?php foreach ($users as $index => $u): ?>
+                            <?php if ($u['user_id'] !== $user['user_id']): ?>
+                                <tr data-user-id="<?php echo htmlspecialchars($u['user_id']); ?>">
+                                    <td>
+                                        <div class="user-info">
+                                            <i class="fas fa-user-circle user-avatar"></i>
+                                            <div>
+                                                <div class="user-name"><?php echo htmlspecialchars($u['username']); ?></div>
+                                                <div class="user-email"><?php echo htmlspecialchars($u['email']); ?></div>
+                                                <div class="user-alias">Alias: <?php echo htmlspecialchars($u['alias']); ?></div>
+                                            </div>
                                         </div>
-                                    </div>
-                               </td>
-                                <td><span class="role-badge <?php echo $user['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $user['is_admin'] ? 'Admin' : 'User'; ?></span></td>
-                                <td><span class="status-badge active">Active</span></td>
-                                <td class="user-created-at"><?php echo $user['created_at']; ?></td>
-                                <td><?php echo number_format($user['trustlevel'], 1); ?></td>
-                                <td><?php echo $user['is_vendor'] ? 'Yes' : 'No'; ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn view-user" data-user-id="<?php echo $user['user_id']; ?>" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn ban-user" data-user-id="<?php echo $user['user_id']; ?>" title="Ban User">
-                                            <i class="fas fa-ban"></i>
-                                        </button>
-                                        <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($user['user_id']); ?>" title="Delete User">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td><span class="role-badge <?php echo $u['is_admin'] ? 'admin' : 'user'; ?>"><?php echo $u['is_admin'] ? 'Admin' : 'User'; ?></span></td>
+                                    <td><span class="status-badge active">Active</span></td>
+                                    <td class="user-created-at"><?php echo $u['created_at']; ?></td>
+                                    <td><?php echo number_format($u['trustlevel'], 1); ?></td>
+                                    <td><?php echo $u['is_vendor'] ? 'Yes' : 'No'; ?></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view-user" data-user-id="<?php echo $u['user_id']; ?>" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn ban-user" data-user-id="<?php echo $u['user_id']; ?>" title="Ban User">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                            <button class="action-btn delete-user" data-user-id="<?php echo htmlspecialchars($u['user_id']); ?>" title="Delete User">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -187,7 +188,7 @@ try {
                         $categories = require_once DUMMIES_PATH . '/categories.staticData.php';
                         foreach ($categories as $category): 
                             $categoryValue = strtolower(str_replace(' ', '-', $category['Name']));
-                            $icon = match($category['Name']) {
+                            $icon = match ($category['Name']) {
                                 'Weapons' => '⚔️',
                                 'Hunting Equipment' => '🏹',
                                 'Prehistoric Drugs' => '🧪',
@@ -203,9 +204,9 @@ try {
                                 default => '📦'
                             };
                         ?>
-                        <option value="<?php echo $categoryValue; ?>">
-                            <?php echo $icon . ' ' . htmlspecialchars($category['Name']); ?>
-                        </option>
+                            <option value="<?php echo $categoryValue; ?>">
+                                <?php echo $icon . ' ' . htmlspecialchars($category['Name']); ?>
+                            </option>
                         <?php endforeach; ?>
                     </select>
                 </div>

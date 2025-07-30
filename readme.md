@@ -5,7 +5,7 @@
 <br />
 <div align="center">
   <a href="">
-    <img src="" alt="img" width="130" height="100">
+    <img src="assets\images\logo_arcc.png" alt="img" width="350" height="250">
   </a>
   <h3 align="center">Primal Black Market</h3>
 </div>
@@ -15,10 +15,9 @@
 
 <br />
 
-![](https://visit-counter.vercel.app/counter.png?page=necrokochou/AD-Task-3)
+![](https://visit-counter.vercel.app/counter.png?page=necrokochou/Primal-Black-Market)
 
-[![wakatime](https://wakatime.com/badge/user/018f07eb-269b-4b7c-b3af-6bf4e57e5c82/project/cc8d9f3c-4219-44bd-b58f-e713c49e5dc7.svg)](https://wakatime.com/badge/user/018f07eb-269b-4b7c-b3af-6bf4e57e5c82/project/cc8d9f3c-4219-44bd-b58f-e713c49e5dc7)
-
+[![wakatime](https://wakatime.com/badge/github/necrokochou/Primal-Black-Market.svg)](https://wakatime.com/badge/github/necrokochou/Primal-Black-Market)
 ---
 
 <br />
@@ -50,9 +49,22 @@
 
 Description
 
+A Final Project showcasing Black Market website with the Prehistoric/Primal theme
+
+### Members
+
+- Banaag, Christiane Janiel
+- Cendana, Carl Markruel
+- Flores, Joseph Aiden
+- Galang, Christian Allen
+- Pamilar,Louie
+
 ### Key Components
 
-- Key Component
+- Login
+- Multi-Page
+- Admin Features
+- Cart System
 
 ### Technology
 
@@ -84,49 +96,126 @@ Description
    | Camel       | Components and Pages | index.php or footer.component.php |
 8. Renaming of Pages folder names are a must, and relates to what it is doing or data it holding.
 9. Use proper label in your github commits: `feat`, `fix`, `refactor` and `docs`
-10. File Structure to follow below.
+
+10. Primal Black Market Project Structure:
 
 ```
-AD-ProjectName
-└─ assets
-|   └─ css
-|   |   └─ name.css
-|   └─ img
-|   |   └─ name.jpeg/.jpg/.webp/.png
-|   └─ js
-|       └─ name.js
-└─ components
-|   └─ name.component.php
-|   └─ templates
-|      └─ name.component.php
-└─ handlers
-|   └─ name.handler.php
-└─ layout
-|   └─ name.layout.php
-└─ pages
-|  └─ pageName
-|     └─ assets
-|     |  └─ css
-|     |  |  └─ name.css
-|     |  └─ img
-|     |  |  └─ name.jpeg/.jpg/.webp/.png
-|     |  └─ js
-|     |     └─ name.js
-|     └─ index.php
-└─ staticData
-|  └─ name.staticdata.php
-└─ utils
-|   └─ name.utils.php
-└─ vendor
-└─ .gitignore
-└─ bootstrap.php
-└─ composer.json
-└─ composer.lock
-└─ index.php
-└─ readme.md
-└─ router.php
+Primal-Black-Market
+├── assets
+│   ├── css
+│   │   ├── primal-about.css
+│   │   ├── primal-account.css
+│   │   ├── primal-admin.css
+│   │   ├── primal-body.css
+│   │   ├── primal-cart.css
+│   │   ├── primal-login.css
+│   │   ├── primal-register.css
+│   │   ├── primal-registration.css
+│   │   ├── primal-seller-modal.css
+│   │   ├── primal-shop.css
+│   │   └── homepage.css
+│   ├── images
+│   │   ├── Logo.png
+│   │   ├── heroimg.jpg
+│   │   ├── bc.png
+│   │   ├── mc.png
+│   │   ├── pp.png
+│   │   ├── visa.png
+│   │   ├── clothing/
+│   │   ├── food/
+│   │   ├── forging-materials/
+│   │   ├── hunting-materials/
+│   │   ├── infrastructure/
+│   │   ├── pets/
+│   │   ├── prehistoric-drugs/
+│   │   ├── ritual-artifacts/
+│   │   ├── spices-etc/
+│   │   ├── user-uploads/
+│   │   ├── voodoo/
+│   │   └── Weps/
+│   └── js
+│       ├── primal-about.js
+│       ├── primal-account.js
+│       ├── primal-admin.js
+│       ├── primal-body.js
+│       ├── primal-cart.js
+│       ├── primal-login.js
+│       ├── primal-register.js
+│       ├── primal-seller-modal.js
+│       ├── primal-shop.js
+│       └── main.js
+├── components
+│   ├── sellerProductModal.component.php
+│   └── componentGroup/
+│       └── templates/
+├── handlers
+│   ├── account.handler.php
+│   ├── admin.handler.php
+│   ├── auth.handler.php
+│   ├── cart.handler.php
+│   ├── emailCheck.handler.php
+│   ├── logout.handler.php
+│   ├── mongodbChecker.handler.php
+│   ├── postgresChecker.handler.php
+│   └── products.handler.php
+├── layouts
+│   ├── header.php
+│   ├── footer.php
+│   └── example.layout.php
+├── pages
+│   ├── about/
+│   ├── account/
+│   ├── admin/
+│   ├── cart/
+│   ├── login/
+│   ├── logout/
+│   ├── register/
+│   └── shop/
+├── staticData
+│   ├── pgTables.staticData.php
+│   └── dummies/
+├── utils
+│   ├── auth.util.php
+│   ├── cart.util.php
+│   ├── databaseHealthCheck.util.php
+│   ├── DatabaseService.util.php
+│   ├── dbConnect.util.php
+│   ├── dbMigratePostgresql.util.php
+│   ├── dbResetPostgresql.util.php
+│   ├── dbSeederPostgresql.util.php
+│   ├── dbVerifyTables.util.php
+│   ├── envSetter.util.php
+│   ├── fixCategoriesDatabase.util.php
+│   ├── productCard.util.php
+│   ├── register.util.php
+│   ├── session.util.php
+├── database
+│   ├── users.model.sql
+│   ├── categories.model.sql
+│   ├── listings.model.sql
+│   ├── transactions.model.sql
+│   ├── cart.model.sql
+│   └── purchase_history.model.sql
+├── docs
+│   ├── FULL-NOTES.md
+│   ├── Reminder_Seeder-Migrate-Reset.md
+│   ├── dummyDatas-Notes.md
+│   └── GitSomeHelp.md
+├── errors
+│   └── example.error.php
+├── vendor/
+├── .gitignore
+├── bootstrap.php
+├── composer.json
+├── composer.lock
+├── index.php
+├── readme.md
+├── router.php
+├── compose.yaml
+├── Dockerfile
+└── create-upload-directory.sh
 ```
-> The following should be renamed: name.css, name.js, name.jpeg/.jpg/.webp/.png, name.component.php(but not the part of the `component.php`), Name.utils.php(but not the part of the `utils.php`)
+> Use descriptive names for files and folders. Avoid generic names like `name.js` or `name.css`. Follow the Primal Black Market conventions for all new files and folders.
 
 ## Resources
 
@@ -135,3 +224,4 @@ AD-ProjectName
 | ChatGPT | General AI assistance for planning, learning concepts, and gather ideas. | https://chat.openai.com |
 | GitHub Copilot | In-IDE code suggestions and boilerplate generation. | https://github.com/features/copilot |
 | Professor's Sample | Used for reference, understanding concepts and logical flow. | https://github.com/zyx-0314/hands-on |
+| Ian Ramirez | Course and Projecr Adviser | https://github.com/zyx-0314 |

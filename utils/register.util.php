@@ -1,5 +1,6 @@
 <?php
-require_once BASE_PATH . '/utils/dbConnect.util.php'; // Assumes connectPostgres() exists
+require_once BASE_PATH . '/bootstrap.php';
+require_once UTILS_PATH . '/dbConnect.util.php'; // Assumes connectPostgres() exists
 
 function isUsernameTaken(string $username): bool
 {
@@ -96,13 +97,13 @@ function registerUser(string $username, string $password, string $email, ?string
         $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->bindParam(':alias', $alias, PDO::PARAM_STR);
-        
+
         // Convert boolean to PostgreSQL-compatible format
         $vendorBoolean = $is_vendor ? 'true' : 'false';
         $stmt->bindParam(':is_vendor', $vendorBoolean, PDO::PARAM_STR);
 
         error_log("Executing INSERT with params: " . json_encode($executeParams));
-        
+
         $ok = $stmt->execute();
 
         if (!$ok) {

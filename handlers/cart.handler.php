@@ -10,6 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $user = $_SESSION['user'] ?? null;
 
+require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/cart.util.php';
 
 header('Content-Type: application/json');
