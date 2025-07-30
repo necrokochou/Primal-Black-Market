@@ -82,11 +82,6 @@ try {
 
 
     <section class="promo-video-section">
-        <div class="promo-banner">
-            <span class="promo-label">EXTRA 75% OFF</span>
-            <span class="promo-code">USE PROMO CODE: <b>HGARJFA</b></span>
-            <a href="#" class="btn">SHOP NOW</a>
-        </div>
         <div class="promo-video">
             <iframe width="100%" height="200" src="https://www.youtube.com/embed/8ZK_S-46KwE" title="Timelapse - Lighthouse (Oct 2012)" frameborder="0" allowfullscreen></iframe>
         </div>
