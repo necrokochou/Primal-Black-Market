@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../bootstrap.php';
+require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 
 session_start();
@@ -7,7 +7,8 @@ session_start();
 header('Content-Type: application/json');
 
 // Only allow logged-in admin users
-if (!isset($_SESSION['user']) || !($_SESSION['user']['is_admin'] ?? false)) {
+$user = $_SESSION['user'] ?? null;
+if (!isset($user) || !($user['is_admin'] ?? false)) {
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
 }
@@ -23,7 +24,7 @@ try {
             $userId = $_POST['user_id'] ?? null;
 
             // Prevent self-deletion
-            if ($userId === ($_SESSION['user']['id'] ?? null)) {
+            if ($userId === ($user['user_id'] ?? null)) {
                 $response['error'] = 'You cannot delete your own account while logged in.';
                 break;
             }

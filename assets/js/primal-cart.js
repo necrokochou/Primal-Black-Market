@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const cartItemsDiv = document.getElementById('cart-items');
     const updateCartBtn = document.getElementById('update-cart-btn');
     const checkoutBtn = document.getElementById('checkout-btn');
-    const voucherInput = document.getElementById('cart-voucher');
-    const voucherBtn = document.querySelector('.cart-voucher-btn');
     
     // ================================
     // ENHANCED CART RENDERING
@@ -39,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </a>
                 </div>
             `;
-            updateCartSummary(0, 0, 0, 0);
+            updateCartSummary(0, 0, 0);
             return;
         }
         
@@ -79,23 +77,11 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }).join('');
         
-        // Discount from voucher
-        const voucherDiscountRate = appliedVoucher?.discount ?? 0;
-
-        // Quantity-based discount
-        let quantityDiscountRate = 0;
-        if (cart.length >= 5) quantityDiscountRate = 0.05;
-        else if (cart.length >= 3) quantityDiscountRate = 0.03;
-        else if (cart.length >= 2) quantityDiscountRate = 0.01;
-
-        // Total discount rate is the higher of the two
-        const discountRate = Math.max(voucherDiscountRate, quantityDiscountRate);
-
-        const discount = subtotal * discountRate;
+        // Calculate totals without discount
         const delivery = subtotal > 0 ? 50 : 0;
-        const total = subtotal - discount + delivery;
+        const total = subtotal + delivery;
 
-        updateCartSummary(subtotal, discount, delivery, total);
+        updateCartSummary(subtotal, delivery, total);
         
         // Add event listeners to new elements
         addCartEventListeners();
@@ -114,20 +100,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // CART SUMMARY UPDATES
     // ================================
     
-    function updateCartSummary(subtotal, discount, delivery, total) {
+    function updateCartSummary(subtotal, delivery, total) {
         const subtotalEl = document.getElementById('cart-subtotal');
-        const discountEl = document.getElementById('cart-discount');
         const deliveryEl = document.getElementById('cart-delivery');
         const totalEl = document.getElementById('cart-total');
         
         if (subtotalEl) {
             subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
             animateValue(subtotalEl, subtotal);
-        }
-        
-        if (discountEl) {
-            discountEl.textContent = `-$${discount.toFixed(2)}`;
-            animateValue(discountEl, discount);
         }
         
         if (deliveryEl) {
@@ -278,78 +258,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ================================
-    // VOUCHER FUNCTIONALITY
-    // ================================
-    
-    let appliedVoucher = null;
-    
-    function initializeVoucherSystem() {
-        if (voucherBtn) {
-            voucherBtn.addEventListener('click', function() {
-                const voucherCode = voucherInput.value.trim().toLowerCase();
-                
-                if (!voucherCode) {
-                    showUpdateNotification('Please enter a voucher code', 'error');
-                    return;
-                }
-                
-                applyVoucher(voucherCode);
-            });
-        }
-        
-        if (voucherInput) {
-            voucherInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    voucherBtn.click();
-                }
-            });
-        }
-    }
-    
-    function applyVoucher(code) {
-        const validVouchers = {
-            'primal10': { discount: 0.10, description: '10% off' },
-            'wild20': { discount: 0.20, description: '20% off' },
-            'savage15': { discount: 0.15, description: '15% off' },
-            'beast25': { discount: 0.25, description: '25% off' }
-        };
-        
-        if (validVouchers[code]) {
-            appliedVoucher = validVouchers[code];
-            
-            // Visual feedback
-            voucherInput.style.borderColor = 'var(--primal-green)';
-            voucherBtn.textContent = 'Applied!';
-            voucherBtn.style.background = 'linear-gradient(135deg, var(--primal-green), #28a745)';
-            
-            // Update cart summary
-            renderCartEnhanced();
-            
-            showUpdateNotification(`Voucher applied: ${appliedVoucher.description}`, 'success');
-            
-            // Reset button after delay
-            setTimeout(() => {
-                voucherBtn.textContent = 'Apply';
-                voucherBtn.style.background = 'linear-gradient(135deg, var(--primal-green), #4a5a3a)';
-            }, 3000);
-        } else {
-            // Invalid voucher
-            voucherInput.style.borderColor = '#dc3545';
-            voucherBtn.textContent = 'Invalid';
-            voucherBtn.style.background = 'linear-gradient(135deg, #dc3545, #b02a37)';
-            
-            showUpdateNotification('Invalid voucher code', 'error');
-            
-            // Reset after delay
-            setTimeout(() => {
-                voucherInput.style.borderColor = 'rgba(127, 79, 36, 0.3)';
-                voucherBtn.textContent = 'Apply';
-                voucherBtn.style.background = 'linear-gradient(135deg, var(--primal-green), #4a5a3a)';
-            }, 3000);
-        }
-    }
-    
-    // ================================
     // CHECKOUT FUNCTIONALITY
     // ================================
     
@@ -366,20 +274,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Checkout animation
                 this.style.transform = 'scale(0.95)';
                 this.textContent = 'Processing...';
+                this.disabled = true;
                 
-                setTimeout(() => {
-                    // Simulate checkout process
-                    showCheckoutModal();
+                try {
+                    // Process real checkout through transaction handler
+                    const response = await fetch('/handlers/transaction.handler.php', {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            action: 'checkout',
+                            payment_method: 'Credit Card',
+                            delivery_notes: 'Standard delivery'
+                        })
+                    });
                     
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showCheckoutModal(data);
+                    } else {
+                        showUpdateNotification(`Checkout failed: ${data.error}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Checkout error:', error);
+                    showUpdateNotification('Checkout failed. Please try again.', 'error');
+                } finally {
                     // Reset button
                     this.style.transform = 'scale(1)';
                     this.textContent = 'Checkout Now';
-                }, 1000);
+                    this.disabled = false;
+                }
             });
         }
     }
     
-    async function showCheckoutModal() {
+    async function showCheckoutModal(checkoutData) {
         const modal = document.createElement('div');
         modal.style.cssText = `
             position: fixed;
@@ -395,6 +327,10 @@ document.addEventListener('DOMContentLoaded', function() {
             animation: fadeIn 0.3s ease-out;
         `;
         
+        const totalItems = checkoutData?.total_items || 0;
+        const transactionSummary = checkoutData?.transactions || [];
+        const totalAmount = transactionSummary.reduce((sum, t) => sum + parseFloat(t.total_price), 0);
+        
         modal.innerHTML = `
             <div style="
                 background: var(--cart-card-bg);
@@ -407,20 +343,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
             ">
                 <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--primal-green); margin-bottom: 1rem;"></i>
-                <h2 style="font-family: 'Cinzel', serif; font-size: 2rem; color: var(--primal-beige-light); margin-bottom: 1rem;">Checkout Successful!</h2>
-                <p style="font-family: 'Inter', sans-serif; color: rgba(255, 255, 255, 0.8); margin-bottom: 2rem;">
-                    Your order has been processed. You will receive a confirmation email shortly.
+                <h2 style="font-family: 'Cinzel', serif; font-size: 2rem; color: var(--primal-beige-light); margin-bottom: 1rem;">Purchase Successful!</h2>
+                <p style="font-family: 'Inter', sans-serif; color: rgba(255, 255, 255, 0.8); margin-bottom: 1rem;">
+                    Your order has been processed successfully!
                 </p>
-                <button id="closeModal" style="
-                    background: linear-gradient(135deg, var(--primal-orange), var(--primal-brown));
-                    color: white;
-                    border: none;
-                    padding: 1rem 2rem;
-                    border-radius: 12px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                ">Close</button>
+                <div style="background: rgba(127, 79, 36, 0.2); border-radius: 10px; padding: 1rem; margin-bottom: 2rem; text-align: left;">
+                    <div style="color: var(--primal-beige-light); margin-bottom: 0.5rem;">
+                        <strong>Order Summary:</strong>
+                    </div>
+                    <div style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem;">
+                        Items: ${totalItems}<br>
+                        Total Amount: $${totalAmount.toFixed(2)}<br>
+                        Payment: Credit Card<br>
+                        Status: Processed
+                    </div>
+                </div>
+                <p style="font-family: 'Inter', sans-serif; color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; margin-bottom: 2rem;">
+                    You can view your purchase history in your account page.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button id="viewAccount" style="
+                        background: linear-gradient(135deg, var(--primal-green), #28a745);
+                        color: white;
+                        border: none;
+                        padding: 1rem 1.5rem;
+                        border-radius: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    ">View Account</button>
+                    <button id="closeModal" style="
+                        background: linear-gradient(135deg, var(--primal-orange), var(--primal-brown));
+                        color: white;
+                        border: none;
+                        padding: 1rem 1.5rem;
+                        border-radius: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    ">Continue Shopping</button>
+                </div>
             </div>
         `;
         
@@ -428,6 +390,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Close modal functionality
         const closeBtn = modal.querySelector('#closeModal');
+        const viewAccountBtn = modal.querySelector('#viewAccount');
+        
         closeBtn.addEventListener('click', async function() {
             modal.style.animation = 'fadeOut 0.3s ease-out';
             setTimeout(async () => {
@@ -452,6 +416,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Failed to clear cart after checkout:', err);
                 }
             }, 300);
+        });
+        
+        viewAccountBtn.addEventListener('click', function() {
+            window.location.href = '/pages/account/index.php?tab=purchase-history&success=purchase_completed';
         });
         
         // Close on background click
@@ -580,7 +548,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // ================================
     
     // Initialize all features
-    initializeVoucherSystem();
     initializeCheckout();
     initializeUpdateButton();
     

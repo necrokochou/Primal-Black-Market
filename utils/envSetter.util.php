@@ -1,11 +1,13 @@
 <?php
+// Remove circular dependency - bootstrap.php should be loaded before this file
 require_once BASE_PATH . '/bootstrap.php';
 require_once BASE_PATH . '/vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);
 $dotenv->load();
 
-function getPostgresEnv(): array {
+function getPostgresEnv(): array
+{
     return [
         'host' => $_ENV['PG_HOST'] ?? 'postgresql',
         'port' => $_ENV['PG_PORT'] ?? 5432,
@@ -15,7 +17,8 @@ function getPostgresEnv(): array {
     ];
 }
 
-function getMongoEnv(): array {
+function getMongoEnv(): array
+{
     return [
         'uri' => $_ENV['MONGO_URI'] ?? 'mongodb://root:rootPassword@mongodb:27111',
         'host' => $_ENV['MONGO_HOST'] ?? 'mongodb',

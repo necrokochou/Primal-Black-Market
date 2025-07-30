@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-require_once __DIR__ . '/../bootstrap.php';
+require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 
 $db = DatabaseService::getInstance()->getConnection();

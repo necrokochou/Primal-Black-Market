@@ -1,5 +1,7 @@
 <?php
-require_once BASE_PATH . '/utils/envSetter.util.php';
+// Ensure bootstrap.php constants are available
+require_once BASE_PATH . '/bootstrap.php';
+require_once UTILS_PATH . '/envSetter.util.php';
 class DatabaseService
 {
     private static $instance = null;
@@ -169,8 +171,8 @@ class DatabaseService
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $alias = $alias ?: $username;
 
-            $sql = "INSERT INTO users (username, email, password, alias, trust_level, is_vendor, is_admin, created_at) 
-                    VALUES (:username, :email, :password, :alias, 0.0, false, false, NOW())";
+            $sql = "INSERT INTO users (Username, Email, Password, Alias, TrustLevel, Is_Vendor, Is_Admin, Created_At) 
+                    VALUES (:username, :email, :password, :alias, 0.0, false, false, CURRENT_TIMESTAMP)";
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindValue(':username', $username);
@@ -268,36 +270,36 @@ class DatabaseService
     }
 
     // Get all users (for admin dashboard)
-    public function getAllUsers()
-    {
-        $sql = "SELECT user_id, username, email, alias, trustlevel, is_vendor, is_admin
-            FROM users";
-
-        $stmt = $this->pdo->query($sql);
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        //return $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-        // Ensure created_at is always set to a valid value
-        foreach ($users as &$user) {
-            if (empty($user['created_at']) || strtotime($user['created_at']) === false) {
-                $user['created_at'] = date('Y-m-d H:i:s');
-            }
-        }
-
-        return $users;
-    }
-
-    //use this when created_at is added to users.model.sql
     // public function getAllUsers()
     // {
-    //     $sql = "SELECT user_id, username, email, alias, trustlevel, is_vendor, is_admin, created_at 
-    //         FROM users 
-    //         ORDER BY created_at DESC";
+    //     $sql = "SELECT user_id, username, email, alias, trustlevel, is_vendor, is_admin, 
+    //         FROM users";
 
     //     $stmt = $this->pdo->query($sql);
-    //     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //     //return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+    //     // Ensure created_at is always set to a valid value
+    //     foreach ($users as &$user) {
+    //         if (empty($user['created_at']) || strtotime($user['created_at']) === false) {
+    //             $user['created_at'] = date('Y-m-d H:i:s');
+    //         }
+    //     }
+
+    //     return $users;
     // }
+
+    //use this when created_at is added to users.model.sql
+    public function getAllUsers()
+    {
+        $sql = "SELECT user_id, username, email, alias, trustlevel, is_vendor, is_admin, created_at 
+            FROM users 
+            ORDER BY created_at DESC";
+
+        $stmt = $this->pdo->query($sql);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     // Get user count
     public function getUserCount()

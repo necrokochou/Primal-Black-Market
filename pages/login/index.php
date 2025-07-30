@@ -5,7 +5,8 @@ if (isset($_SESSION['user'])) {
     exit;
 }
 
-require_once __DIR__ . '/../../layouts/header.php';
+require_once BASE_PATH . '/bootstrap.php';
+require_once LAYOUTS_PATH . '/header.php';
 ?>
 <link rel="stylesheet" href="/assets/css/primal-login.css">
 
@@ -17,8 +18,8 @@ require_once __DIR__ . '/../../layouts/header.php';
         <form id="login-form" class="primal-form" method="POST" action="/handlers/auth.handler.php" novalidate>
             <input type="hidden" name="action" value="login">
             <div class="input-group">
-                <input type="text" name="username" class="primal-input" placeholder="Username" required
-                    autocomplete="username" aria-label="Username" />
+                <input type="text" name="username" class="primal-input" placeholder="Username or Email" required
+                    autocomplete="username" aria-label="Username or Email" />
                 <div class="input-highlight"></div>
             </div>
 
@@ -62,4 +63,4 @@ require_once __DIR__ . '/../../layouts/header.php';
 </main>
 
 <script src="/assets/js/primal-login.js"></script>
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>

@@ -1,15 +1,43 @@
 <?php
+// Start output buffering to prevent premature output
+ob_start();
+
 // Check if user is logged in
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 if (!isset($_SESSION['user'])) {
+    // Clean output buffer before redirect
+    if (ob_get_level()) {
+        ob_end_clean();
+    }
     header('Location: /pages/login/index.php');
     exit;
 }
 
-require_once __DIR__ . '/../../layouts/header.php';
+require_once BASE_PATH . '/bootstrap.php';
+require_once LAYOUTS_PATH . '/header.php';
+
+// Handle success/error messages from URL parameters (for non-AJAX form submissions)
+$notification = null;
+if (isset($_GET['success'])) {
+    $notification = [
+        'type' => 'success',
+        'message' => urldecode($_GET['success'])
+    ];
+} elseif (isset($_GET['error'])) {
+    $notification = [
+        'type' => 'error', 
+        'message' => urldecode($_GET['error'])
+    ];
+}
+
+require_once BASE_PATH . '/bootstrap.php';
 
 // Get user data from session
 $user = $_SESSION['user'];
+$userID = $user['user_id'];
 $username = $user['username'];
 $alias = $user['alias'] ?? $username;
 $email = $user['email'] ?? '';
@@ -18,27 +46,97 @@ $isVendor = $user['is_vendor'] ?? false;
 $isAdmin = $user['is_admin'] ?? false;
 // Get user's listings from database (if they are a vendor)
 $userListings = [];
+$purchaseHistory = [];
 if ($isVendor) {
     try {
-        require_once BASE_PATH . '/bootstrap.php';
         require_once UTILS_PATH . '/DatabaseService.util.php';
-        $db = DatabaseService::getInstance();
-        // Note: This would require a method to get listings by vendor ID
-        // For now, we'll show empty array until that method is implemented
-        $userListings = [];
+        $db = DatabaseService::getInstance()->getConnection();
+
+        // Get listings for this vendor
+        $stmt = $db->prepare("
+            SELECT listing_id, title, description, category, price, quantity, 
+                   is_active, publish_date, item_image 
+            FROM listings 
+            WHERE vendor_id = :vendor_id 
+            ORDER BY publish_date DESC
+        ");
+        $stmt->execute(['vendor_id' => $userID]);
+        $userListings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        error_log("Found " . count($userListings) . " listings for vendor: " . $userID);
+        if (!empty($userListings)) {
+            error_log("Sample listing data: " . json_encode(array_slice($userListings, 0, 2)));
+        }
+
+        // Get sales history for this vendor
+        $stmt = $db->prepare("
+            SELECT ph.*, l.title, l.item_image
+            FROM purchase_history ph
+            JOIN listings l ON ph.listing_id = l.listing_id
+            WHERE l.vendor_id = :vendor_id
+            ORDER BY ph.purchase_date DESC
+        ");
+        $stmt->execute(['vendor_id' => $userID]);
+        $purchaseHistory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     } catch (Exception $e) {
-        error_log("Database error getting user listings: " . $e->getMessage());
+        error_log("Database error (vendor data): " . $e->getMessage());
         $userListings = [];
+        $purchaseHistory = [];
+    }
+} else {
+    // Get purchase history for a regular user
+    try {
+        require_once UTILS_PATH . '/DatabaseService.util.php';
+        $db = DatabaseService::getInstance()->getConnection();
+
+        $stmt = $db->prepare("
+            SELECT ph.*, l.title, l.item_image
+            FROM purchase_history ph
+            JOIN listings l ON ph.listing_id = l.listing_id
+            WHERE ph.user_id = :user_id
+            ORDER BY ph.purchase_date DESC
+        ");
+        $stmt->execute(['user_id' => $userID]);
+        $purchaseHistory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch (Exception $e) {
+        error_log("Database error (user purchase history): " . $e->getMessage());
+        $purchaseHistory = [];
     }
 }
 
-require_once __DIR__ . '/../../layouts/header.php';
+require_once LAYOUTS_PATH . '/header.php';
+
+// Temporary debug information
+if ($isVendor && isset($_GET['debug'])) {
+    echo "<div style='background: rgba(255,140,0,0.1); border: 1px solid #ff8c00; padding: 1rem; margin: 1rem; border-radius: 8px;'>";
+    echo "<h4 style='color: #ff8c00; margin: 0 0 1rem 0;'>🐛 Debug Info (remove ?debug from URL to hide)</h4>";
+    echo "<p><strong>User ID:</strong> " . htmlspecialchars($user['user_id']) . "</p>";
+    echo "<p><strong>Is Vendor:</strong> " . ($isVendor ? 'Yes' : 'No') . "</p>";
+    echo "<p><strong>Products Found:</strong> " . count($userListings) . "</p>";
+    if (!empty($userListings)) {
+        echo "<p><strong>Latest Product:</strong> " . htmlspecialchars($userListings[0]['title']) . " (Added: " . $userListings[0]['publish_date'] . ")</p>";
+    }
+    echo "</div>";
+}
 ?>
 
 <!-- Account Page Specific Styles -->
 <link rel="stylesheet" href="/assets/css/primal-account.css">
 
 <main class="primal-account-bg min-vh-100">
+    <!-- Display notifications from URL parameters -->
+    <?php if ($notification): ?>
+        <div class="notification-banner notification-<?php echo $notification['type']; ?>" id="url-notification">
+            <i class="fas fa-<?php echo $notification['type'] === 'success' ? 'check-circle' : 'exclamation-circle'; ?>"></i>
+            <span><?php echo htmlspecialchars($notification['message']); ?></span>
+            <button onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    <?php endif; ?>
+    
     <div class="account-container">
         <!-- Account Header -->
         <div class="account-header primal-card <?php echo $isAdmin ? 'admin-header' : ''; ?>">
@@ -46,7 +144,13 @@ require_once __DIR__ . '/../../layouts/header.php';
                 <i class="fas fa-<?php echo $isAdmin ? 'shield-alt' : ($isVendor ? 'store' : 'user-circle'); ?>"></i>
             </div>
             <div class="account-info">
-                <h1 class="account-name"><?php echo htmlspecialchars($alias); ?></h1>
+                <h1 class="account-name">
+                    <?php
+                    echo htmlspecialchars(
+                        $alias === $username ? $username : "{$username} ({$alias})"
+                    );
+                    ?>
+                </h1>
                 <p class="account-type">
                     <?php
                     if ($isAdmin) {
@@ -90,19 +194,13 @@ require_once __DIR__ . '/../../layouts/header.php';
                 <button class="nav-tab" data-tab="product-management">
                     <i class="fas fa-cogs"></i> Product Management
                 </button>
+                <button class="nav-tab" data-tab="sales-history">
+                    <i class="fas fa-chart-line"></i> Sales History
+                </button>
             <?php endif; ?>
-            <button class="nav-tab" data-tab="history">
-                <i class="fas fa-history"></i>
-                <?php echo $isVendor ? 'Sales History' : 'Purchase History'; ?>
-            </button>
             <button class="nav-tab" data-tab="settings">
                 <i class="fas fa-cog"></i> Account Settings
             </button>
-            <?php if ($isAdmin): ?>
-                <button class="nav-tab" data-tab="admin-tools">
-                    <i class="fas fa-tools"></i> Admin Tools
-                </button>
-            <?php endif; ?>
         </div>
 
         <!-- Products/Purchases Tab -->
@@ -112,11 +210,6 @@ require_once __DIR__ . '/../../layouts/header.php';
                     <i class="fas fa-<?php echo $isVendor ? 'store' : 'shopping-bag'; ?>"></i>
                     <?php echo $isVendor ? 'My Products' : 'My Purchases'; ?>
                 </h2>
-                <?php if ($isVendor): ?>
-                    <button class="primal-btn-primary" id="add-product-btn">
-                        <i class="fas fa-plus"></i> Add New Product
-                    </button>
-                <?php endif; ?>
             </div>
             <?php if ($isVendor): ?>
                 <!-- Vendor Products Grid -->
@@ -126,45 +219,56 @@ require_once __DIR__ . '/../../layouts/header.php';
                             <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
                                 <i class="fas fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
                                 <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Products Yet</h3>
-                                <p>Start building your primal marketplace by adding your first product.</p>
-                                <button class="primal-btn-primary" style="margin-top: 1rem;" onclick="document.getElementById('add-product-btn').click();">
-                                    <i class="fas fa-plus"></i> Add Your First Product
-                                </button>
+                                <p>You haven't added any products to your collection.</p>
                             </div>
                         </div>
                     <?php else: ?>
                         <?php foreach (array_slice($userListings, 0, 6) as $listing): ?>
                             <div class="product-card">
                                 <div class="product-image">
-                                    <img src="<?php echo htmlspecialchars($listing['item_image'] ?? '/assets/images/default-product.png'); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
+                                    <?php 
+                                    $imagePath = $listing['item_image'] ?? '';
+                                    if (empty($imagePath) || !file_exists($_SERVER['DOCUMENT_ROOT'] . $imagePath)) {
+                                        $imagePath = '/assets/images/example.png'; // fallback image
+                                    }
+                                    ?>
+                                    <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
                                     <div class="product-status <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
                                 </div>
                                 <div class="product-details">
                                     <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
                                     <p class="product-category"><?php echo htmlspecialchars($listing['category']); ?></p>
                                     <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
-                                    <p class="product-description"><?php echo htmlspecialchars($listing['description']); ?></p>
-                                </div>
-                                <div class="product-actions">
-                                    <button class="primal-btn-secondary edit-product" data-product-id="<?php echo $listing['listing_id']; ?>">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
-                                    <button class="primal-btn-danger remove-product" data-product-id="<?php echo $listing['listing_id']; ?>">
-                                        <i class="fas fa-trash"></i> Remove
-                                    </button>
+                                    <p class="product-description"><?php echo htmlspecialchars(substr($listing['description'], 0, 100)) . (strlen($listing['description']) > 100 ? '...' : ''); ?></p>
+                                    <p class="product-date">Added: <?php echo date('M j, Y', strtotime($listing['publish_date'])); ?></p>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
             <?php else: ?>
-                <!-- Member Purchases -->
+                <!-- Member Purchases - Dynamic Loading -->
                 <div class="purchases-section primal-card">
-                    <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
-                        <i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                        <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Purchases Yet</h3>
+                    <div class="purchase-header">
+                        <h3><i class="fas fa-history"></i> Purchase History</h3>
+                        <button id="refresh-purchases" class="primal-btn-secondary">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    
+                    <div id="purchase-loading" class="loading-spinner" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Loading purchases...
+                    </div>
+                    
+                    <div id="purchase-list">
+                        <!-- Dynamic content will be loaded here -->
+                    </div>
+                    
+                    <div id="no-purchases" class="no-purchases-state" style="display: none;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>No Purchases Yet</h3>
                         <p>Explore the primal marketplace and discover unique items.</p>
-                        <a href="/pages/shop" class="primal-btn-primary" style="margin-top: 1rem;">
+                        <a href="/pages/shop" class="primal-btn-primary">
                             <i class="fas fa-store"></i> Browse Products
                         </a>
                     </div>
@@ -173,141 +277,201 @@ require_once __DIR__ . '/../../layouts/header.php';
         </div>
 
         <?php if ($isVendor): ?>
-        <!-- Product Management Tab (Only for Sellers) -->
-        <div id="product-management-content" class="tab-content">
-            <div class="section-header">
-                <h2>
-                    <i class="fas fa-cogs"></i> Product Management
-                </h2>
-                <div class="section-filters">
-                    <input type="text" id="seller-product-search" class="search-input" placeholder="Search my products...">
-                    <select id="seller-product-category-filter" class="filter-select">
-                        <option value="all">All Categories</option>
-                        <option value="clothing">Clothing & Accessories</option>
-                        <option value="food">Food & Sustenance</option>
-                        <option value="forging-materials">Forging Materials</option>
-                        <option value="hunting-materials">Hunting Materials</option>
-                        <option value="infrastructure">Infrastructure</option>
-                        <option value="pets">Pets & Companions</option>
-                        <option value="prehistoric-drugs">Prehistoric Remedies</option>
-                        <option value="ritual-artifacts">Ritual Artifacts</option>
-                        <option value="spices-etc">Spices & Seasonings</option>
-                        <option value="voodoo">Voodoo Items</option>
-                        <option value="weapons">Weapons & Tools</option>
-                    </select>
-                    <select id="seller-product-status-filter" class="filter-select">
-                        <option value="all">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <button class="primal-btn-primary" id="add-new-product-btn">
-                        <i class="fas fa-plus"></i> Add New Product
-                    </button>
-                </div>
-            </div>
-
-            <div class="seller-products-management-grid">
-                <?php if (empty($userListings)): ?>
-                    <div class="empty-state primal-card">
-                        <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
-                            <i class="fas fa-boxes" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                            <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Products to Manage</h3>
-                            <p>Start adding products to your inventory to manage them here.</p>
-                            <button class="primal-btn-primary" style="margin-top: 1rem;" onclick="document.getElementById('add-new-product-btn').click();">
-                                <i class="fas fa-plus"></i> Add Your First Product
-                            </button>
-                        </div>
+            <!-- Product Management Tab (Only for Sellers) -->
+            <div id="product-management-content" class="tab-content">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-cogs"></i> Product Management
+                    </h2>
+                    <div class="section-filters">
+                        <input type="text" id="seller-product-search" class="search-input" placeholder="Search my products...">
+                        <select id="seller-product-category-filter" class="filter-select">
+                            <option value="all">All Categories</option>
+                            <?php 
+                            $categories = require_once DUMMIES_PATH . '/categories.staticData.php';
+                            foreach ($categories as $category): 
+                                $categoryValue = strtolower(str_replace(' ', '-', $category['Name']));
+                                $icon = match($category['Name']) {
+                                    'Weapons' => '⚔️',
+                                    'Hunting Equipment' => '🏹',
+                                    'Prehistoric Drugs' => '🧪',
+                                    'Food' => '🍖',
+                                    'Spices and etc.' => '🌿',
+                                    'General Equipment' => '🔧',
+                                    'Forging Materials' => '⛏️',
+                                    'Clothing' => '👘',
+                                    'Infrastructure' => '🏗️',
+                                    'Voodoo' => '🔮',
+                                    'Ritual Artifacts' => '📿',
+                                    'Pets' => '🐺',
+                                    default => '📦'
+                                };
+                            ?>
+                            <option value="<?php echo $categoryValue; ?>">
+                                <?php echo $icon . ' ' . htmlspecialchars($category['Name']); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <select id="seller-product-status-filter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <button class="primal-btn-primary" id="add-new-product-btn">
+                            <i class="fas fa-plus"></i> Add New Product
+                        </button>
                     </div>
-                <?php else: ?>
-                    <?php foreach ($userListings as $listing): ?>
-                        <div class="seller-product-management-item" data-product-id="<?php echo $listing['listing_id']; ?>">
-                            <div class="product-image">
-                                <img src="<?php echo htmlspecialchars($listing['item_image'] ?? '/assets/images/default-product.png'); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
-                                <div class="product-status-indicator <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
-                            </div>
-                            <div class="product-details">
-                                <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
-                                <p class="product-category"><?php echo htmlspecialchars($listing['category_name'] ?? $listing['category']); ?></p>
-                                <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
-                                <p class="product-stock">Stock: <?php echo $listing['quantity']; ?></p>
-                                <p class="product-views">Views: <?php echo $listing['views'] ?? 0; ?></p>
-                                <p class="product-sales">Sales: <?php echo $listing['sales'] ?? 0; ?></p>
-                            </div>
-                            <div class="product-management-actions">
-                                <button class="action-btn edit-seller-product" data-product-id="<?php echo $listing['listing_id']; ?>" title="Edit Product">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                                <button class="action-btn toggle-seller-product-status" data-product-id="<?php echo $listing['listing_id']; ?>" title="Toggle Status">
-                                    <i class="fas fa-<?php echo $listing['is_active'] ? 'pause' : 'play'; ?>"></i>
-                                    <?php echo $listing['is_active'] ? 'Deactivate' : 'Activate'; ?>
-                                </button>
-                                <button class="action-btn duplicate-seller-product" data-product-id="<?php echo $listing['listing_id']; ?>" title="Duplicate Product">
-                                    <i class="fas fa-copy"></i> Duplicate
-                                </button>
-                                <button class="action-btn delete-seller-product" data-product-id="<?php echo $listing['listing_id']; ?>" title="Delete Product">
-                                    <i class="fas fa-trash"></i> Delete
+                </div>
+
+                <div class="seller-products-management-grid">
+                    <?php if (empty($userListings)): ?>
+                        <div class="empty-state primal-card">
+                            <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
+                                <i class="fas fa-boxes" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No Products to Manage</h3>
+                                <p>Start adding products to your inventory to manage them here.</p>
+                                <button class="primal-btn-primary" style="margin-top: 1rem;" onclick="document.getElementById('add-new-product-btn').click();">
+                                    <i class="fas fa-plus"></i> Add Your First Product
                                 </button>
                             </div>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
+                    <?php else: ?>
+                        <?php foreach ($userListings as $listing): ?>
+                            <div class="seller-product-management-item" data-product-id="<?php echo $listing['listing_id']; ?>">
+                                <div class="product-image">
+                                    <?php 
+                                    $imagePath = $listing['item_image'] ?? '';
+                                    if (empty($imagePath) || !file_exists($_SERVER['DOCUMENT_ROOT'] . $imagePath)) {
+                                        $imagePath = '/assets/images/example.png'; // fallback image
+                                    }
+                                    ?>
+                                    <img src="<?php echo htmlspecialchars($imagePath); ?>" alt="<?php echo htmlspecialchars($listing['title']); ?>" loading="lazy">
+                                    <div class="product-status-indicator <?php echo $listing['is_active'] ? 'active' : 'inactive'; ?>"></div>
+                                </div>
+                                <div class="product-details">
+                                    <h3><?php echo htmlspecialchars($listing['title']); ?></h3>
+                                    <p class="product-category"><?php echo htmlspecialchars($listing['category']); ?></p>
+                                    <p class="product-price">$<?php echo number_format($listing['price'], 2); ?></p>
+                                    <p class="product-stock">Stock: <?php echo $listing['quantity']; ?></p>
+                                    <p class="product-date">Added: <?php echo date('M j, Y', strtotime($listing['publish_date'])); ?></p>
+                                    <p class="product-status-text">Status: <span class="<?php echo $listing['is_active'] ? 'text-success' : 'text-muted'; ?>"><?php echo $listing['is_active'] ? 'Active' : 'Inactive'; ?></span></p>
+                                </div>
+                                <div class="product-management-actions">
+                                    <button class="action-btn edit-seller-product" data-product-id="<?php echo $listing['listing_id']; ?>" title="Edit Product">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn delete-seller-product" data-product-id="<?php echo $listing['listing_id']; ?>" title="Delete Product">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
 
-            <!-- Product Management Statistics -->
-            <div class="seller-product-stats primal-card">
-                <h3><i class="fas fa-chart-bar"></i> Product Statistics</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <span class="stat-number"><?php echo count($userListings); ?></span>
-                        <span class="stat-label">Total Products</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number"><?php echo count(array_filter($userListings, function($l) { return $l['is_active']; })); ?></span>
-                        <span class="stat-label">Active Products</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number"><?php echo count(array_filter($userListings, function($l) { return !$l['is_active']; })); ?></span>
-                        <span class="stat-label">Inactive Products</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">$<?php echo number_format(array_sum(array_column($userListings, 'price')), 2); ?></span>
-                        <span class="stat-label">Total Value</span>
+                <!-- Product Management Statistics -->
+                <div class="seller-product-stats primal-card">
+                    <h3><i class="fas fa-chart-bar"></i> Product Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number"><?php echo count($userListings); ?></span>
+                            <span class="stat-label">Total Products</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?php echo count(array_filter($userListings, function ($l) {
+                                                            return $l['is_active'];
+                                                        })); ?></span>
+                            <span class="stat-label">Active Products</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><?php echo count(array_filter($userListings, function ($l) {
+                                                            return !$l['is_active'];
+                                                        })); ?></span>
+                            <span class="stat-label">Inactive Products</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">$<?php echo number_format(array_sum(array_column($userListings, 'price')), 2); ?></span>
+                            <span class="stat-label">Total Value</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         <?php endif; ?>
 
-        <!-- Purchase/Sales History Tab -->
-        <div id="history-content" class="tab-content">
-            <div class="section-header">
-                <h2>
-                    <i class="fas fa-chart-line"></i>
-                    <?php echo $isVendor ? 'Sales History' : 'Purchase History'; ?>
-                </h2>
-                <div class="history-filters">
-                    <select id="status-filter" class="filter-select">
-                        <option value="all">All Status</option>
-                        <option value="completed">Completed</option>
-                        <option value="pending">Pending</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                    <select id="date-filter" class="filter-select">
-                        <option value="all">All Time</option>
-                        <option value="week">Last Week</option>
-                        <option value="month">Last Month</option>
-                        <option value="year">Last Year</option>
-                    </select>
+        <?php if ($isVendor): ?>
+            <!-- Sales History Tab (Only for Vendors) -->
+            <div id="sales-history-content" class="tab-content">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-chart-line"></i> Sales History
+                    </h2>
+                    <div class="history-filters">
+                        <select id="sales-status-filter" class="filter-select">
+                            <option value="all">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="processed">Processed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <select id="sales-date-filter" class="filter-select">
+                            <option value="all">All Time</option>
+                            <option value="week">Last Week</option>
+                            <option value="month">Last Month</option>
+                            <option value="year">Last Year</option>
+                        </select>
+                        <button id="refresh-sales" class="primal-btn-secondary">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sales-history-container primal-card">
+                    <div class="sales-summary">
+                        <h3><i class="fas fa-analytics"></i> Sales Summary</h3>
+                        <div class="sales-stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-sales-count">0</span>
+                                <span class="stat-label">Total Sales</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="total-sales-revenue">$0.00</span>
+                                <span class="stat-label">Total Revenue</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="avg-order-value">$0.00</span>
+                                <span class="stat-label">Avg Order Value</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="recent-sales-count">0</span>
+                                <span class="stat-label">This Month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sales-history-list">
+                        <div class="sales-header">
+                            <h3><i class="fas fa-history"></i> Recent Sales</h3>
+                        </div>
+                        
+                        <div id="sales-loading" class="loading-spinner" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> Loading sales history...
+                        </div>
+                        
+                        <div id="sales-list">
+                            <!-- Dynamic sales content will be loaded here -->
+                        </div>
+                        
+                        <div id="no-sales" class="no-sales-state" style="display: none;">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>No Sales Yet</h3>
+                            <p>Your sales history will appear here once customers purchase your products.</p>
+                            <a href="/pages/shop" class="primal-btn-primary">
+                                <i class="fas fa-store"></i> View My Products in Shop
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="purchase-history-list primal-card">
-                <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
-                    <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No History Available</h3>
-                    <p><?php echo $isVendor ? 'Your sales history will appear here once you make your first sale.' : 'Your purchase history will appear here once you make your first purchase.'; ?></p>
-                </div>
-            </div>
-        </div>
+        <?php endif; ?>
 
         <!-- Settings Tab -->
         <div id="settings-content" class="tab-content">
@@ -391,131 +555,25 @@ require_once __DIR__ . '/../../layouts/header.php';
                 <?php endif; ?>
             </div>
         </div>
-
-        <?php if ($isAdmin): ?>
-            <!-- Admin Tools Tab -->
-            <div id="admin-tools-content" class="tab-content">
-                <div class="section-header">
-                    <h2><i class="fas fa-shield-alt"></i> Administrative Tools</h2>
-                </div>
-
-                <div class="settings-grid">
-                    <div class="settings-section primal-card">
-                        <h3><i class="fas fa-tachometer-alt"></i> Quick Actions</h3>
-                        <div style="display: flex; flex-direction: column; gap: 1rem;">
-                            <a href="/pages/admin/index.php" class="primal-btn-primary" style="text-decoration: none; text-align: center;">
-                                <i class="fas fa-desktop"></i> Full Admin Dashboard
-                            </a>
-                            <button class="primal-btn-secondary" style="width: 100%;">
-                                <i class="fas fa-users"></i> View All Users
-                            </button>
-                            <button class="primal-btn-secondary" style="width: 100%;">
-                                <i class="fas fa-box"></i> Manage Products
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="settings-section primal-card">
-                        <h3><i class="fas fa-chart-bar"></i> System Overview</h3>
-                        <div style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">
-                            <p><strong>Account Type:</strong> Administrator</p>
-                            <p><strong>Privileges:</strong> Full System Access</p>
-                            <p><strong>Last Login:</strong> <?php echo date('M d, Y g:i A'); ?></p>
-                            <p><strong>Trust Level:</strong> Maximum (<?php echo number_format($trustLevel, 1); ?>)</p>
-                        </div>
-                    </div>
-
-                    <div class="settings-section primal-card">
-                        <h3><i class="fas fa-cogs"></i> System Settings</h3>
-                        <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: 1.5rem;">
-                            Access advanced system configuration and maintenance tools.
-                        </p>
-                        <button class="primal-btn-secondary" style="width: 100%; margin-bottom: 0.75rem;">
-                            <i class="fas fa-database"></i> Database Management
-                        </button>
-                        <button class="primal-btn-secondary" style="width: 100%;">
-                            <i class="fas fa-file-alt"></i> System Logs
-                        </button>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
     </div>
 </main>
 
-<!-- Product Modal -->
-<div class="modal-overlay" id="product-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="modal-title"><i class="fas fa-plus-circle"></i> Add New Product</h3>
-            <button class="modal-close" aria-label="Close modal">&times;</button>
-        </div>
-        <div class="modal-body">
-            <form id="product-form">
-                <div class="form-group">
-                    <label for="product-name"><i class="fas fa-tag"></i> Product Name</label>
-                    <input type="text" id="product-name" name="name" placeholder="Enter product name" required>
-                </div>
+<!-- Basic Product Modal removed - using sellerProductModal.component.php instead -->
 
-                <div class="form-group">
-                    <label for="product-category"><i class="fas fa-list"></i> Category</label>
-                    <select id="product-category" name="category" required>
-                        <option value="">Select a category</option>
-                        <option value="weapons">⚔️ Weapons & Tools</option>
-                        <option value="armor">🛡️ Armor & Protection</option>
-                        <option value="potions">🧪 Potions & Elixirs</option>
-                        <option value="food">🍖 Food & Provisions</option>
-                        <option value="materials">🔨 Crafting Materials</option>
-                        <option value="artifacts">📿 Ritual Artifacts</option>
-                        <option value="pets">🐺 Companions & Pets</option>
-                        <option value="infrastructure">🏘️ Infrastructure</option>
-                        <option value="drugs">💊 Prehistoric Drugs</option>
-                        <option value="voodoo">🔮 Voodoo Items</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="product-price"><i class="fas fa-dollar-sign"></i> Price (USD)</label>
-                    <input type="number" id="product-price" name="price" step="0.01" min="0" placeholder="0.00" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="product-quantity"><i class="fas fa-boxes"></i> Quantity Available</label>
-                    <input type="number" id="product-quantity" name="quantity" min="1" placeholder="1" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="product-description"><i class="fas fa-align-left"></i> Description</label>
-                    <textarea id="product-description" name="description" rows="4" placeholder="Describe your primal offering..." required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="product-image"><i class="fas fa-image"></i> Product Image URL</label>
-                    <input type="url" id="product-image" name="image" placeholder="https://example.com/image.jpg">
-                    <small style="color: rgba(255, 255, 255, 0.6); font-size: 0.8rem; margin-top: 0.5rem; display: block;">
-                        Optional: Provide a direct link to your product image
-                    </small>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="primal-btn-primary">
-                        <i class="fas fa-save"></i> Save Product
-                    </button>
-                    <button type="button" class="primal-btn-secondary modal-close">
-                        <i class="fas fa-times"></i> Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<?php 
+<?php
 // Include seller product modal for vendors
 if ($isVendor) {
-    include __DIR__ . '/../../components/sellerProductModal.component.php';
+    include COMPONENTS_PATH . '/sellerProductModal.component.php';
 }
 ?>
 
+<!-- Pass PHP data to JavaScript -->
+<script>
+window.accountPageData = {
+    isVendor: <?php echo $isVendor ? 'true' : 'false'; ?>,
+    isAdmin: <?php echo $isAdmin ? 'true' : 'false'; ?>
+};
+</script>
+
 <script src="/assets/js/primal-account.js"></script>
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>
