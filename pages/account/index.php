@@ -32,8 +32,11 @@ if (isset($_GET['success'])) {
     ];
 }
 
+require_once BASE_PATH . '/bootstrap.php';
+
 // Get user data from session
 $user = $_SESSION['user'];
+$userID = $user['user_id'];
 $username = $user['username'];
 $alias = $user['alias'] ?? $username;
 $email = $user['email'] ?? '';
@@ -42,12 +45,12 @@ $isVendor = $user['is_vendor'] ?? false;
 $isAdmin = $user['is_admin'] ?? false;
 // Get user's listings from database (if they are a vendor)
 $userListings = [];
+$purchaseHistory = [];
 if ($isVendor) {
     try {
-        require_once BASE_PATH . '/bootstrap.php';
         require_once UTILS_PATH . '/DatabaseService.util.php';
         $db = DatabaseService::getInstance()->getConnection();
-        
+
         // Get listings for this vendor
         $stmt = $db->prepare("
             SELECT listing_id, title, description, category, price, quantity, 
@@ -56,18 +59,49 @@ if ($isVendor) {
             WHERE vendor_id = :vendor_id 
             ORDER BY publish_date DESC
         ");
-        $stmt->execute(['vendor_id' => $user['user_id']]);
+        $stmt->execute(['vendor_id' => $userID]);
         $userListings = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        error_log("Found " . count($userListings) . " listings for vendor: " . $user['user_id']);
-        
-        // Debug: Log the first few listings
+
+        error_log("Found " . count($userListings) . " listings for vendor: " . $userID);
         if (!empty($userListings)) {
             error_log("Sample listing data: " . json_encode(array_slice($userListings, 0, 2)));
         }
+
+        // Get sales history for this vendor
+        $stmt = $db->prepare("
+            SELECT ph.*, l.title, l.item_image
+            FROM purchase_history ph
+            JOIN listings l ON ph.listing_id = l.listing_id
+            WHERE l.vendor_id = :vendor_id
+            ORDER BY ph.purchase_date DESC
+        ");
+        $stmt->execute(['vendor_id' => $userID]);
+        $purchaseHistory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     } catch (Exception $e) {
-        error_log("Database error getting user listings: " . $e->getMessage());
+        error_log("Database error (vendor data): " . $e->getMessage());
         $userListings = [];
+        $purchaseHistory = [];
+    }
+} else {
+    // Get purchase history for a regular user
+    try {
+        require_once UTILS_PATH . '/DatabaseService.util.php';
+        $db = DatabaseService::getInstance()->getConnection();
+
+        $stmt = $db->prepare("
+            SELECT ph.*, l.title, l.item_image
+            FROM purchase_history ph
+            JOIN listings l ON ph.listing_id = l.listing_id
+            WHERE ph.user_id = :user_id
+            ORDER BY ph.purchase_date DESC
+        ");
+        $stmt->execute(['user_id' => $userID]);
+        $purchaseHistory = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch (Exception $e) {
+        error_log("Database error (user purchase history): " . $e->getMessage());
+        $purchaseHistory = [];
     }
 }
 
@@ -449,11 +483,44 @@ if ($isVendor && isset($_GET['debug'])) {
                 </div>
             </div>
             <div class="purchase-history-list primal-card">
-                <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
-                    <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                    <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No History Available</h3>
-                    <p><?php echo $isVendor ? 'Your sales history will appear here once you make your first sale.' : 'Your purchase history will appear here once you make your first purchase.'; ?></p>
-                </div>
+                <?php if (!empty($purchaseHistory)): ?>
+                    <div class="cart-table">
+                        <div class="cart-table-header">
+                            <div class="cart-th-product">Product</div>
+                            <div>Price</div>
+                            <div>Quantity</div>
+                            <div>Total</div>
+                        </div>
+
+                        <div id="history-items">
+                            <?php foreach ($purchaseHistory as $item): ?>
+                                <div class="cart-row">
+                                    <div class="cart-row-product">
+                                        <img class="cart-row-img" src="<?= htmlspecialchars($item['item_image']) ?>" alt="<?= htmlspecialchars($item['title']) ?>">
+                                        <div class="cart-row-info">
+                                            <div class="cart-row-title"><?= htmlspecialchars($item['title']) ?></div>
+                                            <div class="cart-row-color">
+                                                <span>Purchased on:</span>
+                                                <?= date('M d, Y', strtotime($item['purchase_date'])) ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="cart-row-total">₱<?= number_format($item['price_each'], 2) ?></div>
+                                    <div class="cart-row-qty">
+                                        <span class="cart-qty"><?= $item['quantity'] ?></span>
+                                    </div>
+                                    <div class="cart-row-total">₱<?= number_format($item['total_price'], 2) ?></div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div style="text-align: center; padding: 3rem; color: rgba(255, 255, 255, 0.6);">
+                        <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h3 style="color: var(--primal-beige); margin-bottom: 1rem;">No History Available</h3>
+                        <p><?= $isVendor ? 'Your sales history will appear here once you make your first sale.' : 'Your purchase history will appear here once you make your first purchase.'; ?></p>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
