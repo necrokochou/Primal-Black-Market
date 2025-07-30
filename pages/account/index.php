@@ -496,20 +496,20 @@ if ($isVendor && isset($_GET['debug'])) {
                             <?php foreach ($purchaseHistory as $item): ?>
                                 <div class="cart-row">
                                     <div class="cart-row-product">
-                                        <img class="cart-row-img" src="<?= htmlspecialchars($item['Item_Image']) ?>" alt="<?= htmlspecialchars($item['Title']) ?>">
+                                        <img class="cart-row-img" src="<?= htmlspecialchars($item['item_image']) ?>" alt="<?= htmlspecialchars($item['title']) ?>">
                                         <div class="cart-row-info">
-                                            <div class="cart-row-title"><?= htmlspecialchars($item['Title']) ?></div>
+                                            <div class="cart-row-title"><?= htmlspecialchars($item['title']) ?></div>
                                             <div class="cart-row-color">
                                                 <span>Purchased on:</span>
-                                                <?= date('M d, Y', strtotime($item['Purchase_Date'])) ?>
+                                                <?= date('M d, Y', strtotime($item['purchase_date'])) ?>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="cart-row-total">₱<?= number_format($item['Price_Each'], 2) ?></div>
+                                    <div class="cart-row-total">₱<?= number_format($item['price_each'], 2) ?></div>
                                     <div class="cart-row-qty">
-                                        <span class="cart-qty"><?= $item['Quantity'] ?></span>
+                                        <span class="cart-qty"><?= $item['quantity'] ?></span>
                                     </div>
-                                    <div class="cart-row-total">₱<?= number_format($item['Total_Price'], 2) ?></div>
+                                    <div class="cart-row-total">₱<?= number_format($item['total_price'], 2) ?></div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
