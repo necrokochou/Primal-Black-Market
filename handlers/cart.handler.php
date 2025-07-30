@@ -1,7 +1,8 @@
 <?php
+require_once BASE_PATH . '/bootstrap.php';
 error_reporting(E_ALL);
 ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/../logs/php-error.log');
+ini_set('error_log', BASE_PATH . '/logs/php-error.log');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -9,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $user = $_SESSION['user'] ?? null;
 
-require_once __DIR__ . '/../utils/cart.util.php';
+require_once UTILS_PATH . '/cart.util.php';
 
 header('Content-Type: application/json');
 

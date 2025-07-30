@@ -3,7 +3,7 @@
  * Database Health Check for Product Creation Issues
  */
 
-require_once __DIR__ . '/../bootstrap.php';
+require_once BASE_PATH . '/bootstrap.php';
 require_once UTILS_PATH . '/DatabaseService.util.php';
 
 echo "🏥 PRIMAL BLACK MARKET - DATABASE HEALTH CHECK\n";

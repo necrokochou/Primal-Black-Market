@@ -9,7 +9,8 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-require_once __DIR__ . '/../../layouts/header.php';
+require_once BASE_PATH . '/bootstrap.php';
+require_once LAYOUTS_PATH . '/header.php';
 ?>
 
 <!-- Cart Page Specific Styles -->
@@ -73,4 +74,4 @@ require_once __DIR__ . '/../../layouts/header.php';
 <!-- Cart Page JavaScript -->
 <script src="/assets/js/primal-cart.js"></script>
 
-<?php require_once __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require_once LAYOUTS_PATH . '/footer.php'; ?>

@@ -1,4 +1,6 @@
 <?php
+require_once BASE_PATH . '/bootstrap.php';
+
 // Load categories from database
 try {
     require_once BASE_PATH . '/utils/DatabaseService.util.php';
@@ -7,7 +9,7 @@ try {
 } catch (Exception $e) {
     error_log("Error loading categories: " . $e->getMessage());
     // Fallback to static data if database fails
-    $categories = require_once __DIR__ . '/../staticData/dummies/categories.staticData.php';
+    $categories = require_once DUMMIES_PATH . '/categories.staticData.php';
 }
 ?>
 
