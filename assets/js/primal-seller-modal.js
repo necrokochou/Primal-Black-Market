@@ -837,32 +837,38 @@ function setupEventListeners() {
             openProductModal();
         });
     });
-    
+
     // Edit product button functionality
     document.querySelectorAll('.edit-product, .edit-seller-product').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function () {
             const productId = this.dataset.productId;
             console.log('Edit product clicked:', productId);
-            
-            // In a real implementation, you would fetch the product data from your backend
-            openProductModal({
-                id: productId,
-                title: 'Sample Primal Product',
-                category: 'weapons',
-                price: '49.99',
-                description: 'A magnificent weapon forged in the fires of the ancient world...',
-                quantity: 1,
-                condition: 'excellent',
-                rarity: 'rare',
-                tags: 'handcrafted, sharp, warrior',
-                featured: false,
-                negotiable: true,
-                bulk_discount: false,
-                fast_delivery: true
-            });
+
+            // 🔗 Fetch real product data from backend
+            fetch(`/handlers/products.handler.php?action=read&id=${productId}`, {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 🎯 Pass actual product data to modal
+                        openProductModal(data.product);
+                    } else {
+                        alert('Product not found or could not be loaded.');
+                        console.error(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    alert('An error occurred while fetching product info.');
+                });
         });
     });
-    
+
     // Modal click outside to close
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', function(e) {
